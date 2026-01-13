@@ -1,4 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:senticket_front/UI/pages/activateAccount.dart';
+import 'package:senticket_front/UI/pages/adminInterface.dart';
+import 'package:senticket_front/UI/pages/agentInterface.dart';
+import 'package:senticket_front/UI/pages/buyTicket.dart';
+import 'package:senticket_front/UI/pages/cancelRecharge.dart';
+import 'package:senticket_front/UI/pages/cancelTransfertCredit.dart';
+import 'package:senticket_front/UI/pages/cancelTransfertTicket.dart';
+import 'package:senticket_front/UI/pages/consultAccount.dart';
+import 'package:senticket_front/UI/pages/creditAccount.dart';
+import 'package:senticket_front/UI/pages/deactivateAccount.dart';
+import 'package:senticket_front/UI/pages/debitAccount.dart';
+import 'package:senticket_front/UI/pages/coverPage.dart';
+import 'package:senticket_front/UI/pages/rootView.dart';
+import 'package:senticket_front/UI/pages/login.dart';
+import 'package:senticket_front/UI/pages/logout.dart';
+import 'package:senticket_front/UI/pages/porterInterface.dart';
+import 'package:senticket_front/UI/pages/transfert.ticket.dart';
+import 'package:senticket_front/UI/widgets/admin/agent.mgmt.dart/manage.agent.dart';
+import 'package:senticket_front/UI/widgets/admin/porter.mgmt.dart/manage.porter.dart';
+import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/manage.student.dart';
+import 'package:senticket_front/UI/pages/scanqr.dart';
+import 'package:senticket_front/UI/pages/settings.dart';
+import 'package:senticket_front/UI/pages/signup.dart';
+import 'package:senticket_front/UI/pages/studentInterface.dart';
+import 'package:senticket_front/UI/pages/transfertCredit.dart';
+import 'package:senticket_front/UI/pages/updateProfile.dart';
+import 'package:senticket_front/bloc/historic.bloc.dart';
+import 'package:senticket_front/bloc/services.bloc.dart';
+import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/provider/account_provider.dart';
+import 'package:senticket_front/provider/consulter_menu_provider.dart';
+import 'package:senticket_front/provider/credit_provider.dart';
+import 'package:senticket_front/provider/debit_provider.dart';
+import 'package:senticket_front/provider/menu_provider.dart';
+import 'package:senticket_front/provider/role_privider.dart';
+import 'package:senticket_front/provider/ticket_provider.dart';
+import 'package:senticket_front/provider/user_provider.dart';
+import 'package:senticket_front/services/account_service.dart';
+import 'package:senticket_front/services/consulter_menu_service.dart';
+import 'package:senticket_front/services/credit_service.dart';
+import 'package:senticket_front/services/debit_service.dart';
+import 'package:senticket_front/services/menu_service.dart';
+import 'package:senticket_front/services/role_service.dart';
+import 'package:senticket_front/services/ticket_service.dart';
+import 'package:senticket_front/services/user_service.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +54,101 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(providers: [
+      BlocProvider(create: (context) => ServicesBloc()),
+      BlocProvider(create: (context) => HistoricBloc()),
+      /* ChangeNotifierProvider<AuthProvider>(
+      create: (context) => AuthProvider(AuthService()),
+    ), */
+      ChangeNotifierProvider<RoleProvider>(
+        create: (context) => RoleProvider(RoleApiService()),
+      ),
+      ChangeNotifierProvider<UserProvider>(
+        create: (context) => UserProvider(UserApiService()),
+      ),
+      ChangeNotifierProvider<TicketProvider>(
+        create: (context) => TicketProvider(TicketApiService()),
+      ),
+      /*  ChangeNotifierProvider<AccountProvider>(
+        create: (context) => AccountProvider(AccountApiService()),
+      ), */
+      ChangeNotifierProvider<MenuProvider>(
+        create: (context) => MenuProvider(MenuApiService()),
+      ),
+      ChangeNotifierProvider<ConsulterMenuProvider>(
+        create: (context) => ConsulterMenuProvider(ConsulterMenuApiService()),
+      ),
+      ChangeNotifierProvider<DebitProvider>(
+        create: (context) => DebitProvider(DebitApiService()),
+      ),
+      ChangeNotifierProvider<CreditProvider>(
+        create: (context) => CreditProvider(CreditApiService()),
+      ),
+    ], child: const RootView());
+  }
+}
+
+class RootView extends StatelessWidget {
+  const RootView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: kPrimaryColor,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routes: {
+        "/cover": (context) => const CoverPage(),
+        "/home": (context) => const RootV(),
+        "/login": (context) => const LoginPage(),
+        "/sign-up": (context) => const SignUpPage(),
+        "/admin": (context) => const AdminInterface(),
+        "/manage-students": (context) => const ManageStudent(),
+        "/manage-agents": (context) => const ManageAgent(),
+        "/manage-porters": (context) => const ManagePorter(),
+        "/scanQR": (context) => const ScanQR(),
+        //  "/activate-account": (context) => const ActivateAccount(),
+        //  "/deactivate-account": (context) => const DeactivateAccount(),
+        "/student": (context) => const StudentInterface(),
+        "/ticket": (context) => const BuyTicket(),
+        "/transfert-ticket": (context) => const TransfertTicket(),
+        "/transfert-credit": (context) => const TransfertCredit(),
+        "/cancel-transfert-ticket": (context) => const CancelTrsfTicket(),
+        "/cancel-transfert-credit": (context) => const CancelTrsfCredit(),
+        "/consult-account": (context) => const ConsultAccount(),
+        "/update-profile": (context) => const UpdateProfile(),
+        "/porter": (context) => const PorterInterface(),
+        "/debit-account": (context) => const DebitAccount(),
+        "/agent": (context) => const AgentInterface(),
+        "/credit-account": (context) => const CreditAccount(),
+        "/cancel-recharge": (context) => const CancelRecharge(),
+        "/settings": (context) => const SettingsPage(),
+        "/log-out": (context) => const LogOut(),
+      },
+      initialRoute: "/cover",
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+/* 
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+        // Fournit le Service combiné (Service + Repository)
+        Provider(create: (context) => UserService()),
+        
+        // Fournit le Provider avec dépendance vers le Service
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(context.read<UserService>()),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      ],
+      child: MaterialApp(
     );
   }
 }
+ */
