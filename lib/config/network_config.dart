@@ -8,32 +8,33 @@ import 'package:flutter/foundation.dart';  // Pour kIsWeb
  * Elle retourne l'URL correcte selon la plateforme d'exécution.
  */
 class NetworkConfig {
+  static const String _pcLocalIp = '192.168.1.4';
   /// ============ SECTION 1: URL DE BASE PAR PLATEFORME ============
   /// Retourne l'URL de base de l'API selon la plateforme d'exécution
   static String get baseUrl {
     // Cas 1: Application web (depuis un navigateur)
     if (kIsWeb) {
-      print('🌐 Plateforme: Web - Utilisation de localhost');
+      print('🌐 Plateforme: Web');
       return 'http://localhost:8080';  // Web accède directement au localhost
     }
 
     // Cas 2: Application Android (émulateur ou appareil réel)
     else if (Platform.isAndroid) {
-      print('🤖 Plateforme: Android - Utilisation de 10.0.2.2');
-      // ADRESSE CRITIQUE: L'émulateur Android utilise 10.0.2.2 pour l'hôte
-      return 'http://192.168.1.4:8080';
+      print('Plateforme: Android');
+      // ADRESSE CRITIQUE: L'émulateur Android utilise 192.168.1.4 pour l'hôte
+      return 'http://$_pcLocalIp:8080';
     }
 
     // Cas 3: Application iOS (simulateur ou appareil réel)
     else if (Platform.isIOS) {
-      print('🍎 Plateforme: iOS - Utilisation de localhost');
+      print('Plateforme: iOS');
       // Le simulateur iOS partage le réseau avec l'hôte
       return 'http://localhost:8080';
     }
 
     // Cas 4: Desktop (Windows, macOS, Linux) ou autre
     else {
-      print('💻 Plateforme: Desktop/autre - Utilisation de localhost');
+      print('Plateforme: Desktop/autre - Utilisation de localhost');
       return 'http://localhost:8080';
     }
   }
@@ -87,3 +88,4 @@ class NetworkConfig {
     ''');
   }
 }
+

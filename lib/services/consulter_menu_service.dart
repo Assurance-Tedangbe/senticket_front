@@ -11,9 +11,7 @@ import 'package:senticket_front/model/menu_model.dart';
   - Transformation des données 
 */
 class ConsulterMenuApiService {
-  /* Use the IP address of the Android emulator (10.0.2.2)
-  or your machine's IP address for other emulators/devices. */
-  static const String baseUrl = 'http://10.0.2.2:8080/api/consulter_menus';
+  static const String baseUrl = 'http://192.168.1.4:8080/api/consulter_menus';
 
   // Configure HTTP headers for all requests
   static final Map<String, String> headers = {

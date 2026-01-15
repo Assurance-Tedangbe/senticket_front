@@ -13,11 +13,7 @@ import 'package:senticket_front/model/role_model.dart';
     - Transformation des données
  */
 class RoleApiService {
-  //static const String baseUrl = 'http://10.0.2.2:8080/api/roles';
-  // static const String baseUrl = 'http://localhost:8080/api/roles';
-  // Utilisez NetworkConfig.baseUrl
   final baseUrl = '${NetworkConfig.baseUrl}/api/roles';
-  // String baseUrl = "${GlobalData.host}/api/roles";
 
   /// Headers HTTP pour indiquer qu'on travaille avec du JSON
   static final Map<String, String> headers = {
@@ -36,8 +32,8 @@ class RoleApiService {
   // Durée de validité du cache (10 minutes pour les rôles qui changent peu)
   static const Duration cacheDuration = Duration(minutes: 10);
 
-  Future<void> testConnection() async {
-    final url = Uri.parse('http://10.0.2.2:8080/api/roles');
+/*  Future<void> testConnection() async {
+    final url = Uri.parse('http://192.168.1.4:8080/api/roles');
 
     try {
       // Test avec HttpClient
@@ -49,7 +45,7 @@ class RoleApiService {
       print('✅ Connexion réussie - Status: ${response.statusCode}');
 
       // Test avec ping
-      final result = await Process.run('ping', ['-c', '1', '10.0.2.2']);
+      final result = await Process.run('ping', ['-c', '1', '192.168.1.4']);
       print('Ping result: ${result.stdout}');
 
       httpClient.close();
@@ -58,7 +54,7 @@ class RoleApiService {
 
       // Vérifier l'accessibilité du port
       try {
-        final socket = await Socket.connect('10.0.2.2', 8080,
+        final socket = await Socket.connect('192.168.1.4', 8080,
             timeout: Duration(seconds: 5));
         print('✅ Port 8080 accessible');
         socket.destroy();
@@ -66,7 +62,7 @@ class RoleApiService {
         print('❌ Port 8082 inaccessible: $e');
       }
     }
-  }
+  }*/
 
   // === MÉTHODES PRINCIPALES - CORRESPONDANT AUX ENDPOINTS DU CONTROLLER ===
 

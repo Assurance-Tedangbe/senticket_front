@@ -1,3 +1,4 @@
+/*
 // Fichier: lib/services/base_service.dart
 
 import 'dart:async';
@@ -6,6 +7,7 @@ import 'dart:io';       // Pour SocketException
 import 'package:http/http.dart' as http;
 import '../config/network_config.dart';  // Package HTTP
 
+*/
 /*
  * SERVICE DE BASE POUR LES APPELS HTTP
  * Cette classe fournit des méthodes génériques pour:
@@ -13,7 +15,8 @@ import '../config/network_config.dart';  // Package HTTP
  * - POST: Envoyer des données
  * - Gérer les erreurs réseau
  * - Gérer les réponses HTTP
- */
+ *//*
+
 class BaseService {
   final String endpoint;  // Endpoint spécifique (ex: 'api/users')
   final Map<String, String>? customHeaders;  // Headers personnalisés
@@ -144,4 +147,4 @@ class BaseService {
         throw Exception('Erreur ${response.statusCode}: ${response.body}');
     }
   }
-}
+}*/

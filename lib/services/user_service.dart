@@ -284,8 +284,6 @@ class UserApiService {
 
       // Si l'utilisateur n'est pas dans le cache, on fait un appel API
       final response = await http.get(
-        // Construit l'URL pour l'endpoint spécifique de l'utilisateur
-        // Exemple: http://10.0.2.2:8080/api/users/123
         Uri.parse('$baseUrl/$userId'),
         headers:
             headers, // Utilise les headers configurés (Content-Type, Accept, etc.)
