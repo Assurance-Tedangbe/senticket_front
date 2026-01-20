@@ -1,7 +1,4 @@
-/* import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/buyTicket/ticketABloc.dart';
-import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
-import 'package:senticket_front/constants.dart';
+/*Ancienne version sans dynamisation
 
 class TicketASection extends StatefulWidget {
   const TicketASection({super.key});
@@ -55,28 +52,6 @@ class _TicketASectionState extends State<TicketASection> {
             ), */
             TicketABloc(ticketLibelle: "1"),
             TicketABloc(ticketLibelle: "2"),
-            TicketABloc(ticketLibelle: "3"),
-            TicketABloc(ticketLibelle: "4"),
-            TicketABloc(ticketLibelle: "5"),
-            TicketABloc(ticketLibelle: "6"),
-            TicketABloc(ticketLibelle: "7"),
-            TicketABloc(ticketLibelle: "8"),
-            TicketABloc(ticketLibelle: "9"),
-            TicketABloc(ticketLibelle: "10"),
-            TicketABloc(ticketLibelle: "11"),
-            TicketABloc(ticketLibelle: "12"),
-            TicketABloc(ticketLibelle: "13"),
-            TicketABloc(ticketLibelle: "14"),
-            TicketABloc(ticketLibelle: "15"),
-            TicketABloc(ticketLibelle: "16"),
-            TicketABloc(ticketLibelle: "17"),
-            TicketABloc(ticketLibelle: "18"),
-            TicketABloc(ticketLibelle: "19"),
-            TicketABloc(ticketLibelle: "20"),
-            TicketABloc(ticketLibelle: "21"),
-            TicketABloc(ticketLibelle: "22"),
-            TicketABloc(ticketLibelle: "23"),
-            TicketABloc(ticketLibelle: "24"),
             // })
           ]),
         ),
@@ -130,7 +105,7 @@ class _TicketASectionState extends State<TicketASection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const BlocTitle(text: "Tickets A"),
+                const BlocTitle(text: "Tickets A(petit-déj.)"),
                 if (ticketsA.isNotEmpty)
                   SelectAllButton(
                     onPressed: () => ticketProvider.selectAllTicketsA(),
@@ -152,7 +127,7 @@ class _TicketASectionState extends State<TicketASection> {
                     color: boxshadowColor,
                     blurRadius: 6,
                     offset: Offset(0, 2),
-                  )
+                  ),
                 ],
                 border: Border.all(color: kPrimaryColor, width: 1),
               ),
@@ -163,35 +138,35 @@ class _TicketASectionState extends State<TicketASection> {
                         child: CircularProgressIndicator(color: kPrimaryColor),
                       )
                     : ticketsA.isEmpty
-                        ? const Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.confirmation_number,
-                                  size: 40,
-                                  color: Colors.grey,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Aucun ticket A disponible',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.confirmation_number,
+                              size: 40,
+                              color: greyBorderColor,
                             ),
-                          )
-                        : SingleChildScrollView(
-                            child: Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: ticketsA
-                                  .map((ticket) => TicketABloc(ticket: ticket))
-                                  .toList(),
+                            SizedBox(height: 8),
+                            Text(
+                              'Aucun ticket A disponible',
+                              style: TextStyle(
+                                color: greyBorderColor,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: ticketsA
+                              .map((ticket) => TicketABloc(ticket: ticket))
+                              .toList(),
+                        ),
+                      ),
               ),
             ),
             if (ticketsA.isNotEmpty)
@@ -204,7 +179,8 @@ class _TicketASectionState extends State<TicketASection> {
                       '$selectedCount sur $totalCount sélectionné(s)',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: kPrimaryColor,
+                        color: kThirdColor,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -218,34 +194,6 @@ class _TicketASectionState extends State<TicketASection> {
 } 
 /* 
 // 1ere proposition avec dynamisation
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/buyTicket/ticketABloc.dart';
-import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
-import 'package:senticket_front/UI/widgets/buyTicket/select_all_button.dart';
-import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/provider/ticket_provider.dart';
-
-class TicketASection extends StatefulWidget {
-  const TicketASection({super.key});
-
-  @override
-  State<TicketASection> createState() => _TicketASectionState();
-}
-
-class _TicketASectionState extends State<TicketASection> {
-  @override
-  void initState() {
-    super.initState();
-    // Charger les tickets au démarrage
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ticketProvider = Provider.of<TicketProvider>(
-        context,
-        listen: false,
-      );
-      ticketProvider.loadAllTickets();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

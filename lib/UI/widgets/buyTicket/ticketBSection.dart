@@ -55,28 +55,6 @@ class _TicketBSectionState extends State<TicketBSection> {
             ), */
             TicketBBloc(ticketBLibelle: "1"),
             TicketBBloc(ticketBLibelle: "2"),
-            TicketBBloc(ticketBLibelle: "3"),
-            TicketBBloc(ticketBLibelle: "4"),
-            TicketBBloc(ticketBLibelle: "5"),
-            TicketBBloc(ticketBLibelle: "6"),
-            TicketBBloc(ticketBLibelle: "7"),
-            TicketBBloc(ticketBLibelle: "8"),
-            TicketBBloc(ticketBLibelle: "9"),
-            TicketBBloc(ticketBLibelle: "10"),
-            TicketBBloc(ticketBLibelle: "11"),
-            TicketBBloc(ticketBLibelle: "12"),
-            TicketBBloc(ticketBLibelle: "13"),
-            TicketBBloc(ticketBLibelle: "14"),
-            TicketBBloc(ticketBLibelle: "15"),
-            TicketBBloc(ticketBLibelle: "16"),
-            TicketBBloc(ticketBLibelle: "17"),
-            TicketBBloc(ticketBLibelle: "18"),
-            TicketBBloc(ticketBLibelle: "19"),
-            TicketBBloc(ticketBLibelle: "20"),
-            TicketBBloc(ticketBLibelle: "21"),
-            TicketBBloc(ticketBLibelle: "22"),
-            TicketBBloc(ticketBLibelle: "23"),
-            TicketBBloc(ticketBLibelle: "24"),
             // })
           ]),
         ),
@@ -117,7 +95,7 @@ class _TicketBSectionState extends State<TicketBSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const BlocTitle(text: "Tickets B"),
+                const BlocTitle(text: "Tickets B(déj./dîner)"),
                 if (ticketsB.isNotEmpty)
                   SelectAllButton(
                     onPressed: () => ticketProvider.selectAllTicketsB(),
@@ -139,46 +117,46 @@ class _TicketBSectionState extends State<TicketBSection> {
                     color: boxshadowColor,
                     blurRadius: 6,
                     offset: Offset(0, 2),
-                  )
+                  ),
                 ],
-                border: Border.all(color: Colors.cyan, width: 1),
+                border: Border.all(color: cyanColor, width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ticketProvider.isLoading && ticketsB.isEmpty
                     ? const Center(
-                        child: CircularProgressIndicator(color: Colors.cyan),
+                        child: CircularProgressIndicator(color: cyanColor),
                       )
                     : ticketsB.isEmpty
-                        ? const Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.confirmation_number,
-                                  size: 40,
-                                  color: Colors.grey,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Aucun ticket B disponible',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.confirmation_number,
+                              size: 40,
+                              color: greyBorderColor,
                             ),
-                          )
-                        : SingleChildScrollView(
-                            child: Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: ticketsB
-                                  .map((ticket) => TicketBBloc(ticket: ticket))
-                                  .toList(),
+                            SizedBox(height: 8),
+                            Text(
+                              'Aucun ticket B disponible',
+                              style: TextStyle(
+                                color: greyBorderColor,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: ticketsB
+                              .map((ticket) => TicketBBloc(ticket: ticket))
+                              .toList(),
+                        ),
+                      ),
               ),
             ),
             if (ticketsB.isNotEmpty)
@@ -191,7 +169,8 @@ class _TicketBSectionState extends State<TicketBSection> {
                       '$selectedCount sur $totalCount sélectionné(s)',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.cyan,
+                        color: kThirdColor,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -206,13 +185,6 @@ class _TicketBSectionState extends State<TicketBSection> {
 
 /* 
 // 1ere proposition sans dynamisation
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/buyTicket/ticketBBloc.dart';
-import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
-import 'package:senticket_front/UI/widgets/buyTicket/select_all_button.dart';
-import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/provider/ticket_provider.dart';
 
 class TicketBSection extends StatefulWidget {
   const TicketBSection({super.key});

@@ -13,7 +13,7 @@ class Ticket {
   final DateTime ticketCreationDate;
   final DateTime? ticketPurchaseDate;
   final String ticketDescription;
-  final UserDTO userDTO;
+  final PurchaseUserDTO purchaseUserDTO;
   final bool isSelected;
 
   // Constructeur principal
@@ -27,7 +27,7 @@ class Ticket {
     required this.ticketCreationDate,
     this.ticketPurchaseDate,
     required this.ticketDescription,
-    required this.userDTO,
+    required this.purchaseUserDTO,
     this.isSelected = false,
   });
 
@@ -39,14 +39,15 @@ class Ticket {
       paymentCode: json['paymentCode'] ?? '',
       booked: json['booked'] ?? false,
       ticketType: TicketTypeExtension.fromBackend(json['ticketType']), // ← ICI
-      ticketStatus:
-          TicketStatusExtension.fromApi(json['ticketStatus']), // ← ICI
+      ticketStatus: TicketStatusExtension.fromApi(
+        json['ticketStatus'],
+      ), // ← ICI
       ticketCreationDate: DateTime.parse(json['ticketCreationDate']),
       ticketPurchaseDate: json['ticketPurchaseDate'] != null
           ? DateTime.parse(json['ticketPurchaseDate'])
           : null,
       ticketDescription: json['ticketDescription'] ?? '',
-      userDTO: UserDTO.fromJson(json['userDTO']),
+      purchaseUserDTO: PurchaseUserDTO.fromJson(json['purchaseUserDTO']),
       isSelected: false, // Par défaut non sélectionné
     );
   }
@@ -64,7 +65,7 @@ class Ticket {
       'ticketCreationDate': ticketCreationDate.toIso8601String().split('T')[0],
       'ticketPurchaseDate': ticketPurchaseDate?.toIso8601String().split('T')[0],
       'ticketDescription': ticketDescription,
-      'userDTO': userDTO.toJson(),
+      'purchaseUserDTO': purchaseUserDTO.toJson(),
       'isSelected': isSelected,
     };
   }
@@ -81,7 +82,7 @@ class Ticket {
     DateTime? ticketCreationDate,
     DateTime? ticketPurchaseDate,
     String? ticketDescription,
-    UserDTO? userDTO,
+    PurchaseUserDTO? purchaseUserDTO,
     bool? isSelected,
   }) {
     return Ticket(
@@ -94,54 +95,27 @@ class Ticket {
       ticketCreationDate: ticketCreationDate ?? this.ticketCreationDate,
       ticketPurchaseDate: ticketPurchaseDate ?? this.ticketPurchaseDate,
       ticketDescription: ticketDescription ?? this.ticketDescription,
-      userDTO: userDTO ?? this.userDTO,
+      purchaseUserDTO: purchaseUserDTO ?? this.purchaseUserDTO,
       isSelected: isSelected ?? this.isSelected,
     );
   }
 }
 
-class UserDTO {
-  int? userId;
-  final String firstName;
-  final String lastName;
+class PurchaseUserDTO {
+  final int userId; // Ne doit pas être nullable - le backend le requiert
+  final String username; // Ne doit pas être nullable - le backend le requiert
 
-  UserDTO({this.userId, required this.firstName, required this.lastName});
+  PurchaseUserDTO({required this.userId, required this.username});
 
-  factory UserDTO.fromJson(Map<String, dynamic> json) {
-    return UserDTO(
-      userId: json['userId'],
-      firstName: json['firstName'] ?? '',
-      lastName: json['lastName'] ?? '',
+  factory PurchaseUserDTO.fromJson(Map<String, dynamic> json) {
+    return PurchaseUserDTO(
+      userId: json['userId'] as int,
+      username: json['username'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'userId': userId,
-      'firstName': firstName,
-      'lastName': lastName,
-    };
-  }
-}
-
-class AccountDTO {
-  final int? accountId;
-  final String accountNumber;
-
-  AccountDTO({this.accountId, required this.accountNumber});
-
-  factory AccountDTO.fromJson(Map<String, dynamic> json) {
-    return AccountDTO(
-      accountId: json['accountId'],
-      accountNumber: json['accountNumber'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'accountId': accountId,
-      'accountNumber': accountNumber,
-    };
+    return {'userId': userId, 'username': username};
   }
 }
 
@@ -152,8 +126,11 @@ class CreationTicketsRequestDTO {
   final int countA;
   final int countB;
 
-  CreationTicketsRequestDTO(this.tickets,
-      {required this.countA, required this.countB});
+  CreationTicketsRequestDTO(
+    this.tickets, {
+    required this.countA,
+    required this.countB,
+  });
 
   Map<String, dynamic> toJson() {
     return {
@@ -165,17 +142,26 @@ class CreationTicketsRequestDTO {
 }
 
 class PurchaseTicketsRequestDTO {
-  final UserDTO userDTO;
-  final List<int> ticketIds;
+  final PurchaseUserDTO purchaseUserDTO;
+  final List<int> selectedTicketIds;
 
-  PurchaseTicketsRequestDTO({required this.userDTO, required this.ticketIds});
+  PurchaseTicketsRequestDTO({
+    required this.purchaseUserDTO,
+    required this.selectedTicketIds,
+  });
 
+  // IMPORTANT: Le backend attend "selectedTicketIds" pas "ticketIds"
   Map<String, dynamic> toJson() {
     return {
-      'userDTO': userDTO.toJson(),
-      'ticketIds': ticketIds,
+      'purchaseUserDTO': purchaseUserDTO.toJson(),
+      'selectedTicketIds':
+          selectedTicketIds, // Nom de propriété doit correspondre au backend
     };
   }
+
+  /* String toJsonString() {
+    return json.encode(toJson());
+  } */
 }
 
 class TransferTicketsRequestDTO {
@@ -223,16 +209,35 @@ class DebitAccountRequestDTO {
   final int studentId;
   final List<int> ticketIds;
 
-  DebitAccountRequestDTO(
-      {required this.portierId,
-      required this.studentId,
-      required this.ticketIds});
+  DebitAccountRequestDTO({
+    required this.portierId,
+    required this.studentId,
+    required this.ticketIds,
+  });
 
   Map<String, dynamic> toJson() {
     return {
       'portierId': portierId,
       'studentId': studentId,
-      'ticketIds': ticketIds
+      'ticketIds': ticketIds,
     };
   }
 }
+
+/* class AccountDTO {
+  final int? accountId;
+  final String accountNumber;
+
+  AccountDTO({this.accountId, required this.accountNumber});
+
+  factory AccountDTO.fromJson(Map<String, dynamic> json) {
+    return AccountDTO(
+      accountId: json['accountId'],
+      accountNumber: json['accountNumber'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'accountId': accountId, 'accountNumber': accountNumber};
+  }
+} */

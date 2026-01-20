@@ -53,7 +53,7 @@ class UserProvider with ChangeNotifier {
   String _consultUsername = '';
   bool _isConsultingUser = false;
 
-// variables d'état pour le formulaire de modification
+  // variables d'état pour le formulaire de modification
   String _updateFirstName = '';
   String _updateLastName = '';
   String _updateUsername = '';
@@ -110,7 +110,7 @@ class UserProvider with ChangeNotifier {
   // String get updateConfirmPassword => _updateConfirmPassword;
   Role? get updateRole => _updateRole;
 
-// Getter pour l'utilisateur consulté
+  // Getter pour l'utilisateur consulté
   User? get consultedUser => _currentUser;
 
   // setters for signup form
@@ -186,7 +186,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-// Setters pour le formulaire de modification
+  // Setters pour le formulaire de modification
   void setUpdateFirstName(String value) {
     _updateFirstName = value;
     notifyListeners();
@@ -232,8 +232,8 @@ class UserProvider with ChangeNotifier {
 
     try {
       _users = await _service.getAllUsers(
-          forceRefresh:
-              forceRefresh); //Ask the service to give me all the users
+        forceRefresh: forceRefresh,
+      ); //Ask the service to give me all the users
 
       _error = ''; //Confirm that there are no errors
       print(" successfully laoding : ${_users.length} users");
@@ -257,8 +257,9 @@ class UserProvider with ChangeNotifier {
       // Validate the data before creation
       _service.validateUserData(user);
 
-      final newUser = await _service
-          .createUser(user); // ask the service to create this user in the API
+      final newUser = await _service.createUser(
+        user,
+      ); // ask the service to create this user in the API
 
       _users.add(newUser); // If it works, add the new user to my local list
 
@@ -274,199 +275,6 @@ class UserProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  // Updates an existing user
-  Future<bool> updateExistingUser(User user) async {
-    _isUpdatingUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      _service.validateUserData(user);
-
-      final updatedUser =
-          await _service.updateUser(user); //asking the API to update this user
-
-      // Updates in the local list
-      final index = _users.indexWhere((u) =>
-          u.userId ==
-          user.userId); //looking for this user's position in my list
-      if (index != -1) {
-        _users[index] =
-            updatedUser; //If I found the user (index != -1), I replace the old version with the new one"
-      }
-
-      _error = '';
-      print(" User updated successfully: ${updatedUser.username}");
-      return true;
-    } catch (e) {
-      _error = 'Error updating user: ${e.toString()}';
-      print(" Error updateExistingUser: $e");
-      return false;
-    } finally {
-      _isUpdatingUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Delete a user
-  Future<bool> deleteExistingUser(int userId) async {
-    _isDeletingUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service
-          .deleteUser(userId); //asking the API to delete the user with this ID
-
-      // remove the user from the local list
-      _users.removeWhere((user) => user.userId == userId);
-
-      _error = '';
-      //_isLoading = false;
-      //notifyListeners();
-      print(" User with this ID deleted: $userId");
-      return true;
-    } catch (e) {
-      _error = 'Error deleting: ${e.toString()}';
-      print("Error deleteExistingUser: $e");
-      // _isLoading = false;
-      //notifyListeners();
-      return false;
-    } finally {
-      _isDeletingUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /* Loads a specific user by its ID
-     This method returns void because the result is stored in _currentUser */
-  Future<void> loadUserById(int userId) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      _currentUser = await _service.getUserById(
-          userId); //request a specific user by its id from the API and store it in _currentUser"
-      _error = '';
-      print(" User loaded by ID: $userId");
-    } catch (e) {
-      _error = 'Error loading user: ${e.toString()}';
-      print("Error loadUserById: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Load a specific user by its username
-  Future<void> loadUserByUsername(String username) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      _currentUser = await _service.getUserByUsername(
-          username); //I request a specific user by its username from the API and store it in _currentUser"
-      _error = '';
-      print(" User loaded with username: $username");
-    } catch (e) {
-      _error = 'Error loading user with username: ${e.toString()}';
-      print(" Error loadUserByUsername: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Update password
-  Future<bool> updateUserPassword(int userId, String newPassword) async {
-    _isUpdatingPassword = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.updatePassword(userId,
-          newPassword); //I'm asking the API to change the password for this user"
-
-      _error = '';
-      print(" User password updated successfully: $newPassword");
-      // _isLoading = false;
-      // notifyListeners();
-      return true;
-    } catch (e) {
-      _error = 'Error updating user password: ${e.toString()}';
-      print("Error updatePassword: $e");
-      //  _isLoading = false;
-      //  notifyListeners();
-      return false;
-    } finally {
-      _isUpdatingPassword = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Add role to an existing user
-  Future<bool> addRoleToExistingUser(int userId, int roleId) async {
-    _isAddRoleToUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.addRoleToUser(
-          userId, roleId); //“adding a role to a user via the API”
-
-      _error = '';
-      print("Role $roleId added to user $userId");
-      // _isLoading = false;
-      // notifyListeners();
-      return true;
-    } catch (e) {
-      _error = 'Error adding role: ${e.toString()}';
-      print(" Error addRoleToUser: $e");
-      // _isLoading = false;
-      // notifyListeners();
-      return false;
-    } finally {
-      _isAddRoleToUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Remove role from an existing user
-  Future<bool> removeRoleFromExistingUser(int userId, int roleId) async {
-    _isRemoveRoleFromUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.removeRoleFromUser(
-          userId, roleId); // removing a role from a user via the API
-      _error = '';
-      print("✅ Role $roleId removed from user $userId");
-
-      return true;
-    } catch (e) {
-      _error = 'Error removing role: ${e.toString()}';
-      print(" Error removeRoleFromUser: $e");
-
-      return false;
-    } finally {
-      _isRemoveRoleFromUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Searching for users (uses the service's local cache)
-  List<User> searchUsers(String query) {
-    return _service.searchUsers(query);
   }
 
   // Clear the error message and notify the UI
@@ -573,9 +381,7 @@ class UserProvider with ChangeNotifier {
 
   // Validation pour la connexion
   bool get isLoginFormValid =>
-      _loginUsername.isNotEmpty &&
-      _loginPassword
-          .isNotEmpty; /* &&
+      _loginUsername.isNotEmpty && _loginPassword.isNotEmpty; /* &&
       loginUsernameError == null &&
       loginPasswordError == null; */
 
@@ -601,11 +407,8 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<bool> submitLogin() async {
-    print('=== DEBUG submitLogin ===');
     print('1. loginUsername: $_loginUsername');
-    print('2. loginPassword: $_loginPassword');
     print('3. isLoginFormValid: $isLoginFormValid');
-    print('==========================');
 
     if (!isLoginFormValid) {
       _error = 'Veuillez remplir tous les champs';
@@ -632,6 +435,7 @@ class UserProvider with ChangeNotifier {
       print('   ID: ${user.userId}');
       print('   Email: ${user.email}');
       print('   Rôle: ${user.role?.roleName}');
+      print('   Rôle actuel: ${_currentUser!.role?.roleName}');
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();
@@ -645,6 +449,209 @@ class UserProvider with ChangeNotifier {
       print('❌ Erreur de connexion: $e');
       return false;
     }
+  }
+
+  // Updates an existing user
+  Future<bool> updateExistingUser(User user) async {
+    _isUpdatingUser = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _service.validateUserData(user);
+
+      final updatedUser = await _service.updateUser(
+        user,
+      ); //asking the API to update this user
+
+      // Updates in the local list
+      final index = _users.indexWhere(
+        (u) => u.userId == user.userId,
+      ); //looking for this user's position in my list
+      if (index != -1) {
+        _users[index] =
+            updatedUser; //If I found the user (index != -1), I replace the old version with the new one"
+      }
+
+      _error = '';
+      print(" User updated successfully: ${updatedUser.username}");
+      return true;
+    } catch (e) {
+      _error = 'Error updating user: ${e.toString()}';
+      print(" Error updateExistingUser: $e");
+      return false;
+    } finally {
+      _isUpdatingUser = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Delete a user
+  Future<bool> deleteExistingUser(int userId) async {
+    _isDeletingUser = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.deleteUser(
+        userId,
+      ); //asking the API to delete the user with this ID
+
+      // remove the user from the local list
+      _users.removeWhere((user) => user.userId == userId);
+
+      _error = '';
+      //_isLoading = false;
+      //notifyListeners();
+      print(" User with this ID deleted: $userId");
+      return true;
+    } catch (e) {
+      _error = 'Error deleting: ${e.toString()}';
+      print("Error deleteExistingUser: $e");
+      // _isLoading = false;
+      //notifyListeners();
+      return false;
+    } finally {
+      _isDeletingUser = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /* Loads a specific user by its ID
+     This method returns void because the result is stored in _currentUser */
+  Future<void> loadUserById(int userId) async {
+    _isLoading = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      _currentUser = await _service.getUserById(
+        userId,
+      ); //request a specific user by its id from the API and store it in _currentUser"
+      _error = '';
+      print(" User loaded by ID: $userId");
+    } catch (e) {
+      _error = 'Error loading user: ${e.toString()}';
+      print("Error loadUserById: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Load a specific user by its username
+  Future<void> loadUserByUsername(String username) async {
+    _isLoading = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      _currentUser = await _service.getUserByUsername(
+        username,
+      ); //I request a specific user by its username from the API and store it in _currentUser"
+      _error = '';
+      print(" User loaded with username: $username");
+    } catch (e) {
+      _error = 'Error loading user with username: ${e.toString()}';
+      print(" Error loadUserByUsername: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Update password
+  Future<bool> updateUserPassword(int userId, String newPassword) async {
+    _isUpdatingPassword = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.updatePassword(
+        userId,
+        newPassword,
+      ); //I'm asking the API to change the password for this user"
+
+      _error = '';
+      print(" User password updated successfully: $newPassword");
+      // _isLoading = false;
+      // notifyListeners();
+      return true;
+    } catch (e) {
+      _error = 'Error updating user password: ${e.toString()}';
+      print("Error updatePassword: $e");
+      //  _isLoading = false;
+      //  notifyListeners();
+      return false;
+    } finally {
+      _isUpdatingPassword = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Add role to an existing user
+  Future<bool> addRoleToExistingUser(int userId, int roleId) async {
+    _isAddRoleToUser = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.addRoleToUser(
+        userId,
+        roleId,
+      ); //“adding a role to a user via the API”
+
+      _error = '';
+      print("Role $roleId added to user $userId");
+      // _isLoading = false;
+      // notifyListeners();
+      return true;
+    } catch (e) {
+      _error = 'Error adding role: ${e.toString()}';
+      print(" Error addRoleToUser: $e");
+      // _isLoading = false;
+      // notifyListeners();
+      return false;
+    } finally {
+      _isAddRoleToUser = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Remove role from an existing user
+  Future<bool> removeRoleFromExistingUser(int userId, int roleId) async {
+    _isRemoveRoleFromUser = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.removeRoleFromUser(
+        userId,
+        roleId,
+      ); // removing a role from a user via the API
+      _error = '';
+      print("✅ Role $roleId removed from user $userId");
+
+      return true;
+    } catch (e) {
+      _error = 'Error removing role: ${e.toString()}';
+      print(" Error removeRoleFromUser: $e");
+
+      return false;
+    } finally {
+      _isRemoveRoleFromUser = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Searching for users (uses the service's local cache)
+  List<User> searchUsers(String query) {
+    return _service.searchUsers(query);
   }
 
   Future<void> logout() async {
@@ -709,7 +716,7 @@ class UserProvider with ChangeNotifier {
     }).toList();
   }
 
-// Méthode pour charger un utilisateur pour consultation
+  // Méthode pour charger un utilisateur pour consultation
   Future<void> loadUserForConsultation(int userId) async {
     _isLoading = true;
     _error = '';
@@ -727,8 +734,8 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-/* ******** FOR EDIT USER FORM ******** */
-// Validation pour le formulaire de modification
+  /* ******** FOR EDIT USER FORM ******** */
+  // Validation pour le formulaire de modification
   bool get isUpdateFormValid =>
       _updateFirstName.isNotEmpty &&
       _updateLastName.isNotEmpty &&
@@ -751,7 +758,7 @@ class UserProvider with ChangeNotifier {
     return null;
   }
 
-// Méthode pour pré-remplir les champs avec les données de l'utilisateur
+  // Méthode pour pré-remplir les champs avec les données de l'utilisateur
   void prefillUpdateForm(User user) {
     _updateFirstName = user.firstName;
     _updateLastName = user.lastName;
@@ -767,7 +774,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-// Méthode pour soumettre la mise à jour
+  // Méthode pour soumettre la mise à jour
   Future<bool> submitUpdate() async {
     if (!isUpdateFormValid) {
       _error = 'Veuillez remplir tous les champs correctement';
@@ -830,7 +837,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-// Réinitialiser le formulaire de modification
+  // Réinitialiser le formulaire de modification
   void resetUpdateForm() {
     _updateFirstName = '';
     _updateLastName = '';

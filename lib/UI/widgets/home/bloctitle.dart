@@ -8,7 +8,7 @@ class BlocTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),
     );
   }
 }

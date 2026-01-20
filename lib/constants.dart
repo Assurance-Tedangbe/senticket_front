@@ -14,3 +14,4 @@ const enterTextFieldColor = Colors.black87;
 const textContainerColor = Colors.white70;
 const navigationBackgroundColor = Color.fromARGB(255, 250, 250, 250);
 const validateBtnColor = Colors.green;
+const cyanColor = Colors.cyan;

@@ -56,37 +56,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [
-      BlocProvider(create: (context) => ServicesBloc()),
-      BlocProvider(create: (context) => HistoricBloc()),
-      /* ChangeNotifierProvider<AuthProvider>(
+    return MultiProvider(
+      providers: [
+        BlocProvider(create: (context) => ServicesBloc()),
+        BlocProvider(create: (context) => HistoricBloc()),
+        /* ChangeNotifierProvider<AuthProvider>(
       create: (context) => AuthProvider(AuthService()),
     ), */
-      ChangeNotifierProvider<RoleProvider>(
-        create: (context) => RoleProvider(RoleApiService()),
-      ),
-      ChangeNotifierProvider<UserProvider>(
-        create: (context) => UserProvider(UserApiService()),
-      ),
-      ChangeNotifierProvider<TicketProvider>(
-        create: (context) => TicketProvider(TicketApiService()),
-      ),
-      /*  ChangeNotifierProvider<AccountProvider>(
+        ChangeNotifierProvider<RoleProvider>(
+          create: (context) => RoleProvider(RoleApiService()),
+        ),
+        ChangeNotifierProvider<UserProvider>(
+          create: (context) => UserProvider(UserApiService()),
+        ),
+        ChangeNotifierProvider<TicketProvider>(
+          create: (context) => TicketProvider(TicketApiService()),
+        ),
+        /*  ChangeNotifierProvider<AccountProvider>(
         create: (context) => AccountProvider(AccountApiService()),
       ), */
-      ChangeNotifierProvider<MenuProvider>(
-        create: (context) => MenuProvider(MenuApiService()),
-      ),
-      ChangeNotifierProvider<ConsulterMenuProvider>(
-        create: (context) => ConsulterMenuProvider(ConsulterMenuApiService()),
-      ),
-      ChangeNotifierProvider<DebitProvider>(
-        create: (context) => DebitProvider(DebitApiService()),
-      ),
-      ChangeNotifierProvider<CreditProvider>(
-        create: (context) => CreditProvider(CreditApiService()),
-      ),
-    ], child: const RootView());
+        ChangeNotifierProvider<MenuProvider>(
+          create: (context) => MenuProvider(MenuApiService()),
+        ),
+        ChangeNotifierProvider<ConsulterMenuProvider>(
+          create: (context) => ConsulterMenuProvider(ConsulterMenuApiService()),
+        ),
+        ChangeNotifierProvider<DebitProvider>(
+          create: (context) => DebitProvider(DebitApiService()),
+        ),
+        ChangeNotifierProvider<CreditProvider>(
+          create: (context) => CreditProvider(CreditApiService()),
+        ),
+      ],
+      child: const RootView(),
+    );
   }
 }
 
@@ -97,9 +100,7 @@ class RootView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: kPrimaryColor,
-      ),
+      theme: ThemeData(primaryColor: kPrimaryColor),
       routes: {
         "/cover": (context) => const CoverPage(),
         "/home": (context) => const RootV(),

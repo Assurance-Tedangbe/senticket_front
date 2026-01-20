@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/home/services.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
-import 'package:senticket_front/UI/widgets/home/soldeSection.dart';
-import 'package:senticket_front/UI/widgets/home/statistics.dart';
 
 class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
@@ -17,13 +14,13 @@ class HomeBody extends StatelessWidget {
         child: SizedBox(
           height: size.height,
           width: size.width,
-          child: const Column(children: [
-            SoldeSection(),
-            SizeboxHeightSession(),
-            Services(),
-            SizeboxHeightSession(),
-            Statistics()
-          ]),
+          child: const Column(
+            children: [
+              // SoldeSection(),
+              // SizeboxHeightSession(),
+              Services(),
+            ],
+          ),
         ),
       ),
     );

@@ -48,7 +48,6 @@ class RequestSection extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/buyTicketBtn.dart';
-import 'package:senticket_front/UI/widgets/buyTicket/clientNameSection.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 
@@ -60,7 +59,7 @@ class RequestSection extends StatefulWidget {
 }
 
 class _RequestSectionState extends State<RequestSection> {
-  String buyerName = '';
+  // String buyerName = '';
   final TextEditingController _nameController = TextEditingController();
 
   @override
@@ -71,15 +70,12 @@ class _RequestSectionState extends State<RequestSection> {
 
   void _clearForm() {
     setState(() {
-      buyerName = '';
+      // buyerName = '';
       _nameController.clear();
     });
 
     // Désélectionner tous les tickets
-    final ticketProvider = Provider.of<TicketProvider>(
-      context,
-      listen: false,
-    );
+    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     ticketProvider.clearAllSelections();
   }
 
@@ -105,25 +101,25 @@ class _RequestSectionState extends State<RequestSection> {
                     color: boxshadowColor,
                     blurRadius: 6,
                     offset: Offset(0, 2),
-                  )
+                  ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 1),
+                // border: Border.all(color: kPrimaryColor, width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+                child: /* Column(
+                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [ */
+                    /* Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ClientNameSection(
+                        /*  ClientNameSection(
                           onChanged: (value) {
                             setState(() {
                               buyerName = value;
                             });
                           },
-                        ),
+                        ), */
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -139,18 +135,18 @@ class _RequestSectionState extends State<RequestSection> {
                               selectedCount.toString(),
                               style: const TextStyle(
                                 color: kPrimaryColor,
-                                fontSize: 24,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
                       ],
-                    ),
+                    ), */
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton.icon(
+                        /* ElevatedButton.icon(
                           onPressed: buyerName.isNotEmpty || selectedCount > 0
                               ? _clearForm
                               : null,
@@ -161,17 +157,17 @@ class _RequestSectionState extends State<RequestSection> {
                             foregroundColor: Colors.white,
                             minimumSize: Size(size.width * 0.25, 40),
                           ),
-                        ),
+                        ), */
                         BuyTicketBtn(
-                          buyerName: buyerName,
+                          //   buyerName: buyerName,
                           onSuccess: () {
                             _clearForm();
                           },
                         ),
                       ],
                     ),
-                  ],
-                ),
+                //  ],
+                //  ),
               ),
             ),
           ],

@@ -59,10 +59,10 @@ class TicketBBloc extends StatelessWidget {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: isSelected
-                ? Colors.green
+                ? validateBtnColor
                 : isAvailable
-                    ? Colors.cyan
-                    : Colors.grey,
+                ? cyanColor
+                : greyBorderColor,
             padding: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
@@ -80,7 +80,7 @@ class TicketBBloc extends StatelessWidget {
           child: Text(
             ticket.ticketId?.toString() ?? 'N/A',
             style: TextStyle(
-              color: isSelected ? Colors.white : kThirdColor,
+              color: isSelected ? kSecondColor : kThirdColor,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),

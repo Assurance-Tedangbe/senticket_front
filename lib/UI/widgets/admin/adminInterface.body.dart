@@ -14,9 +14,7 @@ class AdminBody extends StatelessWidget {
         child: SizedBox(
           height: size.height,
           width: size.width,
-          child: const Column(children: [
-            AdminServices(),
-          ]),
+          child: const Column(children: [AdminServices()]),
         ),
       ),
     );

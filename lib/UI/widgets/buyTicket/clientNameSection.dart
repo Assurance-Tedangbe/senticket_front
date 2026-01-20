@@ -64,11 +64,7 @@ class ClientNameSection extends StatefulWidget {
   final Function(String)? onChanged;
   final String? initialValue;
 
-  const ClientNameSection({
-    super.key,
-    this.onChanged,
-    this.initialValue,
-  });
+  const ClientNameSection({super.key, this.onChanged, this.initialValue});
 
   @override
   State<ClientNameSection> createState() => _ClientNameSectionState();
@@ -100,8 +96,8 @@ class _ClientNameSectionState extends State<ClientNameSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Label(text: "Nom de l'acheteur"),
-          const SizedBox(height: 5),
+          // const Label(text: "Nom de l'acheteur"),
+          // const SizedBox(height: 5),
           Container(
             width: size.width * 0.50,
             height: size.height / 14.0,
@@ -114,7 +110,7 @@ class _ClientNameSectionState extends State<ClientNameSection> {
                   color: boxshadowColor,
                   blurRadius: 6,
                   offset: Offset(0, 2),
-                )
+                ),
               ],
               border: Border.all(color: kPrimaryColor, width: 1),
             ),
@@ -122,20 +118,16 @@ class _ClientNameSectionState extends State<ClientNameSection> {
               controller: _controller,
               onChanged: widget.onChanged,
               keyboardType: TextInputType.text,
-              style: const TextStyle(
-                color: enterTextFieldColor,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: enterTextFieldColor, fontSize: 14),
               decoration: const InputDecoration(
                 border: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
                 prefixIcon: Icon(Icons.person, color: Colors.black54),
                 hintText: "Entrez le nom de l'acheteur",
-                hintStyle: TextStyle(
-                  color: enterTextFieldColor,
-                  fontSize: 12,
-                ),
+                hintStyle: TextStyle(color: enterTextFieldColor, fontSize: 12),
               ),
             ),
           ),
