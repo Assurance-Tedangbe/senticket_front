@@ -26,10 +26,9 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
 
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
-        final isLoggedIn = userProvider.currentUser != null;
-        final isStudent = isLoggedIn
-            ? userProvider.currentUser!.role?.name == 'ETUDIANT'
-            : false;
+        final user = userProvider.currentUser;
+        final isLoggedIn = user != null;
+        final isStudent = isLoggedIn ? user.role.name == 'ETUDIANT' : false;
 
         return ChangeNotifierProvider(
           create: (context) => TicketProvider(TicketApiService()),
@@ -109,7 +108,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
               children: [
                 Text(
                   isLoggedIn
-                      ? 'Connecté en tant que: ${userProvider.currentUser!.username}'
+                      ? 'Connecté en tant que: ${userProvider.currentUser!.role.name}'
                       : 'Non connecté',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -120,7 +119,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                 ),
                 if (isLoggedIn)
                   Text(
-                    'Rôle: ${userProvider.currentUser!.role?.name ?? "Non défini"}',
+                    'Rôle: ${userProvider.currentUser!.role.name}',
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
               ],
@@ -134,11 +133,11 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Déconnexion réussie'),
-                    backgroundColor: Colors.green,
+                    backgroundColor: kPrimaryColor,
                   ),
                 );
               },
-              icon: const Icon(Icons.logout, color: redErrorColor),
+              icon: const Icon(Icons.logout, color: kPrimaryColor),
               tooltip: 'Se déconnecter',
             )
           else

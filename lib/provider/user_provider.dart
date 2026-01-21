@@ -433,7 +433,7 @@ class UserProvider with ChangeNotifier {
       print('   ID: ${user.userId}');
       print('   Email: ${user.email}');
       print('   Rôle: ${user.role?.name}');
-      print('   Rôle actuel: ${_currentUser!.role?.name}');
+      print('   Rôle: ${user.role.name}'); // Debug du rôle
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();

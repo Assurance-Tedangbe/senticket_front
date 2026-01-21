@@ -5,16 +5,8 @@ import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
-/*
-  Page d'affichage des informations du compte consulté.
-*/
-/* class ConsultData extends StatelessWidget {
-  static const String _title = 'Informations sur le compte';
-  final int userId;
-
-  const ConsultData({super.key, required this.userId}); */
+// Page d'affichage des informations du compte consulté.
 class ConsultData extends StatefulWidget {
-  // static const String _title = 'Informations sur le compte';
   final int userId;
 
   const ConsultData({super.key, required this.userId});
@@ -50,7 +42,7 @@ class _ConsultDataState extends State<ConsultData> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(title: const Text(_title), backgroundColor: kPrimaryColor),
       /* nous pouvons directement utiliser userProvider.currentUser 
-         sans avoir besoin d'un FutureBuilder supplémentaire.  */
+         sans avoir besoin d'un FutureBuilder suppl.  */
       body: Consumer<UserProvider>(
         builder: (context, userProvider, child) {
           if (userProvider.isLoading && userProvider.currentUser == null) {
@@ -174,7 +166,7 @@ class _ConsultDataState extends State<ConsultData> {
         const Divider(color: greyBorderColor),
 
         // Rôle
-        _buildInfoRow('Rôle', user.role?.name ?? 'Non défini'),
+        _buildInfoRow('Rôle', user.role.name),
       ],
     );
   }
