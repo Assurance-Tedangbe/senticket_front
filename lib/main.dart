@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:senticket_front/UI/pages/activateAccount.dart';
 import 'package:senticket_front/UI/pages/adminInterface.dart';
 import 'package:senticket_front/UI/pages/agentInterface.dart';
 import 'package:senticket_front/UI/pages/buyTicket.dart';
-import 'package:senticket_front/UI/pages/cancelRecharge.dart';
-import 'package:senticket_front/UI/pages/cancelTransfertCredit.dart';
 import 'package:senticket_front/UI/pages/cancelTransfertTicket.dart';
 import 'package:senticket_front/UI/pages/consultAccount.dart';
-import 'package:senticket_front/UI/pages/creditAccount.dart';
-import 'package:senticket_front/UI/pages/deactivateAccount.dart';
 import 'package:senticket_front/UI/pages/debitAccount.dart';
 import 'package:senticket_front/UI/pages/coverPage.dart';
 import 'package:senticket_front/UI/pages/rootView.dart';
@@ -24,12 +19,10 @@ import 'package:senticket_front/UI/pages/scanqr.dart';
 import 'package:senticket_front/UI/pages/settings.dart';
 import 'package:senticket_front/UI/pages/signup.dart';
 import 'package:senticket_front/UI/pages/studentInterface.dart';
-import 'package:senticket_front/UI/pages/transfertCredit.dart';
 import 'package:senticket_front/UI/pages/updateProfile.dart';
 import 'package:senticket_front/bloc/historic.bloc.dart';
 import 'package:senticket_front/bloc/services.bloc.dart';
 import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/provider/account_provider.dart';
 import 'package:senticket_front/provider/consulter_menu_provider.dart';
 import 'package:senticket_front/provider/credit_provider.dart';
 import 'package:senticket_front/provider/debit_provider.dart';
@@ -37,7 +30,6 @@ import 'package:senticket_front/provider/menu_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
-import 'package:senticket_front/services/account_service.dart';
 import 'package:senticket_front/services/consulter_menu_service.dart';
 import 'package:senticket_front/services/credit_service.dart';
 import 'package:senticket_front/services/debit_service.dart';
@@ -46,6 +38,14 @@ import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/pages/activateAccount.dart';
+import 'package:senticket_front/UI/pages/cancelRecharge.dart';
+import 'package:senticket_front/UI/pages/cancelTransfertCredit.dart';
+import 'package:senticket_front/services/account_service.dart';
+import 'package:senticket_front/UI/pages/transfertCredit.dart';
+import 'package:senticket_front/provider/account_provider.dart';
+import 'package:senticket_front/UI/pages/creditAccount.dart';
+import 'package:senticket_front/UI/pages/deactivateAccount.dart';
 
 void main() {
   runApp(const MyApp());
@@ -111,23 +111,23 @@ class RootView extends StatelessWidget {
         "/manage-agents": (context) => const ManageAgent(),
         "/manage-porters": (context) => const ManagePorter(),
         "/scanQR": (context) => const ScanQR(),
-        //  "/activate-account": (context) => const ActivateAccount(),
-        //  "/deactivate-account": (context) => const DeactivateAccount(),
         "/student": (context) => const StudentInterface(),
         "/ticket": (context) => const BuyTicket(),
         "/transfert-ticket": (context) => const TransfertTicket(),
-        "/transfert-credit": (context) => const TransfertCredit(),
         "/cancel-transfert-ticket": (context) => const CancelTrsfTicket(),
-        "/cancel-transfert-credit": (context) => const CancelTrsfCredit(),
         "/consult-account": (context) => const ConsultAccount(),
         "/update-profile": (context) => const UpdateProfile(),
         "/porter": (context) => const PorterInterface(),
         "/debit-account": (context) => const DebitAccount(),
         "/agent": (context) => const AgentInterface(),
-        "/credit-account": (context) => const CreditAccount(),
-        "/cancel-recharge": (context) => const CancelRecharge(),
         "/settings": (context) => const SettingsPage(),
         "/log-out": (context) => const LogOut(),
+        // "/activate-account": (context) => const ActivateAccount(),
+        // "/deactivate-account": (context) => const DeactivateAccount(),
+        // "/transfert-credit": (context) => const TransfertCredit(),
+        // "/cancel-transfert-credit": (context) => const CancelTrsfCredit(),
+        // "/credit-account": (context) => const CreditAccount(),
+        // "/cancel-recharge": (context) => const CancelRecharge(),
       },
       initialRoute: "/cover",
     );
