@@ -24,7 +24,7 @@ class BuyTicketBtn extends StatelessWidget {
             // Vérifier si l'utilisateur est connecté
             final isLoggedIn = userProvider.currentUser != null;
             final isStudent = isLoggedIn
-                ? userProvider.currentUser!.role?.roleName?.toUpperCase() ==
+                ? userProvider.currentUser!.role?.name?.toUpperCase() ==
                       'ETUDIANT'
                 : false;
             final userName =

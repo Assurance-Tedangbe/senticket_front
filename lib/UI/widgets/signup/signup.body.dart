@@ -64,8 +64,9 @@ class _SignupBodyState extends State<SignupBody> {
 
   void _onSignupSuccess() {
     // Navigation vers la page de connexion après inscription réussie
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const LoginPage()));
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 
   /* État local pour le rôle:Le rôle sélectionné est un état local temporaire
@@ -83,8 +84,7 @@ class _SignupBodyState extends State<SignupBody> {
     if (role != null) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.setRole(role);
-      print(
-          '🔄 Rôle transmis au provider: ${role.roleName} (ID: ${role.roleId})');
+      print('🔄 Rôle transmis au provider: ${role.name} (ID: ${role.roleId})');
     }
   }
 

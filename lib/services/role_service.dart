@@ -32,7 +32,7 @@ class RoleApiService {
   // Durée de validité du cache (10 minutes pour les rôles qui changent peu)
   static const Duration cacheDuration = Duration(minutes: 10);
 
-/*  Future<void> testConnection() async {
+  /*  Future<void> testConnection() async {
     final url = Uri.parse('http://192.168.1.4:8080/api/roles');
 
     try {
@@ -69,7 +69,7 @@ class RoleApiService {
   // CREATE : POST /api/roles
   Future<Role> createRole(Role role) async {
     try {
-      print("🔄 Création d'un nouveau rôle: ${role.roleName}");
+      print("🔄 Création d'un nouveau rôle: ${role.name}");
 
       // Validation des données avant envoi à l'API
       _validateRoleData(role);
@@ -86,7 +86,8 @@ class RoleApiService {
         // JSON response → Role object
         final newRole = Role.fromJson(json.decode(response.body));
         print(
-            "✅ Rôle créé avec succès - ID: ${newRole.roleId}, Nom: ${newRole.roleName}");
+          "✅ Rôle créé avec succès - ID: ${newRole.roleId}, Nom: ${newRole.name}",
+        );
 
         // Mise à jour du cache : ajout du nouveau rôle
         _cachedRoles.add(newRole);
@@ -95,7 +96,8 @@ class RoleApiService {
       } else {
         // Gestion des erreurs HTTP
         throw Exception(
-            'Erreur création rôle - Code HTTP: ${response.statusCode}');
+          'Erreur création rôle - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print(" Erreur lors de la création du rôle: $e");
@@ -107,7 +109,8 @@ class RoleApiService {
   Future<List<Role>> getAllRoles({bool forceRefresh = false}) async {
     // Vérification de la validité du cache
     final now = DateTime.now();
-    final cacheValide = _lastFetchTime != null &&
+    final cacheValide =
+        _lastFetchTime != null &&
         now.difference(_lastFetchTime!) < cacheDuration;
 
     // Retourne les données du cache si valides et non forcées
@@ -120,10 +123,7 @@ class RoleApiService {
       print("🌐 Récupération des rôles depuis l'API Spring Boot");
 
       // Appel HTTP GET vers l'API
-      final response = await http.get(
-        Uri.parse(baseUrl),
-        headers: headers,
-      );
+      final response = await http.get(Uri.parse(baseUrl), headers: headers);
 
       print(' Status Code: ${response.statusCode}');
       print(' Response Body (RAW): ${response.body}');
@@ -142,7 +142,8 @@ class RoleApiService {
         return _cachedRoles;
       } else {
         throw Exception(
-            'Erreur récupération rôles - Code HTTP: ${response.statusCode}');
+          'Erreur récupération rôles - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print(" Erreur lors de la récupération des rôles: $e");
@@ -166,12 +167,12 @@ class RoleApiService {
       final cachedRole = _cachedRoles.firstWhere(
         (role) => role.roleId == roleId,
         orElse: () =>
-            Role(roleId: -1, roleName: ''), // Valeur par défaut si non trouvé
+            Role(roleId: -1, name: ''), // Valeur par défaut si non trouvé
       );
 
       // Si trouvé dans le cache, retourne immédiatement
       if (cachedRole.roleId != -1) {
-        print("📦 Rôle trouvé dans le cache: ${cachedRole.roleName}");
+        print("📦 Rôle trouvé dans le cache: ${cachedRole.name}");
         return cachedRole;
       }
 
@@ -183,13 +184,14 @@ class RoleApiService {
 
       if (response.statusCode == 200) {
         final role = Role.fromJson(json.decode(response.body));
-        print("✅ Rôle récupéré depuis l'API: ${role.roleName}");
+        print("✅ Rôle récupéré depuis l'API: ${role.name}");
         return role;
       } else if (response.statusCode == 404) {
         throw Exception('Rôle non trouvé avec ID: $roleId');
       } else {
         throw Exception(
-            'Erreur récupération rôle - Code HTTP: ${response.statusCode}');
+          'Erreur récupération rôle - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print(" Erreur lors de la récupération du rôle par ID: $e");
@@ -204,19 +206,21 @@ class RoleApiService {
 
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/name/$roleName'), // Endpoint /api/roles/name/{roleName}
+          '$baseUrl/name/$roleName',
+        ), // Endpoint /api/roles/name/{roleName}
         headers: headers,
       );
 
       if (response.statusCode == 200) {
         final role = Role.fromJson(json.decode(response.body));
-        print("✅ Rôle trouvé: ${role.roleName}");
+        print("✅ Rôle trouvé: ${role.name}");
         return role;
       } else if (response.statusCode == 404) {
         throw Exception('Rôle non trouvé avec nom: $roleName');
       } else {
         throw Exception(
-            'Erreur récupération rôle - Code HTTP: ${response.statusCode}');
+          'Erreur récupération rôle - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print(" Erreur lors de la récupération du rôle par nom: $e");
@@ -240,7 +244,7 @@ class RoleApiService {
 
       if (response.statusCode == 200) {
         final updatedRole = Role.fromJson(json.decode(response.body));
-        print("✅ Rôle mis à jour avec succès: ${updatedRole.roleName}");
+        print("✅ Rôle mis à jour avec succès: ${updatedRole.name}");
 
         // Mise à jour du cache : remplacement du rôle modifié
         final index = _cachedRoles.indexWhere((r) => r.roleId == role.roleId);
@@ -251,7 +255,8 @@ class RoleApiService {
         return updatedRole;
       } else {
         throw Exception(
-            'Erreur mise à jour rôle - Code HTTP: ${response.statusCode}');
+          'Erreur mise à jour rôle - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print(" Erreur lors de la mise à jour du rôle: $e");
@@ -277,7 +282,8 @@ class RoleApiService {
         _cachedRoles.removeWhere((role) => role.roleId == roleId);
       } else {
         throw Exception(
-            'Erreur suppression rôle - Code HTTP: ${response.statusCode}');
+          'Erreur suppression rôle - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print(" Erreur lors de la suppression du rôle: $e");
@@ -296,10 +302,11 @@ class RoleApiService {
 
     // Filtrage des rôles selon le critère de recherche
     return _cachedRoles
-        .where((role) => role.roleName
-                .toLowerCase()
-                .contains(queryLower) // Recherche dans le nom
-            )
+        .where(
+          (role) => role.name.toLowerCase().contains(
+            queryLower,
+          ), // Recherche dans le nom
+        )
         .toList();
   }
 
@@ -307,26 +314,27 @@ class RoleApiService {
      correspondant à @Size et @NotBlank */
   void _validateRoleData(Role role) {
     // Validation de la longueur minimale (comme @Size(min = 3))
-    if (role.roleName.length < 3) {
+    if (role.name.length < 3) {
       throw Exception('Le nom du rôle doit contenir au moins 3 caractères');
     }
 
     // Validation de la longueur maximale (comme @Size(max = 50))
-    if (role.roleName.length > 50) {
+    if (role.name.length > 50) {
       throw Exception('Le nom du rôle ne peut pas dépasser 50 caractères');
     }
 
     // Validation des noms de rôles réservés (logique métier supplémentaire)
     final nomsReserves = ['superadmin', 'root', 'system'];
-    if (nomsReserves.contains(role.roleName.toLowerCase())) {
+    if (nomsReserves.contains(role.name.toLowerCase())) {
       throw Exception('Ce nom de rôle est réservé et ne peut pas être utilisé');
     }
   }
 
   /* Vérifie si un rôle existe déjà dans le cache pour éviter les doublons  */
   bool roleExists(String roleName) {
-    return _cachedRoles
-        .any((role) => role.roleName.toLowerCase() == roleName.toLowerCase());
+    return _cachedRoles.any(
+      (role) => role.name.toLowerCase() == roleName.toLowerCase(),
+    );
   }
 
   // Récupère les rôles correspondant à un pattern (pour auto-complétion)
@@ -334,8 +342,9 @@ class RoleApiService {
     if (pattern.isEmpty) return _cachedRoles;
 
     return _cachedRoles
-        .where((role) =>
-            role.roleName.toLowerCase().contains(pattern.toLowerCase()))
+        .where(
+          (role) => role.name.toLowerCase().contains(pattern.toLowerCase()),
+        )
         .toList();
   }
 

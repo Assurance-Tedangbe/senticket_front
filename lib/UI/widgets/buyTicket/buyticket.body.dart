@@ -28,8 +28,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
       builder: (context, userProvider, child) {
         final isLoggedIn = userProvider.currentUser != null;
         final isStudent = isLoggedIn
-            ? userProvider.currentUser!.role?.roleName?.toUpperCase() ==
-                  'ETUDIANT'
+            ? userProvider.currentUser!.role?.name == 'ETUDIANT'
             : false;
 
         return ChangeNotifierProvider(
@@ -121,7 +120,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                 ),
                 if (isLoggedIn)
                   Text(
-                    'Rôle: ${userProvider.currentUser!.role?.roleName ?? "Non défini"}',
+                    'Rôle: ${userProvider.currentUser!.role?.name ?? "Non défini"}',
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
               ],

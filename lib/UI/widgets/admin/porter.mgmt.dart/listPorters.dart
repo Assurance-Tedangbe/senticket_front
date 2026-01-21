@@ -30,7 +30,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
   // Filtrer les utilisateurs avec le rôle PORTIER
   List<User> _getPortiers(List<User> allUsers) {
     return allUsers.where((user) {
-      return user.role?.roleName?.toUpperCase() == 'PORTIER';
+      return user.role?.name?.toUpperCase() == 'PORTIER';
     }).toList();
   }
 
@@ -128,11 +128,9 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
     userProvider.currentUser = portier;
     userProvider.prefillUpdateForm(portier);
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const UpdateUser(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const UpdateUser()));
   }
 
   @override
@@ -187,11 +185,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
                   padding: const EdgeInsets.all(40.0),
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.group_off,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
+                      Icon(Icons.group_off, size: 80, color: Colors.grey[400]),
                       const SizedBox(height: 20),
                       const Text(
                         'Aucun portier trouvé',
@@ -257,18 +251,12 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
               label: HeadTableStyle(data: "Nom complet"),
               numeric: false,
             ),
-            DataColumn(
-              label: HeadTableStyle(data: "Email"),
-              numeric: false,
-            ),
+            DataColumn(label: HeadTableStyle(data: "Email"), numeric: false),
             /* DataColumn(
               label: HeadTableStyle(data: "Rôle"),
               numeric: false,
             ), */
-            DataColumn(
-              label: HeadTableStyle(data: "Actions"),
-              numeric: false,
-            ),
+            DataColumn(label: HeadTableStyle(data: "Actions"), numeric: false),
           ],
           rows: portiers.map((portier) {
             return DataRow(
@@ -285,9 +273,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
                     datafromBack: '${portier.firstName} ${portier.lastName}',
                   ),
                 ),
-                DataCell(
-                  DataTableStyle(datafromBack: portier.email),
-                ),
+                DataCell(DataTableStyle(datafromBack: portier.email)),
                 /*  DataCell(
                   Chip(
                     label: Text(
@@ -313,8 +299,11 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
                         child: IconButton(
                           onPressed: () =>
                               _navigateToPortierDetails(context, portier),
-                          icon: const Icon(Icons.visibility,
-                              size: 30, color: kPrimaryColor),
+                          icon: const Icon(
+                            Icons.visibility,
+                            size: 30,
+                            color: kPrimaryColor,
+                          ),
                           padding: const EdgeInsets.all(6),
                         ),
                       ),
@@ -326,8 +315,11 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
                         child: IconButton(
                           onPressed: () =>
                               _navigateToUpdatePortier(context, portier),
-                          icon: const Icon(Icons.edit,
-                              size: 24, color: kPrimaryColor),
+                          icon: const Icon(
+                            Icons.edit,
+                            size: 24,
+                            color: kPrimaryColor,
+                          ),
                           padding: const EdgeInsets.all(6),
                         ),
                       ),
@@ -338,8 +330,11 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
                         message: 'Supprimer',
                         child: IconButton(
                           onPressed: () => _showDeletePortierDialog(portier),
-                          icon: const Icon(Icons.delete,
-                              size: 30, color: kPrimaryColor),
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 30,
+                            color: kPrimaryColor,
+                          ),
                           padding: const EdgeInsets.all(6),
                         ),
                       ),

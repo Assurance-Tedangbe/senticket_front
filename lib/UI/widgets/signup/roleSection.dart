@@ -60,16 +60,18 @@ class RoleSection extends StatelessWidget {
               height: 50,
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 5.0),
-                child: roleProvider.isLoading // ← ICI
+                child:
+                    roleProvider
+                        .isLoading // ← ICI
                     ? // Affiche un indicateur de chargement pendant le chargement
-                    const Center(
+                      const Center(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: kPrimaryColor,
                         ),
                       )
                     : // Affiche la liste déroulante une fois les données chargées
-                    DropdownButtonFormField<Role>(
+                      DropdownButtonFormField<Role>(
                         // ⭐ CHANGEMENT : Utilise la valeur sélectionnée
                         value: roleProvider.roles.isNotEmpty
                             ? roleProvider.roles.first
@@ -87,28 +89,33 @@ class RoleSection extends StatelessWidget {
                         ),
                         onChanged: (Role? value) {
                           onRoleChanged(
-                              value); // ⭐ CHANGEMENT : Passe l'objet Role
+                            value,
+                          ); // ⭐ CHANGEMENT : Passe l'objet Role
 
                           // ⭐ EN PLUS : Mettez à jour le UserProvider
                           if (value != null) {
                             final userProvider = Provider.of<UserProvider>(
-                                context,
-                                listen: false);
+                              context,
+                              listen: false,
+                            );
                             userProvider.setRole(value);
                             print(
-                                '✅ Rôle sélectionné: ${value.roleName} (ID: ${value.roleId})');
+                              '✅ Rôle sélectionné: ${value.name} (ID: ${value.roleId})',
+                            );
                           }
                         },
-                        items: roleProvider.roles // ← ICI
+                        items: roleProvider
+                            .roles // ← ICI
                             .map<DropdownMenuItem<Role>>((Role role) {
-                          return DropdownMenuItem<Role>(
-                            value: role,
-                            child: Text(
-                              role.roleName,
-                              style: const TextStyle(color: kThirdColor),
-                            ),
-                          );
-                        }).toList(),
+                              return DropdownMenuItem<Role>(
+                                value: role,
+                                child: Text(
+                                  role.name,
+                                  style: const TextStyle(color: kThirdColor),
+                                ),
+                              );
+                            })
+                            .toList(),
                       ),
               ),
             ),

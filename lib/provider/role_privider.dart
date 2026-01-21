@@ -94,7 +94,7 @@ class RoleProvider with ChangeNotifier {
 
       _createRoleError = ''; // Confirme le succès
       _error = ''; // Réinitialise l'erreur globale
-      print("✅ Rôle créé avec succès: ${newRole.roleName}");
+      print("✅ Rôle créé avec succès: ${newRole.name}");
       return true; // Indique le succès à l'appelant
     } catch (e) {
       _createRoleError = 'Erreur lors de la création: ${e.toString()}';
@@ -132,7 +132,7 @@ class RoleProvider with ChangeNotifier {
 
       _updateRoleError = ''; // Confirme le succès
       _error = ''; // Réinitialise l'erreur globale
-      print("✅ Rôle mis à jour avec succès: ${updatedRole.roleName}");
+      print("✅ Rôle mis à jour avec succès: ${updatedRole.name}");
       return true;
     } catch (e) {
       _updateRoleError = 'Erreur lors de la mise à jour: ${e.toString()}';
@@ -264,7 +264,8 @@ class RoleProvider with ChangeNotifier {
   Role? getRoleByNameFromCache(String roleName) {
     try {
       return _roles.firstWhere(
-          (role) => role.roleName.toLowerCase() == roleName.toLowerCase());
+        (role) => role.name.toLowerCase() == roleName.toLowerCase(),
+      );
     } catch (e) {
       return null; // Retourne null si non trouvé
     }

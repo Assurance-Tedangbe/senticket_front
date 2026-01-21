@@ -30,7 +30,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
   // Filtrer les utilisateurs avec le rôle AGENT
   List<User> _getAgents(List<User> allUsers) {
     return allUsers.where((user) {
-      return user.role?.roleName?.toUpperCase() == 'AGENT';
+      return user.role?.name?.toUpperCase() == 'AGENT';
     }).toList();
   }
 
@@ -65,8 +65,10 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('SUPPRIMER',
-                  style: TextStyle(color: kPrimaryColor)),
+              child: const Text(
+                'SUPPRIMER',
+                style: TextStyle(color: kPrimaryColor),
+              ),
               onPressed: () async {
                 Navigator.of(context).pop();
                 await _deleteAgent(agent);
@@ -119,11 +121,9 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
     userProvider.currentUser = agent;
     userProvider.prefillUpdateForm(agent); // Pré-remplir le formulaire
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const UpdateUser(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const UpdateUser()));
   }
 
   @override
@@ -178,11 +178,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                   padding: const EdgeInsets.all(40.0),
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.group_off,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
+                      Icon(Icons.group_off, size: 80, color: Colors.grey[400]),
                       const SizedBox(height: 20),
                       const Text(
                         'Aucun agent trouvé',
@@ -197,10 +193,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                         const Text(
                           'Les utilisateurs existent mais aucun n\'a le rôle AGENT.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: Colors.grey, fontSize: 14),
                         ),
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
@@ -252,14 +245,8 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
               label: HeadTableStyle(data: "Nom complet"),
               numeric: false,
             ),
-            DataColumn(
-              label: HeadTableStyle(data: "Email"),
-              numeric: false,
-            ),
-            DataColumn(
-              label: HeadTableStyle(data: "Actions"),
-              numeric: false,
-            ),
+            DataColumn(label: HeadTableStyle(data: "Email"), numeric: false),
+            DataColumn(label: HeadTableStyle(data: "Actions"), numeric: false),
           ],
           rows: agents.map((agent) {
             return DataRow(
@@ -276,9 +263,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                     datafromBack: '${agent.firstName} ${agent.lastName}',
                   ),
                 ),
-                DataCell(
-                  DataTableStyle(datafromBack: agent.email),
-                ),
+                DataCell(DataTableStyle(datafromBack: agent.email)),
                 DataCell(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -290,8 +275,11 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                         child: IconButton(
                           onPressed: () =>
                               _navigateToAgentDetails(context, agent),
-                          icon: const Icon(Icons.visibility,
-                              size: 30, color: kPrimaryColor),
+                          icon: const Icon(
+                            Icons.visibility,
+                            size: 30,
+                            color: kPrimaryColor,
+                          ),
                           padding: const EdgeInsets.all(6),
                         ),
                       ),
@@ -303,8 +291,11 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                         child: IconButton(
                           onPressed: () =>
                               _navigateToUpdateAgent(context, agent),
-                          icon: const Icon(Icons.edit,
-                              size: 30, color: kPrimaryColor),
+                          icon: const Icon(
+                            Icons.edit,
+                            size: 30,
+                            color: kPrimaryColor,
+                          ),
                           padding: const EdgeInsets.all(6),
                         ),
                       ),
@@ -315,8 +306,11 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                         message: 'Supprimer',
                         child: IconButton(
                           onPressed: () => _showDeleteAgentDialog(agent),
-                          icon: const Icon(Icons.delete,
-                              size: 30, color: kPrimaryColor),
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 30,
+                            color: kPrimaryColor,
+                          ),
                           padding: const EdgeInsets.all(6),
                         ),
                       ),

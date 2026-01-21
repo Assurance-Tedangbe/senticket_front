@@ -22,13 +22,14 @@ class User {
   // JSON -> User
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-        userId: json['userId'],
-        username: json['username'],
-        password: json['password'] ?? '', // Default value if null
-        email: json['email'],
-        firstName: json['firstName'],
-        lastName: json['lastName'],
-        role: Role.fromJson(json['roleDTO']));
+      userId: json['userId'],
+      username: json['username'],
+      password: json['password'] ?? '', // Default value if null
+      email: json['email'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      role: Role.fromJson(json['roleDTO']),
+    );
   }
 
   // User -> JSON
@@ -45,7 +46,7 @@ class User {
   }
 
   // Creates a copy of the user with some modified values: useful for edit forms
-/*   User copyWith({
+  /*   User copyWith({
     int? userId,
     String? username,
     String? password,

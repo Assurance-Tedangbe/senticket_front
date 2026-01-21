@@ -111,10 +111,10 @@ class _UserListPageState extends State<UserListPage> {
                     Text(user.email),
                     Chip(
                       label: Text(
-                        user.role.roleName,
+                        user.role.name,
                         style: TextStyle(color: Colors.white, fontSize: 12),
                       ),
-                      backgroundColor: _getRoleColor(user.role.roleName),
+                      backgroundColor: _getRoleColor(user.role.name),
                     ),
                   ],
                 ),
@@ -168,18 +168,14 @@ class _UserListPageState extends State<UserListPage> {
   void _navigateToUserForm(BuildContext context, [User? user]) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => UserFormPage(user: user),
-      ),
+      MaterialPageRoute(builder: (context) => UserFormPage(user: user)),
     );
   }
 
   void _navigateToUserDetail(BuildContext context, User user) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => UserDetailPage(user: user),
-      ),
+      MaterialPageRoute(builder: (context) => UserDetailPage(user: user)),
     );
   }
 
@@ -203,8 +199,9 @@ class _UserListPageState extends State<UserListPage> {
     );
 
     if (confirmed == true) {
-      final success =
-          await context.read<UserProvider>().deleteExistingUser(userId);
+      final success = await context.read<UserProvider>().deleteExistingUser(
+        userId,
+      );
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Utilisateur supprimé avec succès')),

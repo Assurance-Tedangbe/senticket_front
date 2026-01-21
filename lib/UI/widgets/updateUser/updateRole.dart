@@ -11,11 +11,7 @@ class UpdateRole extends StatelessWidget {
   final ValueChanged<Role?> onRoleChanged;
   final Role? selectedRole;
 
-  const UpdateRole({
-    super.key,
-    required this.onRoleChanged,
-    this.selectedRole,
-  });
+  const UpdateRole({super.key, required this.onRoleChanged, this.selectedRole});
 
   Role? _getSelectedRole(List<Role> availableRoles, Role? selectedRole) {
     if (selectedRole == null) return null;
@@ -23,7 +19,7 @@ class UpdateRole extends StatelessWidget {
     // Chercher le rôle correspondant dans la liste disponible
     final matchingRole = availableRoles.firstWhere(
       (role) => role.roleId == selectedRole.roleId,
-      orElse: () => Role(roleId: -1, roleName: ''), // Rôle fictif si non trouvé
+      orElse: () => Role(roleId: -1, name: ''), // Rôle fictif si non trouvé
     );
 
     // Si trouvé, retourner le rôle de la liste (même instance)
@@ -48,10 +44,11 @@ class UpdateRole extends StatelessWidget {
         // Debug: Afficher les rôles disponibles et le rôle sélectionné
         print('🔄 Rôles disponibles: ${roleProvider.roles.length}');
         for (var role in roleProvider.roles) {
-          print('   - ${role.roleName} (ID: ${role.roleId})');
+          print('   - ${role.name} (ID: ${role.roleId})');
         }
         print(
-            '🎯 Rôle sélectionné: ${selectedRole?.roleName} (ID: ${selectedRole?.roleId})');
+          '🎯 Rôle sélectionné: ${selectedRole?.name} (ID: ${selectedRole?.roleId})',
+        );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,8 +80,10 @@ class UpdateRole extends StatelessWidget {
                         ),
                       )
                     : DropdownButtonFormField<Role>(
-                        value:
-                            _getSelectedRole(roleProvider.roles, selectedRole),
+                        value: _getSelectedRole(
+                          roleProvider.roles,
+                          selectedRole,
+                        ),
                         /* selectedRole ??
                             (roleProvider.roles.isNotEmpty
                                 ? roleProvider.roles.first
@@ -104,17 +103,19 @@ class UpdateRole extends StatelessWidget {
                           onRoleChanged(value);
                           if (value != null) {
                             final userProvider = Provider.of<UserProvider>(
-                                context,
-                                listen: false);
+                              context,
+                              listen: false,
+                            );
                             userProvider.setUpdateRole(value);
                           }
                         },
-                        items: roleProvider.roles
-                            .map<DropdownMenuItem<Role>>((Role role) {
+                        items: roleProvider.roles.map<DropdownMenuItem<Role>>((
+                          Role role,
+                        ) {
                           return DropdownMenuItem<Role>(
                             value: role,
                             child: Text(
-                              role.roleName,
+                              role.name,
                               style: const TextStyle(color: kThirdColor),
                             ),
                           );

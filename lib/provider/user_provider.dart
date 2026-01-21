@@ -151,12 +151,12 @@ class UserProvider with ChangeNotifier {
 
   void setRole(Role value) {
     print('=== setRole appelé ===');
-    print('Valeur reçue: ${value.roleName} (ID: ${value.roleId})');
-    print('Ancien _role: ${_role?.roleName}');
+    print('Valeur reçue: ${value.name} (ID: ${value.roleId})');
+    print('Ancien _role: ${_role?.name}');
 
     _role = value;
 
-    print('Nouveau _role: ${_role?.roleName}');
+    print('Nouveau _role: ${_role?.name}');
     print('Rôle ID: ${_role?.roleId}');
     print('Rôle est null? ${_role == null}');
 
@@ -323,12 +323,10 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<bool> submitSignup() async {
-    print('=== DEBUG submitSignup ===');
     print('1. _firstName: $_firstName');
     print('2. _role: $_role');
-    print('3. _role?.roleName: ${_role?.roleName}');
+    print('3. _role?.name: ${_role?.name}');
     print('4. _role?.roleId: ${_role?.roleId}');
-    print('==========================');
 
     if (!isFormValid) {
       _error = 'Veuillez remplir tous les champs correctement';
@@ -354,7 +352,7 @@ class UserProvider with ChangeNotifier {
         role: _role!,
       );
 
-      print('🔄 Création de l\'utilisateur avec rôle: ${_role!.roleName}');
+      print('🔄 Création de l\'utilisateur avec rôle: ${_role!.name}');
 
       return await createNewUser(user);
     } catch (e) {
@@ -434,8 +432,8 @@ class UserProvider with ChangeNotifier {
       print('✅ Connexion réussie: ${user.username}');
       print('   ID: ${user.userId}');
       print('   Email: ${user.email}');
-      print('   Rôle: ${user.role?.roleName}');
-      print('   Rôle actuel: ${_currentUser!.role?.roleName}');
+      print('   Rôle: ${user.role?.name}');
+      print('   Rôle actuel: ${_currentUser!.role?.name}');
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();
@@ -712,7 +710,7 @@ class UserProvider with ChangeNotifier {
   // Méthode pour filtrer par rôle
   List<User> getUsersByRole(String roleName) {
     return _users.where((user) {
-      return user.role?.roleName?.toUpperCase() == roleName.toUpperCase();
+      return user.role?.name?.toUpperCase() == roleName.toUpperCase();
     }).toList();
   }
 

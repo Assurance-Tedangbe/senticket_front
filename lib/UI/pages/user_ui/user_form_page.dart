@@ -24,10 +24,10 @@ class _UserFormPageState extends State<UserFormPage> {
 
   // Liste des rôles disponibles (à récupérer de votre API)
   final List<Role> _availableRoles = [
-    Role(roleId: 1, roleName: 'ADMIN'),
-    Role(roleId: 2, roleName: 'AGENT'),
-    Role(roleId: 3, roleName: 'ETUDIANT'),
-    Role(roleId: 4, roleName: 'PORTIER'),
+    Role(roleId: 1, name: 'ADMIN'),
+    Role(roleId: 2, name: 'AGENT'),
+    Role(roleId: 3, name: 'ETUDIANT'),
+    Role(roleId: 4, name: 'PORTIER'),
   ];
 
   Role? _selectedRole;
@@ -49,9 +49,9 @@ class _UserFormPageState extends State<UserFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.user == null
-            ? 'Nouvel Utilisateur'
-            : 'Modifier Utilisateur'),
+        title: Text(
+          widget.user == null ? 'Nouvel Utilisateur' : 'Modifier Utilisateur',
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -163,7 +163,7 @@ class _UserFormPageState extends State<UserFormPage> {
                 items: _availableRoles.map((Role role) {
                   return DropdownMenuItem<Role>(
                     value: role,
-                    child: Text(role.roleName),
+                    child: Text(role.name),
                   );
                 }).toList(),
                 onChanged: (Role? newValue) {
@@ -187,8 +187,9 @@ class _UserFormPageState extends State<UserFormPage> {
 
                   return ElevatedButton(
                     onPressed: () => _saveUser(context),
-                    child:
-                        Text(widget.user == null ? 'Créer' : 'Mettre à jour'),
+                    child: Text(
+                      widget.user == null ? 'Créer' : 'Mettre à jour',
+                    ),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 50),
                     ),
@@ -229,9 +230,11 @@ class _UserFormPageState extends State<UserFormPage> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.user == null
-                ? 'Utilisateur créé avec succès'
-                : 'Utilisateur modifié avec succès'),
+            content: Text(
+              widget.user == null
+                  ? 'Utilisateur créé avec succès'
+                  : 'Utilisateur modifié avec succès',
+            ),
           ),
         );
       } else {

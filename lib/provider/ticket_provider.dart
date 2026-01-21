@@ -240,7 +240,7 @@ class TicketProvider with ChangeNotifier {
 
     // Vérifier si l'utilisateur a le rôle ETUDIANT
     final user = userProvider.currentUser!;
-    final isStudent = user.role?.roleName?.toUpperCase() == 'ETUDIANT';
+    final isStudent = user.role?.name?.toUpperCase() == 'ETUDIANT';
 
     if (!isStudent) {
       _error = 'Seuls les étudiants peuvent acheter des tickets';

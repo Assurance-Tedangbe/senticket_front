@@ -48,18 +48,13 @@ class _ConsultDataState extends State<ConsultData> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text(_title),
-        backgroundColor: kPrimaryColor,
-      ),
+      appBar: AppBar(title: const Text(_title), backgroundColor: kPrimaryColor),
       /* nous pouvons directement utiliser userProvider.currentUser 
          sans avoir besoin d'un FutureBuilder supplémentaire.  */
       body: Consumer<UserProvider>(
         builder: (context, userProvider, child) {
           if (userProvider.isLoading && userProvider.currentUser == null) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final user = userProvider.currentUser; // ← Données déjà disponibles
@@ -179,10 +174,7 @@ class _ConsultDataState extends State<ConsultData> {
         const Divider(color: greyBorderColor),
 
         // Rôle
-        _buildInfoRow(
-          'Rôle',
-          user.role?.roleName ?? 'Non défini',
-        ),
+        _buildInfoRow('Rôle', user.role?.name ?? 'Non défini'),
       ],
     );
   }

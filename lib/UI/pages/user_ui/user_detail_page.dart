@@ -52,13 +52,14 @@ class UserDetailPage extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundColor: _getRoleColor(user.role.roleName),
+            backgroundColor: _getRoleColor(user.role.name),
             child: Text(
               user.username[0].toUpperCase(),
               style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
+                fontSize: 32,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           SizedBox(height: 16),
@@ -112,7 +113,9 @@ class UserDetailPage extends StatelessWidget {
             SizedBox(height: 16),
             _buildInfoRow('Nom d\'utilisateur', user.username),
             _buildInfoRow(
-                'Mot de passe', '••••••••'), // Masqué pour la sécurité
+              'Mot de passe',
+              '••••••••',
+            ), // Masqué pour la sécurité
           ],
         ),
       ),
@@ -134,15 +137,15 @@ class UserDetailPage extends StatelessWidget {
             Center(
               child: Chip(
                 label: Text(
-                  user.role.roleName,
+                  user.role.name,
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-                backgroundColor: _getRoleColor(user.role.roleName),
+                backgroundColor: _getRoleColor(user.role.name),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               ),
             ),
             SizedBox(height: 12),
-            _buildRoleDescription(user.role.roleName),
+            _buildRoleDescription(user.role.name),
           ],
         ),
       ),
@@ -160,16 +163,12 @@ class UserDetailPage extends StatelessWidget {
             child: Text(
               '$label :',
               style: TextStyle(
-                  fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
+          Expanded(flex: 3, child: Text(value, style: TextStyle(fontSize: 16))),
         ],
       ),
     );

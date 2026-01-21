@@ -32,11 +32,10 @@ class UserApiService {
     // I will create a user via POST /api/users and return the created user"
     try {
       print('📤 Envoi de la requête POST pour créer un utilisateur');
-     // print('📤 Body: ${json.encode(user.toJson())}');
+      // print('📤 Body: ${json.encode(user.toJson())}');
 
       final response = await http.post(
         // I'm trying to send a POST request:
-
         Uri.parse(baseUrl), // Converts the URL string to a Uri object
         headers: headers, // Uses the configured headers
         body: json.encode(user.toJson()), // Converts User object → JSON string
@@ -66,7 +65,8 @@ class UserApiService {
         try {
           // Essayez de parser le JSON
           final Map<String, dynamic> newUser = json.decode(
-              response.body); // Converts the JSON response → User object
+            response.body,
+          ); // Converts the JSON response → User object
 
           print('✅ JSON parsé avec succès: $newUser');
 
@@ -81,7 +81,8 @@ class UserApiService {
       } else {
         print('❌ Statut HTTP non attendu: ${response.statusCode}');
         throw Exception(
-            'Erreur création utilisateur - Code HTTP: ${response.statusCode}');
+          'Erreur création utilisateur - Code HTTP: ${response.statusCode}',
+        );
       }
     } catch (e) {
       //  print("❌ Erreur création: $e");
@@ -100,10 +101,7 @@ class UserApiService {
       final response = await http.post(
         Uri.parse('$authUrl/login'), // ⭐ Ajustez l'URL selon votre API
         headers: headers,
-        body: json.encode({
-          'username': username,
-          'password': password,
-        }),
+        body: json.encode({'username': username, 'password': password}),
       );
 
       print('📥 Login Response Status: ${response.statusCode}');
@@ -130,13 +128,15 @@ class UserApiService {
           // _saveToken(token);
 
           print(
-              '✅ Connexion réussie avec token, utilisateur: ${user.username}');
+            '✅ Connexion réussie avec token, utilisateur: ${user.username}',
+          );
           return user;
         }
         // Si votre API a un format différent
         else {
           print(
-              '⚠️ Format de réponse non reconnu, tentative d\'extraction des données utilisateur');
+            '⚠️ Format de réponse non reconnu, tentative d\'extraction des données utilisateur',
+          );
 
           // Essayez de créer un utilisateur avec les données disponibles
           final user = User(
@@ -149,10 +149,12 @@ class UserApiService {
                 responseData['lastName'] ?? responseData['lastname'] ?? '',
             password: '', // Ne pas stocker le mot de passe
             role: Role(
-              roleId: responseData['roleId'] ??
+              roleId:
+                  responseData['roleId'] ??
                   responseData['role']?['roleId'] ??
                   0,
-              roleName: responseData['roleName'] ??
+              name:
+                  responseData['name'] ??
                   responseData['role']?['name'] ??
                   'USER',
             ),
@@ -197,7 +199,8 @@ class UserApiService {
     // Checks if the cache is still valid
     final now = DateTime.now();
 
-    final cacheValide = _lastFetchTime != null &&
+    final cacheValide =
+        _lastFetchTime != null &&
         now.difference(_lastFetchTime!) < cacheDuration;
 
     // Returns the cache if valid and not forced
@@ -210,16 +213,14 @@ class UserApiService {
     try {
       print("Retrieving users from the API");
 
-      final response = await http.get(
-        Uri.parse(baseUrl),
-        headers: headers,
-      );
+      final response = await http.get(Uri.parse(baseUrl), headers: headers);
 
       if (response.statusCode == 200) {
         // the JSON response → a list of User objects
 
-        final List<dynamic> jsonList =
-            json.decode(response.body); // JSON string  → List of Dart objects
+        final List<dynamic> jsonList = json.decode(
+          response.body,
+        ); // JSON string  → List of Dart objects
 
         _cachedUsers = jsonList
             .map((json) => User.fromJson(json))
@@ -232,7 +233,8 @@ class UserApiService {
         return _cachedUsers;
       } else {
         throw Exception(
-            'Erreur récupération utilisateurs: ${response.statusCode}');
+          'Erreur récupération utilisateurs: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print("Erreur récupération: $e");
@@ -251,7 +253,7 @@ class UserApiService {
   // 3. READ USER BY ID (GET /api/users/{userId})
   // -------------------------
 
-// Déclaration d'une méthode asynchrone qui retourne un objet User
+  // Déclaration d'une méthode asynchrone qui retourne un objet User
   Future<User> getUserById(int userId) async {
     try {
       print("Retrieving user ID: $userId");
@@ -270,7 +272,7 @@ class UserApiService {
           email: '',
           firstName: '',
           lastName: '',
-          role: Role(roleName: ''),
+          role: Role(name: ''),
         ),
       );
 
@@ -302,7 +304,8 @@ class UserApiService {
         throw Exception('Utilisateur non trouvé');
       } else {
         throw Exception(
-            'Erreur récupération utilisateur: ${response.statusCode}');
+          'Erreur récupération utilisateur: ${response.statusCode}',
+        );
       }
     } catch (e) {
       // Bloc catch qui capture toutes les exceptions pouvant survenir
@@ -332,16 +335,17 @@ class UserApiService {
         throw Exception('Utilisateur non trouvé');
       } else {
         throw Exception(
-            'Erreur récupération utilisateur(serveur): ${response.statusCode}');
+          'Erreur récupération utilisateur(serveur): ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Erreur réseau: $e');
     }
   }
 
-// -------------------------
-// 5. UPDATE USER (PUT /api/users/{userId})
-// -------------------------
+  // -------------------------
+  // 5. UPDATE USER (PUT /api/users/{userId})
+  // -------------------------
   Future<User> updateUser(User user) async {
     try {
       print("Update user with ID: ${user.userId}");
@@ -365,7 +369,8 @@ class UserApiService {
         return updatedUser;
       } else {
         throw Exception(
-            'Erreur mise à jour utilisateur: ${response.statusCode}');
+          'Erreur mise à jour utilisateur: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print("Erreur mise à jour: $e");
@@ -373,22 +378,24 @@ class UserApiService {
     }
   }
 
-// -------------------------
-// 6. UPDATE PASSWORD (PUT /api/users/password/{userId})
-// without cahe
-// -------------------------
+  // -------------------------
+  // 6. UPDATE PASSWORD (PUT /api/users/password/{userId})
+  // without cahe
+  // -------------------------
   Future<void> updatePassword(int userId, String newPassword) async {
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/password/$userId'),
         headers: headers,
         body: json.encode(
-            newPassword), // Sends only the new password (not the entire User object)"
+          newPassword,
+        ), // Sends only the new password (not the entire User object)"
       );
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur mise à jour mot de passe: ${response.statusCode}');
+          'Erreur mise à jour mot de passe: ${response.statusCode}',
+        );
       }
 
       print("Password updated for user with ID: $userId");
@@ -397,9 +404,9 @@ class UserApiService {
     }
   }
 
-// -------------------------
-// 7. DELETE USER (DELETE /api/users/{userId})
-// -------------------------
+  // -------------------------
+  // 7. DELETE USER (DELETE /api/users/{userId})
+  // -------------------------
   Future<void> deleteUser(int userId) async {
     try {
       print("Deleting user with ID: $userId");
@@ -416,7 +423,8 @@ class UserApiService {
         _cachedUsers.removeWhere((user) => user.userId == userId);
       } else {
         throw Exception(
-            'Erreur suppression utilisateur: ${response.statusCode}');
+          'Erreur suppression utilisateur: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print("Erreur suppression: $e");
@@ -425,10 +433,10 @@ class UserApiService {
     }
   }
 
-// -------------------------
-// 8. ADD ROLE TO USER (PUT /api/users/{userId}/roles/{roleId})
-// without cahe
-// -------------------------
+  // -------------------------
+  // 8. ADD ROLE TO USER (PUT /api/users/{userId}/roles/{roleId})
+  // without cahe
+  // -------------------------
   Future<void> addRoleToUser(int userId, int roleId) async {
     print("Add role : $roleId to user : $userId");
 
@@ -448,10 +456,10 @@ class UserApiService {
     }
   }
 
-// -------------------------
-// 9. REMOVE ROLE FROM USER (DELETE /api/users/{userId}/roles/{roleId})
-// without cahe
-// -------------------------
+  // -------------------------
+  // 9. REMOVE ROLE FROM USER (DELETE /api/users/{userId}/roles/{roleId})
+  // without cahe
+  // -------------------------
   Future<void> removeRoleFromUser(int userId, int roleId) async {
     print("Remove role : $roleId from user : $userId");
     try {
@@ -470,7 +478,7 @@ class UserApiService {
     }
   }
 
-// Searching for users in the local cache
+  // Searching for users in the local cache
   List<User> searchUsers(String query) {
     print("searching for users with query: $query");
 
@@ -479,26 +487,30 @@ class UserApiService {
     final queryLower = query.toLowerCase();
 
     return _cachedUsers
-        .where((user) =>
-            user.username.toLowerCase().contains(queryLower) ||
-            user.email.toLowerCase().contains(queryLower) ||
-            user.firstName.toLowerCase().contains(queryLower) ||
-            user.lastName.toLowerCase().contains(queryLower) ||
-            user.role.roleName.toLowerCase().contains(queryLower))
+        .where(
+          (user) =>
+              user.username.toLowerCase().contains(queryLower) ||
+              user.email.toLowerCase().contains(queryLower) ||
+              user.firstName.toLowerCase().contains(queryLower) ||
+              user.lastName.toLowerCase().contains(queryLower) ||
+              user.role.name.toLowerCase().contains(queryLower),
+        )
         .toList();
   }
 
-// Basic validation of user data
+  // Basic validation of user data
   void validateUserData(User user) {
     if (user.username.length < 3) {
       throw Exception(
-          'Le nom d\'utilisateur doit contenir au moins 3 caractères');
+        'Le nom d\'utilisateur doit contenir au moins 3 caractères',
+      );
     }
 
     // Validation de la longueur maximale (comme @Size(max = 70))
     if (user.username.length > 70) {
       throw Exception(
-          'Le nom d\'utilisateur ne peut pas dépasser 70 caractères');
+        'Le nom d\'utilisateur ne peut pas dépasser 70 caractères',
+      );
     }
 
     if (user.password.length < 6) {
