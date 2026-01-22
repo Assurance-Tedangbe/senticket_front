@@ -81,12 +81,12 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
         color: isLoggedIn
             ? (isStudent
                   ? Colors.green.withOpacity(0.1)
-                  : redErrorColor.withOpacity(0.1))
+                  : kPrimaryColor.withOpacity(0.1))
             : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isLoggedIn
-              ? (isStudent ? Colors.green : redErrorColor)
+              ? (isStudent ? Colors.green : kPrimaryColor)
               : Colors.grey,
           width: 1,
         ),
@@ -98,7 +98,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                 ? (isStudent ? Icons.person : Icons.warning)
                 : Icons.person_off,
             color: isLoggedIn
-                ? (isStudent ? Colors.green : redErrorColor)
+                ? (isStudent ? cyanColor : kPrimaryColor)
                 : Colors.grey,
           ),
           const SizedBox(width: 12),
@@ -113,7 +113,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: isLoggedIn
-                        ? (isStudent ? Colors.green : redErrorColor)
+                        ? (isStudent ? cyanColor : kPrimaryColor)
                         : Colors.grey,
                   ),
                 ),
@@ -190,14 +190,14 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
       padding: const EdgeInsets.symmetric(vertical: 40),
       child: Column(
         children: [
-          const Icon(Icons.block, size: 80, color: redErrorColor),
+          const Icon(Icons.block, size: 80, color: kPrimaryColor),
           const SizedBox(height: 20),
           const Text(
             'Accès réservé aux étudiants',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: redErrorColor,
+              color: kPrimaryColor,
             ),
           ),
           const SizedBox(height: 10),
@@ -276,18 +276,18 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
       child: Container(
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color: redErrorColor.withOpacity(0.1),
+          color: kPrimaryColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: redErrorColor),
+          border: Border.all(color: kPrimaryColor),
         ),
         child: Row(
           children: [
-            const Icon(Icons.error, color: redErrorColor),
+            const Icon(Icons.error, color: kPrimaryColor),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 ticketProvider.error,
-                style: const TextStyle(color: redErrorColor),
+                style: const TextStyle(color: kPrimaryColor),
               ),
             ),
             IconButton(
@@ -300,7 +300,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     );
   }
 
-  void _showLoginDialog(BuildContext context) {
+  /*   void _showLoginDialog(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     showDialog(
@@ -334,7 +334,10 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       userProvider.error,
-                      style: const TextStyle(color: Colors.red, fontSize: 12),
+                      style: const TextStyle(
+                        color: kPrimaryColor,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
               ],
@@ -353,7 +356,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Connexion réussie'),
-                      backgroundColor: Colors.green,
+                      backgroundColor: validateBtnColor,
                     ),
                   );
                 }
@@ -364,7 +367,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
         );
       },
     );
-  }
+  } */
 }
 
 /* class BuyTicketBody extends StatefulWidget {
