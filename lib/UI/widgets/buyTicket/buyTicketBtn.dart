@@ -46,18 +46,20 @@ class BuyTicketBtn extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isLoggedIn
                           ? (isStudent
-                                ? Colors.green.withOpacity(0.1)
-                                : Colors.orange.withOpacity(0.1))
-                          : Colors.grey.withOpacity(0.1),
+                                ? ticketSectionColor
+                                : ticketSectionColor)
+                          : Colors.grey,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
+                      /* border: Border.all(
                         color: isLoggedIn
-                            ? (isStudent ? Colors.green : Colors.orange)
+                            ? (isStudent
+                                  ? ticketSectionColor
+                                  : ticketSectionColor)
                             : Colors.grey,
                         width: 1,
-                      ),
+                      ), */
                     ),
-                    child: Row(
+                    /* child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
@@ -66,26 +68,26 @@ class BuyTicketBtn extends StatelessWidget {
                               : Icons.person_off,
                           size: 16,
                           color: isLoggedIn
-                              ? (isStudent ? Colors.green : Colors.orange)
+                              ? (isStudent ? kThirdColor : kPrimaryColor)
                               : Colors.grey,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           isLoggedIn
                               ? (isStudent
-                                    ? 'Connecté: $userName (Étudiant)'
-                                    : 'Connecté: $userName (Non étudiant)')
+                                    ? 'Étudiant: $userName connecté'
+                                    : '$userName connecté')
                               : 'Non connecté',
                           style: TextStyle(
                             color: isLoggedIn
-                                ? (isStudent ? Colors.green : Colors.orange)
+                                ? (isStudent ? kThirdColor : kPrimaryColor)
                                 : Colors.grey,
-                            fontWeight: FontWeight.bold,
+                            //fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                         ),
                       ],
-                    ),
+                    ), */
                   ),
                 ),
 
@@ -189,7 +191,8 @@ class BuyTicketBtn extends StatelessWidget {
                                 ? 'Connectez-vous'
                                 : !isStudent
                                 ? 'Non permis'
-                                : 'Acheter ($selectedCount)',
+                                : 'Acheter',
+                            // ($selectedCount)',
                             style: TextStyle(
                               color: kThirdColor,
                               fontSize: 15,

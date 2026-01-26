@@ -102,9 +102,9 @@ class UserApiService {
       );
 
       /*  print('📥 Login Response Status: ${response.statusCode}');
-      print('📥 Login Response Body: ${response.body}');
-      print('📥 Response Headers: ${response.headers}');
-      print('📥 Response Body Length: ${response.body.length}'); */
+          print('📥 Login Response Body: ${response.body}');
+          print('📥 Response Headers: ${response.headers}');
+          print('📥 Response Body Length: ${response.body.length}'); */
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -138,6 +138,7 @@ class UserApiService {
         // Cas 3: Format spécifique de mon API
         else if (responseData.containsKey('user') &&
             responseData['user'] is Map<String, dynamic>) {
+          print('✅ CAS 3');
           print('✅ Format de réponse détecté (avec objet user)');
 
           final userData = responseData['user'] as Map<String, dynamic>;
@@ -145,7 +146,6 @@ class UserApiService {
           print('📋 responseData contenu: $responseData');
 
           /* final userData = responseData['user'] as Map<String, dynamic>;
-          print('✅ CAS 3');
 
           // DEBUG: Afficher ce que contient userData
           print('📋 userData contenu: $userData');

@@ -23,13 +23,12 @@ class TicketApiService {
         'application/json', // Indique au serveur "Je veux recevoir du JSON"
   };
 
-  // === CACHE SIMPLE INTÉGRÉ ===
+  // CACHE SIMPLE INTÉGRÉ
   List<Ticket> _cachedTickets = []; // Cache des tickets
   DateTime? _lastFetchTime; // Dernière récupération
   static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
 
-  // READ ALL TICKETS (GET /api/tickets)
-  // Using cache
+  // READ ALL TICKETS (GET /api/tickets). Using cache
   Future<List<Ticket>> getAllTickets({bool forceRefresh = false}) async {
     // "Vérifie si le cache est encore valide"
     final now = DateTime.now();

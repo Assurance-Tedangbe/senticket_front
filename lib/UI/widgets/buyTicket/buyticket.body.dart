@@ -42,14 +42,6 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                   width: size.width,
                   child: Column(
                     children: [
-                      // En-tête d'authentification
-                      _buildAuthHeader(
-                        context,
-                        userProvider,
-                        isLoggedIn,
-                        isStudent,
-                      ),
-
                       // Interface d'achat (seulement si étudiant connecté)
                       if (isLoggedIn && isStudent)
                         _buildTicketInterface(context)
@@ -57,6 +49,15 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                         _buildNotStudentWarning()
                       else
                         _buildLoginRequired(),
+
+                      const SizeboxTemplate(),
+                      // En-tête d'authentification
+                      _buildAuthHeader(
+                        context,
+                        userProvider,
+                        isLoggedIn,
+                        isStudent,
+                      ),
                     ],
                   ),
                 ),
@@ -77,51 +78,60 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     return Container(
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
+      /* decoration: BoxDecoration(
         color: isLoggedIn
-            ? (isStudent
-                  ? Colors.green.withOpacity(0.1)
-                  : kPrimaryColor.withOpacity(0.1))
-            : Colors.grey.withOpacity(0.1),
+            ? (isStudent ? secondColor : secondColor)
+            : Colors.grey,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
+          border: Border.all(
           color: isLoggedIn
-              ? (isStudent ? Colors.green : kPrimaryColor)
+              ? (isStudent ? cyanColor : kPrimaryColor)
               : Colors.grey,
           width: 1,
-        ),
-      ),
+        ), 
+      ), */
       child: Row(
         children: [
-          Icon(
+          /* Icon(
             isLoggedIn
                 ? (isStudent ? Icons.person : Icons.warning)
                 : Icons.person_off,
             color: isLoggedIn
-                ? (isStudent ? cyanColor : kPrimaryColor)
+                ? (isStudent ? kThirdColor : kPrimaryColor)
                 : Colors.grey,
-          ),
+          ), */
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Icon(
+                  isLoggedIn
+                      ? (isStudent ? Icons.person : Icons.warning)
+                      : Icons.person_off,
+                  size: 16,
+                  color: isLoggedIn
+                      ? (isStudent ? kThirdColor : kPrimaryColor)
+                      : Colors.grey,
+                ),
+                const SizedBox(width: 4),
+                const SizedBox(height: 2),
                 Text(
                   isLoggedIn
-                      ? 'Connecté en tant que: ${userProvider.currentUser!.role.name}'
-                      : 'Non connecté',
+                      ? ' ${userProvider.currentUser!.username} connecté (${userProvider.currentUser!.role.name})'
+                      : '',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    // fontWeight: FontWeight.bold,
                     color: isLoggedIn
-                        ? (isStudent ? cyanColor : kPrimaryColor)
+                        ? (isStudent ? kThirdColor : kPrimaryColor)
                         : Colors.grey,
                   ),
                 ),
-                if (isLoggedIn)
+                /* if (isLoggedIn)
                   Text(
                     'Rôle: ${userProvider.currentUser!.role.name}',
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
+                  ), */
               ],
             ),
           ),
@@ -139,8 +149,8 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
               },
               icon: const Icon(Icons.logout, color: kPrimaryColor),
               tooltip: 'Se déconnecter',
-            )
-          else
+            ),
+          /*  else
             ElevatedButton.icon(
               onPressed: () {
                 // Naviguer vers la page de connexion
@@ -161,7 +171,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                   vertical: 8,
                 ),
               ),
-            ),
+            ), */
         ],
       ),
     );
@@ -369,96 +379,6 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     );
   } */
 }
-
-/* class BuyTicketBody extends StatefulWidget {
-  const BuyTicketBody({super.key});
-
-  @override
-  State<BuyTicketBody> createState() => _BuyTicketBodyState();
-}
-
-class _BuyTicketBodyState extends State<BuyTicketBody> {
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) {
-        final isLoggedIn = userProvider.currentUser != null;
-        final isStudent = isLoggedIn
-            ? userProvider.currentUser!.role?.roleName?.toUpperCase() ==
-                  'ETUDIANT'
-            : false;
-
-        return ChangeNotifierProvider(
-          create: (context) => TicketProvider(TicketApiService()),
-          child: Background(
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(4.0, 0, 4.0, 0),
-                child: SizedBox(
-                  width: size.width,
-                  child: Column(
-                    children: [
-                      Consumer<TicketProvider>(
-                        builder: (context, ticketProvider, child) {
-                          if (ticketProvider.error.isNotEmpty) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(12.0),
-                                decoration: BoxDecoration(
-                                  color: redErrorColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  border: Border.all(color: redErrorColor),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.error,
-                                      color: redErrorColor,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        ticketProvider.error,
-                                        style: const TextStyle(
-                                          color: redErrorColor,
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.close, size: 16),
-                                      onPressed: () {
-                                        ticketProvider.clearError();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                      const TicketASection(),
-                      const SizeboxTemplate(),
-                      const TicketBSection(),
-                      const SizeboxHeight(),
-                      const RequestSection(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-} */
 
 /* Impl. sans dynamisation
 class BuyTicketBody extends StatelessWidget {

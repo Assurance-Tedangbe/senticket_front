@@ -430,10 +430,13 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
 
       print('✅ Connexion réussie: ${user.username}');
-      print('   ID: ${user.userId}');
-      print('   Email: ${user.email}');
-      print('   Rôle: ${user.role?.name}');
-      print('   Rôle: ${user.role.name}'); // Debug du rôle
+      print('ID: ${user.userId}');
+      print('Rôle name: ${user.role.name}');
+      /*  print('Email: ${user.email}');
+      print('Rôle id: ${user.role.roleId}');
+      print('firstname: ${user.firstName}');
+      print('lastname: ${user.lastName}');
+      print('password: ${user.password}'); */
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();
@@ -444,7 +447,7 @@ class UserProvider with ChangeNotifier {
       _error = 'Erreur de connexion: ${e.toString()}';
       notifyListeners();
 
-      print('❌ Erreur de connexion: $e');
+      print(' Erreur de connexion: $e');
       return false;
     }
   }
@@ -500,15 +503,11 @@ class UserProvider with ChangeNotifier {
       _users.removeWhere((user) => user.userId == userId);
 
       _error = '';
-      //_isLoading = false;
-      //notifyListeners();
       print(" User with this ID deleted: $userId");
       return true;
     } catch (e) {
       _error = 'Error deleting: ${e.toString()}';
       print("Error deleteExistingUser: $e");
-      // _isLoading = false;
-      //notifyListeners();
       return false;
     } finally {
       _isDeletingUser = false;
@@ -570,18 +569,14 @@ class UserProvider with ChangeNotifier {
       await _service.updatePassword(
         userId,
         newPassword,
-      ); //I'm asking the API to change the password for this user"
+      ); // asking the API to change the password for this user
 
       _error = '';
       print(" User password updated successfully: $newPassword");
-      // _isLoading = false;
-      // notifyListeners();
       return true;
     } catch (e) {
       _error = 'Error updating user password: ${e.toString()}';
       print("Error updatePassword: $e");
-      //  _isLoading = false;
-      //  notifyListeners();
       return false;
     } finally {
       _isUpdatingPassword = false;
@@ -604,14 +599,10 @@ class UserProvider with ChangeNotifier {
 
       _error = '';
       print("Role $roleId added to user $userId");
-      // _isLoading = false;
-      // notifyListeners();
       return true;
     } catch (e) {
       _error = 'Error adding role: ${e.toString()}';
       print(" Error addRoleToUser: $e");
-      // _isLoading = false;
-      // notifyListeners();
       return false;
     } finally {
       _isAddRoleToUser = false;

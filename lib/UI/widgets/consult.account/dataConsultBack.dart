@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:senticket_front/constants.dart';
 
 class DataConsultBack extends StatelessWidget {
@@ -13,3 +13,4 @@ class DataConsultBack extends StatelessWidget {
     );
   }
 }
+ */
