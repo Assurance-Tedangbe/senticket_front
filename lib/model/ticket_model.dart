@@ -47,7 +47,7 @@ class Ticket {
           ? DateTime.parse(json['ticketPurchaseDate'])
           : null,
       ticketDescription: json['ticketDescription'] ?? '',
-      purchaseUserDTO: PurchaseUserDTO.fromJson(json['purchaseUserDTO']),
+      purchaseUserDTO: PurchaseUserDTO.fromJson(json['userDTO']),
       isSelected: false, // Par défaut non sélectionné
     );
   }
@@ -122,7 +122,7 @@ class PurchaseUserDTO {
 // Modèles pour les requêtes complexes
 class CreationTicketsRequestDTO {
   final List<Ticket> tickets;
-  // Represents the total number of A tickets to create
+  //the total number of A tickets to create
   final int countA;
   final int countB;
 
@@ -150,12 +150,10 @@ class PurchaseTicketsRequestDTO {
     required this.selectedTicketIds,
   });
 
-  // IMPORTANT: Le backend attend "selectedTicketIds" pas "ticketIds"
   Map<String, dynamic> toJson() {
     return {
       'purchaseUserDTO': purchaseUserDTO.toJson(),
-      'selectedTicketIds':
-          selectedTicketIds, // Nom de propriété doit correspondre au backend
+      'selectedTicketIds': selectedTicketIds,
     };
   }
 

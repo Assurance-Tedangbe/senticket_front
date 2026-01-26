@@ -24,11 +24,11 @@ class BuyTicketBtn extends StatelessWidget {
             // Vérifier si l'utilisateur est connecté
             final isLoggedIn = userProvider.currentUser != null;
             final isStudent = isLoggedIn
-                ? userProvider.currentUser!.role?.name?.toUpperCase() ==
+                ? userProvider.currentUser!.role.name.toUpperCase() ==
                       'ETUDIANT'
                 : false;
-            final userName =
-                userProvider.currentUser?.username ?? 'Non connecté';
+            /*  final userName =
+                userProvider.currentUser?.username ?? 'Non connecté'; */
 
             double totalPrice = 0;
             for (var ticket in selectedTickets) {
@@ -37,6 +37,7 @@ class BuyTicketBtn extends StatelessWidget {
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Afficher l'état de connexion
                 Padding(
@@ -94,37 +95,37 @@ class BuyTicketBtn extends StatelessWidget {
                 if (selectedCount > 0)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Container(
+                    /* child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 55,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: kPrimaryColor.withOpacity(0.1),
+                        color: kPrimaryColor,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: kPrimaryColor),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$selectedCount ticket(s) sélectionné(s)',
-                            style: const TextStyle(
-                              color: kThirdColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
+                      ), */
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$selectedCount ticket(s) sélectionné(s)',
+                          style: const TextStyle(
+                            color: kThirdColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
-                          Text(
-                            'Total: ${totalPrice.toStringAsFixed(2)} FCFA',
-                            style: const TextStyle(
-                              color: kThirdColor,
-                              fontSize: 12,
-                            ),
+                        ),
+                        Text(
+                          'Total: ${totalPrice.toStringAsFixed(2)} FCFA',
+                          style: const TextStyle(
+                            color: kThirdColor,
+                            fontSize: 12,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                    //  ),
                   ),
                 SizedBox(
                   width: size.width * 0.7,
@@ -191,7 +192,7 @@ class BuyTicketBtn extends StatelessWidget {
                                 ? 'Connectez-vous'
                                 : !isStudent
                                 ? 'Non permis'
-                                : 'Acheter',
+                                : 'Acheter ticket(s) ',
                             // ($selectedCount)',
                             style: TextStyle(
                               color: kThirdColor,

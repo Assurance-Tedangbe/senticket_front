@@ -109,28 +109,23 @@ class TicketProvider with ChangeNotifier {
   /* CHARGE TOUS LES TICKETS DEPUIS L'API
    * @param forceRefresh : si true, ignore le cache et force le rechargement */
   Future<void> loadAllTickets({bool forceRefresh = false}) async {
-    // "charge les tickets, cela va prendre du temps (async)"
-
     _isLoading = true; // active le chargement
     _error = ''; // efface les erreurs précédentes
     notifyListeners(); // notifie tous les écouteurs (UI) que l'état a changé/du début du chargement
     // Notifie tous les widgets écoutant ce provider
 
     try {
-      // Appel asynchrone au service pour récupérer les tickets
       _tickets = await _service.getAllTickets(
         forceRefresh: forceRefresh,
-      ); // "Demande au service de me donner tous les tickets"
+      ); // "récupère tous les tickets depuis l'API via le service"
 
       // Si succès : mise à jour de la liste et effacement des erreurs
       _error = ''; // "Confirme qu'il n'y a pas d'erreurs"
       print("Chargement réussi : ${_tickets.length} tickets");
     } catch (e) {
-      // En cas d'erreur : stockage du message d'erreur
       _error = e.toString(); // "Stocke l'erreur"
       print("Erreur loadAllTickets: $e");
     } finally {
-      // Dans tous les cas : fin du chargement et notification
       _isLoading = false; // "arrête le chargement"
       notifyListeners(); // "notifie l'UI de la fin du chargement"
     }
@@ -182,7 +177,7 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> purchaseTickets() async {
+  /*  Future<bool> purchaseTickets() async {
     // Récupérer UserProvider via BuildContext (on le fera passer depuis le widget)
     // Cette méthode sera modifiée dans le widget pour passer le context
 
@@ -225,7 +220,7 @@ class TicketProvider with ChangeNotifier {
       _isPurchasingTickets = false;
       notifyListeners();
     }
-  }
+  } */
 
   // Nouvelle méthode qui accepte le context pour récupérer l'utilisateur
   Future<bool> purchaseTicketsWithContext(BuildContext context) async {

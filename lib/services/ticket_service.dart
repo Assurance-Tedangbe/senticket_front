@@ -136,10 +136,6 @@ class TicketApiService {
 
       print("URL: $baseUrl/purchase");
 
-      final requestBody = purchaseTicketsRequestDTO.toJson();
-      final requestBodyString = json.encode(requestBody);
-
-      print("Request body JSON: $requestBodyString");
       print(
         "PurchaseUserDTO: ${purchaseTicketsRequestDTO.purchaseUserDTO.toJson()}",
       );
@@ -148,17 +144,20 @@ class TicketApiService {
       );
       print("Ticket IDs: ${purchaseTicketsRequestDTO.selectedTicketIds}");
 
-      /* // Log le DTO pour debug
-      final requestBody = purchaseTicketsRequestDTO.toJson();
-      print("Request body: $requestBody"); */
-
       final response = await http.put(
         Uri.parse('$baseUrl/purchase'),
         headers: headers,
-        body: json.encode(requestBodyString),
+        body: json.encode(({
+          'purchaseUserDTO': {
+            'userId': purchaseTicketsRequestDTO.purchaseUserDTO.userId,
+            'username': purchaseTicketsRequestDTO.purchaseUserDTO.username,
+          },
+          'selectedTicketIds': purchaseTicketsRequestDTO.selectedTicketIds,
+        })),
       );
 
       print("Status code: ${response.statusCode}");
+      print("Response headers: ${response.headers}");
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {

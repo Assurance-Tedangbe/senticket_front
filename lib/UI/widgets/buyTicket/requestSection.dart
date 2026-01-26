@@ -36,89 +36,18 @@ class _RequestSectionState extends State<RequestSection> {
 
     return Consumer<TicketProvider>(
       builder: (context, ticketProvider, child) {
-        final selectedCount = ticketProvider.selectedTickets.length;
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: double.infinity,
-              height: size.height / 5.0,
-              decoration: BoxDecoration(
-                color: ticketSectionColor,
-                borderRadius: const BorderRadius.all(Radius.circular(17.0)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: boxshadowColor,
-                    blurRadius: 6,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-                // border: Border.all(color: kPrimaryColor, width: 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: /* Column(
-                //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [ */
-                    /* Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        /*  ClientNameSection(
-                          onChanged: (value) {
-                            setState(() {
-                              buyerName = value;
-                            });
-                          },
-                        ), */
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              'Tickets sélectionnés',
-                              style: TextStyle(
-                                color: kPrimaryColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              selectedCount.toString(),
-                              style: const TextStyle(
-                                color: kPrimaryColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ), */
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        /* ElevatedButton.icon(
-                          onPressed: buyerName.isNotEmpty || selectedCount > 0
-                              ? _clearForm
-                              : null,
-                          icon: const Icon(Icons.clear, size: 16),
-                          label: const Text('Effacer tout'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[600],
-                            foregroundColor: Colors.white,
-                            minimumSize: Size(size.width * 0.25, 40),
-                          ),
-                        ), */
-                        BuyTicketBtn(
-                          onSuccess: () {
-                            _clearForm();
-                          },
-                        ),
-                      ],
-                    ),
-                //  ],
-                //  ),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BuyTicketBtn(
+                  onSuccess: () {
+                    _clearForm();
+                  },
+                ),
+              ],
             ),
           ],
         );
@@ -126,46 +55,3 @@ class _RequestSectionState extends State<RequestSection> {
     );
   }
 }
-
-/* Impl. sans dynamisation
-class RequestSection extends StatelessWidget {
-  const RequestSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        width: double.infinity,
-        height: size.height / 5.0,
-        decoration: BoxDecoration(
-            color: ticketSectionColor,
-            borderRadius: const BorderRadius.all(Radius.circular(17.0)),
-            boxShadow: const [
-              BoxShadow(
-                  color: boxshadowColor, blurRadius: 6, offset: Offset(0, 2))
-            ],
-            border: Border.all(color: kPrimaryColor, width: 1)),
-        child: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ClientNameSection(),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BuyTicketBtn(),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    ]);
-  }
-} */

@@ -145,15 +145,7 @@ class UserApiService {
           print('📋 userData contenu: $userData');
           print('📋 responseData contenu: $responseData');
 
-          /* final userData = responseData['user'] as Map<String, dynamic>;
-
-          // DEBUG: Afficher ce que contient userData
-          print('📋 userData contenu: $userData');
-          print('📋 responseData contenu: $responseData');
-          print('📋 userData keys: ${userData.keys}');
-          print('📋 userData[roleID]: ${userData['roleId']}');
-          print('📋 userData[name]: ${userData['name']}');
-
+          /*
           // Construire le rôle d'abord pour vérifier
           final role = Role(
             roleId: (userData['roleId'] ?? userData['roleId'] ?? 0).toInt(),
@@ -184,14 +176,7 @@ class UserApiService {
           );
 
           print('✅ user connecté: ${user.username}');
-          print('ID: ${user.userId}');
-          print('Email: ${user.email}');
-          print('firstname: ${user.firstName}');
-          print('lastname: ${user.lastName}');
-          print('password: ${user.password}');
           print('Rôle name: ${user.role.name}');
-          print('Rôle id: ${user.role.roleId}');
-
           return user; */
 
           return User.fromJson(userData);

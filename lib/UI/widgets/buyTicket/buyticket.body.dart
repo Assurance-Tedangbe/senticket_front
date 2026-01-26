@@ -78,60 +78,23 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     return Container(
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 16),
-      /* decoration: BoxDecoration(
-        color: isLoggedIn
-            ? (isStudent ? secondColor : secondColor)
-            : Colors.grey,
-        borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-          color: isLoggedIn
-              ? (isStudent ? cyanColor : kPrimaryColor)
-              : Colors.grey,
-          width: 1,
-        ), 
-      ), */
       child: Row(
         children: [
-          /* Icon(
-            isLoggedIn
-                ? (isStudent ? Icons.person : Icons.warning)
-                : Icons.person_off,
-            color: isLoggedIn
-                ? (isStudent ? kThirdColor : kPrimaryColor)
-                : Colors.grey,
-          ), */
           const SizedBox(width: 12),
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  isLoggedIn
-                      ? (isStudent ? Icons.person : Icons.warning)
-                      : Icons.person_off,
-                  size: 16,
-                  color: isLoggedIn
-                      ? (isStudent ? kThirdColor : kPrimaryColor)
-                      : Colors.grey,
-                ),
-                const SizedBox(width: 4),
-                const SizedBox(height: 2),
                 Text(
                   isLoggedIn
                       ? ' ${userProvider.currentUser!.username} connecté (${userProvider.currentUser!.role.name})'
                       : '',
                   style: TextStyle(
-                    // fontWeight: FontWeight.bold,
                     color: isLoggedIn
                         ? (isStudent ? kThirdColor : kPrimaryColor)
                         : Colors.grey,
                   ),
                 ),
-                /* if (isLoggedIn)
-                  Text(
-                    'Rôle: ${userProvider.currentUser!.role.name}',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ), */
               ],
             ),
           ),
@@ -150,28 +113,6 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
               icon: const Icon(Icons.logout, color: kPrimaryColor),
               tooltip: 'Se déconnecter',
             ),
-          /*  else
-            ElevatedButton.icon(
-              onPressed: () {
-                // Naviguer vers la page de connexion
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => LoginPage()),
-                );
-                // Pour l'instant, simulez une connexion
-                //  _showLoginDialog(context);
-              },
-              icon: const Icon(Icons.login, size: 16),
-              label: const Text('Se connecter'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-              ),
-            ), */
         ],
       ),
     );
@@ -266,7 +207,6 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                 context,
                 MaterialPageRoute(builder: (_) => LoginPage()),
               );
-              // _showLoginDialog(context);
             },
             icon: const Icon(Icons.login),
             label: const Text('Se connecter'),
@@ -309,103 +249,5 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
       ),
     );
   }
-
-  /*   void _showLoginDialog(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Connexion Étudiant'),
-          content: SizedBox(
-            width: 300,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Nom d\'utilisateur',
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  onChanged: userProvider.setLoginUsername,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Mot de passe',
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                  onChanged: userProvider.setLoginPassword,
-                ),
-                if (userProvider.error.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      userProvider.error,
-                      style: const TextStyle(
-                        color: kPrimaryColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Annuler'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final success = await userProvider.submitLogin();
-                if (success && context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Connexion réussie'),
-                      backgroundColor: validateBtnColor,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Se connecter'),
-            ),
-          ],
-        );
-      },
-    );
-  } */
 }
 
-/* Impl. sans dynamisation
-class BuyTicketBody extends StatelessWidget {
-  const BuyTicketBody({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Background(
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(4.0, 0, 4.0, 0),
-          child: SizedBox(
-            height: size.height,
-            width: size.width,
-            child: const Column(children: [
-              TicketASection(),
-              SizeboxTemplate(),
-              TicketBSection(),
-              SizeboxHeight(),
-              RequestSection()
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
-} */
