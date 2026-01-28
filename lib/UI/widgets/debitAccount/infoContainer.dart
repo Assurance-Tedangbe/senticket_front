@@ -15,17 +15,15 @@ class InfoContainer extends StatelessWidget {
         color: textContainerColor,
         borderRadius: BorderRadius.circular(10),
         boxShadow: const [
-          BoxShadow(color: boxshadowColor, blurRadius: 6, offset: Offset(0, 2))
+          BoxShadow(color: boxshadowColor, blurRadius: 6, offset: Offset(0, 2)),
         ],
+        border: Border.all(color: kPrimaryColor, width: 1),
       ),
       child: const Padding(
         padding: EdgeInsets.all(8.0),
         child: Text(
-          "Pour débiter le compte d'un étudiant, vous avez le choix entre scanner son code QR et entrer son n° de compte",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
+          "Pour débiter le compte d'un étudiant, vous avez le choix entre scanner son code QR et entrer son nom d'utilisateur.",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         ),
       ),
     );

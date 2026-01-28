@@ -44,7 +44,6 @@ class _ConsultBodyState extends State<ConsultBody> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Icône de la page
             const PageIconTemplate(iconData: Icons.search),
             const SizedBox(height: 20),
 
@@ -57,7 +56,6 @@ class _ConsultBodyState extends State<ConsultBody> {
                       onChanged: (value) =>
                           userProvider.setConsultUsername(value),
                     ),
-                    //const SizedBox(height: 20),
                     const SizeboxTemplate(),
                     ConsultBtn(
                       // onConsultSuccess: _onConsultSuccess,

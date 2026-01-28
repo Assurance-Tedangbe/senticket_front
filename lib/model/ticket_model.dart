@@ -156,10 +156,60 @@ class PurchaseTicketsRequestDTO {
       'selectedTicketIds': selectedTicketIds,
     };
   }
+}
 
-  /* String toJsonString() {
-    return json.encode(toJson());
-  } */
+class DebitAccountRequestDTO {
+  final DebitPorterDTO debitPorterDTO;
+  final DebitStudentDTO debitStudentDTO;
+  final List<int> ticketIds;
+
+  DebitAccountRequestDTO({
+    required this.debitPorterDTO,
+    required this.debitStudentDTO,
+    required this.ticketIds,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'debitPorterDTO': debitPorterDTO.toJson(),
+      'debitStudentDTO': debitStudentDTO.toJson(),
+      'ticketIds': ticketIds,
+    };
+  }
+}
+
+class DebitPorterDTO {
+  final int porterId;
+  final String porterUsername;
+
+  DebitPorterDTO({required this.porterId, required this.porterUsername});
+  factory DebitPorterDTO.fromJson(Map<String, dynamic> json) {
+    return DebitPorterDTO(
+      porterId: json['porterId'] as int,
+      porterUsername: json['porterUsername'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'porterId': porterId, 'porterUsername': porterUsername};
+  }
+}
+
+class DebitStudentDTO {
+  final int debitStudentId;
+  final String username;
+
+  DebitStudentDTO({required this.debitStudentId, required this.username});
+  factory DebitStudentDTO.fromJson(Map<String, dynamic> json) {
+    return DebitStudentDTO(
+      debitStudentId: json['debitStudentId'] as int,
+      username: json['username'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'debitStudentId': debitStudentId, 'username': username};
+  }
 }
 
 class TransferTicketsRequestDTO {
@@ -198,26 +248,6 @@ class CancelTransferTicketsRequestDTO {
       'originalSenderUserId': originalSenderUserId,
       'currentOwnerUserId': currentOwnerUserId,
       'ticketIdsToCancel': ticketIdsToCancel,
-    };
-  }
-}
-
-class DebitAccountRequestDTO {
-  final int portierId;
-  final int studentId;
-  final List<int> ticketIds;
-
-  DebitAccountRequestDTO({
-    required this.portierId,
-    required this.studentId,
-    required this.ticketIds,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'portierId': portierId,
-      'studentId': studentId,
-      'ticketIds': ticketIds,
     };
   }
 }

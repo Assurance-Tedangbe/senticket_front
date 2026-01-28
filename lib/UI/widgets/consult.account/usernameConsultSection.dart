@@ -3,9 +3,7 @@ import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
-/*
-  Widget pour le champ "Nom d'utilisateur" dans la page de consultation de compte.
-*/
+// Widget pour le champ "Nom d'utilisateur" dans la page de consultation de compte.
 class UsernameConsultSection extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String>? onChanged;
@@ -25,10 +23,7 @@ class UsernameConsultSection extends StatelessWidget {
           children: <Widget>[
             const Text(
               'Nom d\'utilisateur',
-              style: TextStyle(
-                color: kThirdColor,
-                fontSize: 15,
-              ),
+              style: TextStyle(color: kThirdColor, fontSize: 15),
             ),
             const SizedBox(height: 10),
             Container(
@@ -45,14 +40,12 @@ class UsernameConsultSection extends StatelessWidget {
                     offset: Offset(0, 2),
                   ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 3),
+                border: Border.all(color: kPrimaryColor, width: 2),
               ),
               child: TextFormField(
                 controller: controller,
                 keyboardType: TextInputType.text,
-                style: const TextStyle(
-                  color: enterTextFieldColor,
-                ),
+                style: const TextStyle(color: enterTextFieldColor),
                 onChanged: onChanged,
                 decoration: InputDecoration(
                   border: InputBorder.none,

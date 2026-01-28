@@ -367,7 +367,7 @@ class TicketApiService {
   ) async {
     try {
       print(
-        "Debiter le compte dont l'ID est: ${debitAccountRequestDTO.studentId}",
+        "Debiter le compte de l'utilisateur: ${debitAccountRequestDTO.debitStudentDTO.username}",
       );
 
       final response = await http.put(
@@ -380,7 +380,7 @@ class TicketApiService {
         throw Exception('Erreur débit compte: ${response.statusCode}');
       }
 
-      print("Compte ${debitAccountRequestDTO.studentId} débité");
+      print("Compte ${debitAccountRequestDTO.debitStudentDTO.username} débité");
     } catch (e) {
       throw Exception('Erreur réseau: $e');
     }

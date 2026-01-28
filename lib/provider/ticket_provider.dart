@@ -524,7 +524,9 @@ class TicketProvider with ChangeNotifier {
       ); // "demande à l'API de débiter le compte"
 
       _error = '';
-      print("Compte ${debitAccountRequestDTO.studentId} débité");
+      print(
+        "Compte de ${debitAccountRequestDTO.debitStudentDTO.username} débité",
+      );
       return true;
     } catch (e) {
       _error = 'Erreur débit compte: ${e.toString()}';

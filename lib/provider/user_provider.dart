@@ -61,6 +61,10 @@ class UserProvider with ChangeNotifier {
   String _updatePassword = '';
   Role? _updateRole;
 
+  // Debit form state
+  String _debitUsername = '';
+  bool _isDebitingUser = false;
+
   UserProvider(this._service);
 
   // === GETTERS - Accès contrôlé à l'état ===
@@ -219,6 +223,12 @@ class UserProvider with ChangeNotifier {
 
   void setUpdateRole(Role value) {
     _updateRole = value;
+    notifyListeners();
+  }
+
+  // Debit form setters
+  void setDebitUsername(String value) {
+    _debitUsername = value;
     notifyListeners();
   }
 
@@ -643,6 +653,10 @@ class UserProvider with ChangeNotifier {
 
   String? get consultUsernameError {
     return _consultUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
+  }
+
+  String? get debitUsernameError {
+    return _debitUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
   }
 
   // Méthode pour filtrer par rôle
