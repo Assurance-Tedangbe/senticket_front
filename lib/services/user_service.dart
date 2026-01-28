@@ -20,31 +20,22 @@ class UserApiService {
     'Accept': 'application/json', // Tells the server "I want to receive JSON"
   };
 
-  // === CACHE SIMPLE INTÉGRÉ ===
+  // CACHE SIMPLE INTÉGRÉ
   List<User> _cachedUsers = []; // Cache des utilisateurs
   DateTime? _lastFetchTime; // Dernière récupération
   static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
 
-  // -------------------------
   // 1. CREATE USER (POST /api/users)
-  // -------------------------
   Future<User> createUser(User user) async {
-    // I will create a user via POST /api/users and return the created user"
     try {
-      print('📤 Envoi de la requête POST pour créer un utilisateur');
-      // print('📤 Body: ${json.encode(user.toJson())}');
+      print('Envoi de la requête POST pour créer un utilisateur');
 
       final response = await http.post(
-        // I'm trying to send a POST request:
+        // sending a POST request:
         Uri.parse(baseUrl), // Converts the URL string to a Uri object
         headers: headers, // Uses the configured headers
         body: json.encode(user.toJson()), // Converts User object → JSON string
       );
-
-      /*print('📥 Response Status: ${response.statusCode}');
-      print('📥 Response Headers: ${response.headers}');
-      print('📥 Response Body (RAW): ${response.body}');
-      print('📥 Response Body Length: ${response.body.length}');*/
 
       if (response.statusCode == 201) {
         // Si le corps de réponse est vide (null)
@@ -101,16 +92,10 @@ class UserApiService {
         body: json.encode({'username': username, 'password': password}),
       );
 
-      /*  print('📥 Login Response Status: ${response.statusCode}');
-          print('📥 Login Response Body: ${response.body}');
-          print('📥 Response Headers: ${response.headers}');
-          print('📥 Response Body Length: ${response.body.length}'); */
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
 
         // Ajustez selon la réponse de votre API
-        // Si votre API retourne directement un objet User
 
         // Cas 1: Format standard avec userId à la racine
         if (responseData.containsKey('userId')) {
@@ -142,42 +127,8 @@ class UserApiService {
           print('✅ Format de réponse détecté (avec objet user)');
 
           final userData = responseData['user'] as Map<String, dynamic>;
-          print('📋 userData contenu: $userData');
-          print('📋 responseData contenu: $responseData');
-
-          /*
-          // Construire le rôle d'abord pour vérifier
-          final role = Role(
-            roleId: (userData['roleId'] ?? userData['roleId'] ?? 0).toInt(),
-            name: userData['name']?.toString() ?? '',
-          );
-
-          print('🛠 Role construit: id=${role.roleId}, name=${role.name}');
-
-          // Extraction des données depuis l'objet 'user'
-          final user = User(
-            userId: userData['userId'] ?? 0,
-            username: userData['username'] ?? username,
-            email: userData['email'] ?? '',
-            firstName: responseData['firstName'] ?? userData['firstName'] ?? '',
-            lastName: responseData['lastName'] ?? userData['lastName'] ?? '',
-            password:
-                responseData['password'] ??
-                userData['password'] ??
-                '', // Ne pas stocker le mot de passe
-            role: Role(
-              roleId: responseData['roleDTO']['roleId'] ?? 0,
-              name: responseData['roleDTO']['name'] ?? '',
-            ),
-            /*  role: Role(
-              roleId: userData['roleId'] ?? userData['roleId'] ?? 0,
-              name: userData['name'] ?? '',
-            ), */
-          );
-
-          print('✅ user connecté: ${user.username}');
-          print('Rôle name: ${user.role.name}');
-          return user; */
+          print(' userData conteúdo: $userData');
+          print(' responseData conteúdo: $responseData');
 
           return User.fromJson(userData);
         }
@@ -258,7 +209,7 @@ class UserApiService {
     }
   }
 
-  // ⭐ NOUVEAU : Méthode pour obtenir les headers avec authentification
+  // Méthode pour obtenir les headers avec authentification
   Future<Map<String, String>> getAuthHeaders() async {
     final headers = {
       'Content-Type': 'application/json',
@@ -274,9 +225,7 @@ class UserApiService {
     return headers;
   }
 
-  // -------------------------
-  // 2. READ ALL USERS (GET /api/users)
-  // -------------------------
+  // READ ALL USERS (GET /api/users)
   // Uses caching to avoid unnecessary API calls
   Future<List<User>> getAllUsers({bool forceRefresh = false}) async {
     // Checks if the cache is still valid
@@ -332,10 +281,7 @@ class UserApiService {
     }
   }
 
-  // -------------------------
-  // 3. READ USER BY ID (GET /api/users/{userId})
-  // -------------------------
-
+  // READ USER BY ID (GET /api/users/{userId})
   // Déclaration d'une méthode asynchrone qui retourne un objet User
   Future<User> getUserById(int userId) async {
     try {
@@ -362,7 +308,7 @@ class UserApiService {
       // Vérifie si l'utilisateur a été trouvé dans le cache
       // cachedUser.userId != -1 signifie qu'on a trouvé un utilisateur valide dans le cache
       if (cachedUser.userId != -1) {
-        print("📦 User found in cache");
+        print(" User found in cache");
         // Retourne l'utilisateur du cache sans faire d'appel API
         return cachedUser;
       }
@@ -372,7 +318,7 @@ class UserApiService {
         Uri.parse('$baseUrl/$userId'),
         headers:
             headers, // Utilise les headers configurés (Content-Type, Accept, etc.)
-      ); // GET /api/users/{userId} to retrieve a specific user"
+      );
 
       // Vérifie le code de statut HTTP de la réponse
       if (response.statusCode == 200) {
@@ -399,16 +345,14 @@ class UserApiService {
     }
   }
 
-  // -------------------------
-  // 4. READ USER BY USERNAME (GET /api/users/username/{username})
+  // READ USER BY USERNAME (GET /api/users/username/{username})
   // without cahe
-  // -------------------------
   Future<User> getUserByUsername(String username) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/username/$username'),
         headers: headers,
-      ); // GET /api/users/username/{username} to find a user by username"
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
@@ -426,9 +370,7 @@ class UserApiService {
     }
   }
 
-  // -------------------------
-  // 5. UPDATE USER (PUT /api/users/{userId})
-  // -------------------------
+  // UPDATE USER (PUT /api/users/{userId})
   Future<User> updateUser(User user) async {
     try {
       print("Update user with ID: ${user.userId}");
@@ -437,7 +379,7 @@ class UserApiService {
         Uri.parse('$baseUrl/${user.userId}'),
         headers: headers,
         body: json.encode(user.toJson()), // Sends the new data"
-      ); // PUT /api/users/{userId} to modify an existing user
+      );
 
       if (response.statusCode == 200) {
         final updatedUser = User.fromJson(json.decode(response.body));
@@ -461,10 +403,8 @@ class UserApiService {
     }
   }
 
-  // -------------------------
-  // 6. UPDATE PASSWORD (PUT /api/users/password/{userId})
+  // UPDATE PASSWORD (PUT /api/users/password/{userId})
   // without cahe
-  // -------------------------
   Future<void> updatePassword(int userId, String newPassword) async {
     try {
       final response = await http.put(
@@ -487,9 +427,7 @@ class UserApiService {
     }
   }
 
-  // -------------------------
-  // 7. DELETE USER (DELETE /api/users/{userId})
-  // -------------------------
+  // DELETE USER (DELETE /api/users/{userId})
   Future<void> deleteUser(int userId) async {
     try {
       print("Deleting user with ID: $userId");
@@ -512,51 +450,6 @@ class UserApiService {
     } catch (e) {
       print("Erreur suppression: $e");
 
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  // -------------------------
-  // 8. ADD ROLE TO USER (PUT /api/users/{userId}/roles/{roleId})
-  // without cahe
-  // -------------------------
-  Future<void> addRoleToUser(int userId, int roleId) async {
-    print("Add role : $roleId to user : $userId");
-
-    try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/$userId/roles/$roleId'),
-        headers: headers,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Erreur ajout rôle: ${response.statusCode}');
-      }
-
-      print("Rôle $roleId ajouté à l'utilisateur $userId");
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  // -------------------------
-  // 9. REMOVE ROLE FROM USER (DELETE /api/users/{userId}/roles/{roleId})
-  // without cahe
-  // -------------------------
-  Future<void> removeRoleFromUser(int userId, int roleId) async {
-    print("Remove role : $roleId from user : $userId");
-    try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/$userId/roles/$roleId'),
-        headers: headers,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Erreur retrait rôle: ${response.statusCode}');
-      }
-
-      print("✅ Rôle $roleId retiré de l'utilisateur $userId");
-    } catch (e) {
       throw Exception('Erreur réseau: $e');
     }
   }
@@ -618,6 +511,47 @@ class UserApiService {
     // Retirer l'utilisateur du cache pour forcer une nouvelle récupération
     _cachedUsers.removeWhere((user) => user.userId == userId);
     print('🗑️ Cache invalidé pour l\'utilisateur ID: $userId');
+  }
+
+  // ADD ROLE TO USER (PUT /api/users/{userId}/roles/{roleId})
+  // without cahe
+  Future<void> addRoleToUser(int userId, int roleId) async {
+    print("Add role : $roleId to user : $userId");
+
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/$userId/roles/$roleId'),
+        headers: headers,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Erreur ajout rôle: ${response.statusCode}');
+      }
+
+      print("Rôle $roleId ajouté à l'utilisateur $userId");
+    } catch (e) {
+      throw Exception('Erreur réseau: $e');
+    }
+  }
+
+  // REMOVE ROLE FROM USER (DELETE /api/users/{userId}/roles/{roleId})
+  // without cahe
+  Future<void> removeRoleFromUser(int userId, int roleId) async {
+    print("Remove role : $roleId from user : $userId");
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/$userId/roles/$roleId'),
+        headers: headers,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Erreur retrait rôle: ${response.statusCode}');
+      }
+
+      print("✅ Rôle $roleId retiré de l'utilisateur $userId");
+    } catch (e) {
+      throw Exception('Erreur réseau: $e');
+    }
   }
 }
 

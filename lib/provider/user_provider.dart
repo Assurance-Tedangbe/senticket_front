@@ -585,59 +585,6 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  // Add role to an existing user
-  Future<bool> addRoleToExistingUser(int userId, int roleId) async {
-    _isAddRoleToUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.addRoleToUser(
-        userId,
-        roleId,
-      ); //“adding a role to a user via the API”
-
-      _error = '';
-      print("Role $roleId added to user $userId");
-      return true;
-    } catch (e) {
-      _error = 'Error adding role: ${e.toString()}';
-      print(" Error addRoleToUser: $e");
-      return false;
-    } finally {
-      _isAddRoleToUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Remove role from an existing user
-  Future<bool> removeRoleFromExistingUser(int userId, int roleId) async {
-    _isRemoveRoleFromUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.removeRoleFromUser(
-        userId,
-        roleId,
-      ); // removing a role from a user via the API
-      _error = '';
-      print("✅ Role $roleId removed from user $userId");
-
-      return true;
-    } catch (e) {
-      _error = 'Error removing role: ${e.toString()}';
-      print(" Error removeRoleFromUser: $e");
-
-      return false;
-    } finally {
-      _isRemoveRoleFromUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
   // Searching for users (uses the service's local cache)
   List<User> searchUsers(String query) {
     return _service.searchUsers(query);
@@ -836,6 +783,59 @@ class UserProvider with ChangeNotifier {
     _updateRole = null;
     _error = '';
     notifyListeners();
+  }
+
+  // Add role to an existing user
+  Future<bool> addRoleToExistingUser(int userId, int roleId) async {
+    _isAddRoleToUser = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.addRoleToUser(
+        userId,
+        roleId,
+      ); //“adding a role to a user via the API”
+
+      _error = '';
+      print("Role $roleId added to user $userId");
+      return true;
+    } catch (e) {
+      _error = 'Error adding role: ${e.toString()}';
+      print(" Error addRoleToUser: $e");
+      return false;
+    } finally {
+      _isAddRoleToUser = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Remove role from an existing user
+  Future<bool> removeRoleFromExistingUser(int userId, int roleId) async {
+    _isRemoveRoleFromUser = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.removeRoleFromUser(
+        userId,
+        roleId,
+      ); // removing a role from a user via the API
+      _error = '';
+      print("✅ Role $roleId removed from user $userId");
+
+      return true;
+    } catch (e) {
+      _error = 'Error removing role: ${e.toString()}';
+      print(" Error removeRoleFromUser: $e");
+
+      return false;
+    } finally {
+      _isRemoveRoleFromUser = false;
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }
 
