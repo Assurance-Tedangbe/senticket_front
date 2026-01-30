@@ -27,8 +27,6 @@ class BuyTicketBtn extends StatelessWidget {
                 ? userProvider.currentUser!.role.name.toUpperCase() ==
                       'ETUDIANT'
                 : false;
-            /*  final userName =
-                userProvider.currentUser?.username ?? 'Non connecté'; */
 
             double totalPrice = 0;
             for (var ticket in selectedTickets) {
@@ -51,60 +49,14 @@ class BuyTicketBtn extends StatelessWidget {
                                 : ticketSectionColor)
                           : Colors.grey,
                       borderRadius: BorderRadius.circular(8),
-                      /* border: Border.all(
-                        color: isLoggedIn
-                            ? (isStudent
-                                  ? ticketSectionColor
-                                  : ticketSectionColor)
-                            : Colors.grey,
-                        width: 1,
-                      ), */
                     ),
-                    /* child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isLoggedIn
-                              ? (isStudent ? Icons.person : Icons.warning)
-                              : Icons.person_off,
-                          size: 16,
-                          color: isLoggedIn
-                              ? (isStudent ? kThirdColor : kPrimaryColor)
-                              : Colors.grey,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isLoggedIn
-                              ? (isStudent
-                                    ? 'Étudiant: $userName connecté'
-                                    : '$userName connecté')
-                              : 'Non connecté',
-                          style: TextStyle(
-                            color: isLoggedIn
-                                ? (isStudent ? kThirdColor : kPrimaryColor)
-                                : Colors.grey,
-                            //fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ), */
                   ),
                 ),
 
                 if (selectedCount > 0)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    /* child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 55,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: kPrimaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: kPrimaryColor),
-                      ), */
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -193,7 +145,6 @@ class BuyTicketBtn extends StatelessWidget {
                                 : !isStudent
                                 ? 'Non permis'
                                 : 'Acheter ticket(s) ',
-                            // ($selectedCount)',
                             style: TextStyle(
                               color: kThirdColor,
                               fontSize: 15,

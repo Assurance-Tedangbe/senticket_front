@@ -31,10 +31,8 @@ class TicketProvider with ChangeNotifier {
 
   // Pas besoin de stocker UserProvider ici, on le récupère via Provider.of dans les méthodes
 
-  // === INTERNAL STATE FOR ALL OPERATIONS = ETAT PRINCIPAL DE L'APPLICATION ===
-
-  List<Ticket> _tickets = []; // "Liste vide pour stocker tous les tickets"
-  // Liste principale qui stocke tous les tickets chargés depuis l'API
+  List<Ticket> _tickets =
+      []; // "Liste vide pour stocker tous les tickets chargés depuis l'API"
 
   Ticket?
   _currentTicket; // "Ticket actuellement sélectionné (peut être null si aucun ticket n'est sélectionné)"
@@ -45,13 +43,12 @@ class TicketProvider with ChangeNotifier {
   String _error = ''; // "Stocke les messages d'erreur (initialement vide)"
   // Stocke le dernier message d'erreur rencontré, vide string signifie aucune erreur
 
-  // === ETATS SPECIFIQUES PAR OPERATION ===
-  // Ces booléens permettent de savoir précisément quelle opération est en cours
+  // Ces booléens permettent de savoir quelle opération est en cours
 
   bool _isCreatingTickets = false; // Création de nouveaux tickets en cours
   // True uniquement pendant la création de nouveaux tickets
 
-  bool _isUpdatingTicket = false; // "Mise à jour en cours"
+  bool _isUpdatingTicket = false;
   bool _isDeletingTicket = false;
   bool _isUpdatingTicketStatus = false;
   bool _isBookingTicket = false;
@@ -65,11 +62,16 @@ class TicketProvider with ChangeNotifier {
   TicketProvider(this._service);
   // Le constructeur reçoit une instance de TicketApiService en paramètre (dependency injection)
 
+  // NEW: State for debit operation
+  List<Ticket> _studentTicketsForDebit = [];
+  TicketType? _selectedTicketTypeForDebit;
+  List<int> _selectedTicketIdsForDebit = [];
+
   // Les getters permettent un accès en lecture seule aux variables privées
 
   // GETTERS PRINCIPAUX
   List<Ticket> get tickets =>
-      _tickets; // Retourne la liste complète des tickets (en lecture seule)
+      _tickets; // Retourne la liste complète des tickets
   // Permet à d'autres classes de lire `_tickets` mais pas de le modifier
   Ticket? get currentTicket =>
       _currentTicket; // Retourne le ticket actuellement sélectionné (peut être null)
@@ -89,6 +91,12 @@ class TicketProvider with ChangeNotifier {
   bool get isTransferringTickets => _isTransferringTickets;
   bool get isCancelingTransfer => _isCancelingTransfer;
   bool get isDebitingAccount => _isDebitingAccount;
+
+  // NEW: Getters for debit operation
+  List<Ticket> get studentTicketsForDebit => _studentTicketsForDebit;
+  TicketType? get selectedTicketTypeForDebit => _selectedTicketTypeForDebit;
+  List<int> get selectedTicketIdsForDebit => _selectedTicketIdsForDebit;
+  int get selectedTicketsCount => _selectedTicketIdsForDebit.length;
 
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
@@ -130,6 +138,8 @@ class TicketProvider with ChangeNotifier {
       notifyListeners(); // "notifie l'UI de la fin du chargement"
     }
   }
+
+  // ******* FOR PURCHASETICKETS OPERATION ********
 
   // Pour gérer la sélection/désélection
   void toggleTicketSelection(int ticketId) {
@@ -177,52 +187,12 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /*  Future<bool> purchaseTickets() async {
-    // Récupérer UserProvider via BuildContext (on le fera passer depuis le widget)
-    // Cette méthode sera modifiée dans le widget pour passer le context
-
-    final selected = selectedTickets;
-    if (selected.isEmpty) {
-      _error = 'Veuillez sélectionner des tickets';
-      notifyListeners();
-      return false;
-    }
-
-    _isPurchasingTickets = true;
+  //🧹 Nettoie l'erreur courante et notifie l'UI
+  void clearError() {
     _error = '';
     notifyListeners();
+  }
 
-    try {
-      final ticketIds = selected.map((t) => t.ticketId!).toList();
-
-      // Cette méthode sera appelée avec le context pour récupérer l'utilisateur
-      throw Exception(
-        "Cette méthode doit être appelée depuis le widget avec le context",
-      );
-
-      /* final purchaseRequest = PurchaseTicketsRequestDTO(
-        purchaseUserDTO: PurchaseUserDTO(username: ''),
-        selectedTicketIds: ticketIds,
-      );
-      final success = await _service.purchaseTickets(purchaseRequest);
-      if (success == true) {
-        await loadAllTickets(forceRefresh: true);
-        _error = '';
-        return true;
-      } else {
-        _error = 'Échec de l\'achat des tickets';
-        return false;
-      } */
-    } catch (e) {
-      _error = 'Erreur lors de l\'achat: $e';
-      return false;
-    } finally {
-      _isPurchasingTickets = false;
-      notifyListeners();
-    }
-  } */
-
-  // Nouvelle méthode qui accepte le context pour récupérer l'utilisateur
   Future<bool> purchaseTicketsWithContext(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
@@ -290,6 +260,226 @@ class TicketProvider with ChangeNotifier {
       return false;
     } finally {
       _isPurchasingTickets = false;
+      notifyListeners();
+    }
+  }
+
+  // ******* FOR DEBIT OPERATION ********
+
+  // Fetch student's booked tickets for debit
+  Future<void> fetchStudentTicketsForDebit({
+    required int studentId,
+    TicketType? ticketType,
+  }) async {
+    _isLoading = true;
+    _error = '';
+    _selectedTicketTypeForDebit = ticketType;
+    notifyListeners();
+
+    try {
+      _studentTicketsForDebit = await _service.getTicketsByUser(
+        userId: studentId,
+        booked: true,
+        ticketStatus: 'BOOKED',
+        ticketType: ticketType?.toBackend,
+      );
+
+      // Filter only booked and BOOKED status tickets
+      _studentTicketsForDebit = _studentTicketsForDebit
+          .where(
+            (ticket) =>
+                ticket.booked && ticket.ticketStatus == TicketStatus.booked,
+          )
+          .toList();
+
+      // Reset selection
+      _selectedTicketIdsForDebit.clear();
+      _studentTicketsForDebit = _studentTicketsForDebit
+          .map((ticket) => ticket.copyWith(isSelected: false))
+          .toList();
+
+      _error = '';
+    } catch (e) {
+      _error = 'Erreur lors du chargement des tickets: $e';
+      _studentTicketsForDebit.clear();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Set selected ticket type for debit
+  void setSelectedTicketTypeForDebit(TicketType? type) {
+    _selectedTicketTypeForDebit = type;
+    notifyListeners();
+  }
+
+  // Toggle ticket selection for debit
+  void toggleTicketSelectionForDebit(int ticketId) {
+    final index = _studentTicketsForDebit.indexWhere(
+      (t) => t.ticketId == ticketId,
+    );
+    if (index != -1) {
+      final ticket = _studentTicketsForDebit[index];
+      final updatedTicket = ticket.copyWith(isSelected: !ticket.isSelected);
+      _studentTicketsForDebit[index] = updatedTicket;
+
+      if (updatedTicket.isSelected) {
+        _selectedTicketIdsForDebit.add(ticketId);
+      } else {
+        _selectedTicketIdsForDebit.remove(ticketId);
+      }
+      notifyListeners();
+    }
+  }
+
+  // Select all tickets for debit
+  void selectAllTicketsForDebit() {
+    for (var i = 0; i < _studentTicketsForDebit.length; i++) {
+      _studentTicketsForDebit[i] = _studentTicketsForDebit[i].copyWith(
+        isSelected: true,
+      );
+      _selectedTicketIdsForDebit.add(_studentTicketsForDebit[i].ticketId!);
+    }
+    notifyListeners();
+  }
+
+  // Deselect all tickets for debit
+  void deselectAllTicketsForDebit() {
+    for (var i = 0; i < _studentTicketsForDebit.length; i++) {
+      _studentTicketsForDebit[i] = _studentTicketsForDebit[i].copyWith(
+        isSelected: false,
+      );
+    }
+    _selectedTicketIdsForDebit.clear();
+    notifyListeners();
+  }
+
+  // Perform debit operation
+  Future<bool> debitAccount(DebitAccountRequestDTO request) async {
+    _isDebitingAccount = true;
+    _isLoading = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      await _service.debitAccount(request);
+
+      // Clear selection after successful debit
+      _selectedTicketIdsForDebit.clear();
+      _studentTicketsForDebit = _studentTicketsForDebit
+          .map((ticket) => ticket.copyWith(isSelected: false))
+          .toList();
+
+      _error = '';
+      print("Compte de ${request.debitStudentDTO.username} débité avec succès");
+      return true;
+    } catch (e) {
+      _error = 'Erreur débit compte: ${e.toString()}';
+      print("Erreur debitAccount: $e");
+      return false;
+    } finally {
+      _isDebitingAccount = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // old
+  /*  Future<bool> debitAccount(
+    DebitAccountRequestDTO debitAccountRequestDTO,
+  ) async {
+    _isDebitingAccount = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.debitAccount(
+        debitAccountRequestDTO,
+      ); // "demande à l'API de débiter le compte"
+
+      _error = '';
+      print(
+        "Compte de ${debitAccountRequestDTO.debitStudentDTO.username} débité",
+      );
+      return true;
+    } catch (e) {
+      _error = 'Erreur débit compte: ${e.toString()}';
+      print("Erreur debitAccount: $e");
+      return false;
+    } finally {
+      _isDebitingAccount = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  } */
+
+  // Reset debit state
+  void resetDebitState() {
+    _studentTicketsForDebit.clear();
+    _selectedTicketTypeForDebit = null;
+    _selectedTicketIdsForDebit.clear();
+    _error = '';
+    notifyListeners();
+  }
+
+  /*
+  // 🔄 TRANSFERT DE TICKETS ENTRE UTILISATEURS
+  // @param request : DTO contenant les infos de transfert
+  Future<bool> transferTickets(
+    TransferTicketsRequestDTO transferTicketsRequestDTO,
+  ) async {
+    _isTransferringTickets = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.transferTickets(
+        transferTicketsRequestDTO,
+      ); // "demande à l'API de transférer les tickets"
+
+      _error = '';
+      print(
+        "Tickets transférés de ${transferTicketsRequestDTO.fromStudentId} vers ${transferTicketsRequestDTO.toStudentId}",
+      );
+      return true;
+    } catch (e) {
+      _error = 'Erreur transfert tickets: ${e.toString()}';
+      print("Erreur transferTickets: $e");
+      return false;
+    } finally {
+      _isTransferringTickets = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /* ↩️ ANNULATION D'UN TRANSFERT DE TICKETS
+   *  @param request : DTO contenant les infos d'annulation */
+  Future<bool> cancelTransferTickets(
+    CancelTransferTicketsRequestDTO cancelTransferTicketsRequestDTO,
+  ) async {
+    _isCancelingTransfer = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _service.cancelTransferTickets(
+        cancelTransferTicketsRequestDTO,
+      ); // demande à l'API d'annuler le transfert de tickets
+
+      _error = '';
+      print(
+        "Transfert de tickets annulé entre ${cancelTransferTicketsRequestDTO.currentOwnerUserId} et ${cancelTransferTicketsRequestDTO.originalSenderUserId}",
+      );
+      return true;
+    } catch (e) {
+      _error = 'Erreur annulation transfert tickets: ${e.toString()}';
+      print("Erreur cancelTransferTickets: $e");
+      return false;
+    } finally {
+      _isCancelingTransfer = false;
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -364,8 +554,7 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  /*
-   * 🗑️ SUPPRESSION D'UN TICKET */
+  // 🗑️ SUPPRESSION D'UN TICKET
   Future<bool> deleteExistingTicket(int ticketId) async {
     _isDeletingTicket = true;
     _isLoading = true;
@@ -394,16 +583,13 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  /* Cette méthode retourne void car le résultat est stocké dans _currentTicket
-   *  🔍 CHARGEMENT D'UN TICKET SPECIFIQUE PAR SON ID
-   * @param ticketId : l'identifiant du ticket à charger */
+  // retourne void car le résultat est stocké dans _currentTicket
   Future<void> loadTicketById(int ticketId) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
 
     try {
-      // Chargement du ticket depuis l'API et le stocke comme ticket courant
       _currentTicket = await _service.getTicketById(
         ticketId,
       ); // "demande un ticket spécifique par son id à l'API et le stocke dans _currentTicket"
@@ -418,137 +604,7 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  /* 🛒 ACHAT DE TICKETS
-   * @param request : DTO contenant les infos d'achat */
-  /*  Future<bool> purchaseTickets(
-    PurchaseTicketsRequestDTO purchaseTicketsRequestDTO,
-  ) async {
-    _isPurchasingTickets = true;
-    _isLoading = true;
-    notifyListeners();
 
-    try {
-      final purchasedTickets = await _service.purchaseTickets(
-        purchaseTicketsRequestDTO,
-      ); // "demande à l'API d'acheter les tickets"
-
-      _tickets.addAll(
-        purchasedTickets,
-      ); // "Ajoute les tickets achetés à la liste locale"
-      _error = '';
-      print("Tickets achetés avec succès: ${purchasedTickets.length} tickets");
-      return true;
-    } catch (e) {
-      _error = 'Erreur achat tickets: ${e.toString()}';
-      print("Erreur purchaseTickets: $e");
-      return false;
-    } finally {
-      _isPurchasingTickets = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  } */
-
-  /* 🔄 TRANSFERT DE TICKETS ENTRE UTILISATEURS
-   * @param request : DTO contenant les infos de transfert */
-  Future<bool> transferTickets(
-    TransferTicketsRequestDTO transferTicketsRequestDTO,
-  ) async {
-    _isTransferringTickets = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.transferTickets(
-        transferTicketsRequestDTO,
-      ); // "demande à l'API de transférer les tickets"
-
-      _error = '';
-      print(
-        "Tickets transférés de ${transferTicketsRequestDTO.fromStudentId} vers ${transferTicketsRequestDTO.toStudentId}",
-      );
-      return true;
-    } catch (e) {
-      _error = 'Erreur transfert tickets: ${e.toString()}';
-      print("Erreur transferTickets: $e");
-      return false;
-    } finally {
-      _isTransferringTickets = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /* ↩️ ANNULATION D'UN TRANSFERT DE TICKETS
-   *  @param request : DTO contenant les infos d'annulation */
-  Future<bool> cancelTransferTickets(
-    CancelTransferTicketsRequestDTO cancelTransferTicketsRequestDTO,
-  ) async {
-    _isCancelingTransfer = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.cancelTransferTickets(
-        cancelTransferTicketsRequestDTO,
-      ); // demande à l'API d'annuler le transfert de tickets
-
-      _error = '';
-      print(
-        "Transfert de tickets annulé entre ${cancelTransferTicketsRequestDTO.currentOwnerUserId} et ${cancelTransferTicketsRequestDTO.originalSenderUserId}",
-      );
-      return true;
-    } catch (e) {
-      _error = 'Erreur annulation transfert tickets: ${e.toString()}';
-      print("Erreur cancelTransferTickets: $e");
-      return false;
-    } finally {
-      _isCancelingTransfer = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /* 💳 DEBIT D'UN COMPTE UTILISATEUR
-   * @param request : DTO contenant les infos de débit */
-  Future<bool> debitAccount(
-    DebitAccountRequestDTO debitAccountRequestDTO,
-  ) async {
-    _isDebitingAccount = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.debitAccount(
-        debitAccountRequestDTO,
-      ); // "demande à l'API de débiter le compte"
-
-      _error = '';
-      print(
-        "Compte de ${debitAccountRequestDTO.debitStudentDTO.username} débité",
-      );
-      return true;
-    } catch (e) {
-      _error = 'Erreur débit compte: ${e.toString()}';
-      print("Erreur debitAccount: $e");
-      return false;
-    } finally {
-      _isDebitingAccount = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /*🧹 EFFACEMENT DU MESSAGE D'ERREUR
-   * Nettoie l'erreur courante et notifie l'UI
-   * - Utile pour permettre à l'utilisateur de réessayer après une erreur */
-  void clearError() {
-    _error = '';
-    notifyListeners();
-  }
-
-  /*🧹 EFFACEMENT DU TICKET COURANT
-   * Réinitialise la sélection courante et notifie l'UI */
   void clearCurrentTicket() {
     _currentTicket = null;
     notifyListeners();
@@ -827,6 +883,36 @@ class TicketProvider with ChangeNotifier {
   String getTypeDisplayName(TicketType type) {
     return type.displayName; // "a", "b"
   }
+  */
+
+  /*  Future<bool> purchaseTickets(
+    PurchaseTicketsRequestDTO purchaseTicketsRequestDTO,
+  ) async {
+    _isPurchasingTickets = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final purchasedTickets = await _service.purchaseTickets(
+        purchaseTicketsRequestDTO,
+      ); // "demande à l'API d'acheter les tickets"
+
+      _tickets.addAll(
+        purchasedTickets,
+      ); // "Ajoute les tickets achetés à la liste locale"
+      _error = '';
+      print("Tickets achetés avec succès: ${purchasedTickets.length} tickets");
+      return true;
+    } catch (e) {
+      _error = 'Erreur achat tickets: ${e.toString()}';
+      print("Erreur purchaseTickets: $e");
+      return false;
+    } finally {
+      _isPurchasingTickets = false;
+      _isLoading = false;
+      notifyListeners();
+    }
+  } */
 
   /*
    * 👤 CHARGEMENT DES TICKETS PAR COMPTE

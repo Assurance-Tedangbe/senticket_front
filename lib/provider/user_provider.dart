@@ -27,12 +27,12 @@ class UserProvider with ChangeNotifier {
 
   // State for specific operations
   bool _isCreatingUser = false; // Creation in progress
-  bool _isUpdatingUser = false; // Update in progress
-  bool _isDeletingUser = false; // Deletion in progress
-  bool _isUpdatingPassword = false; // Password change in progress
-  bool _isAddRoleToUser = false; // Adding role to user in progress
-  bool _isRemoveRoleFromUser = false; // Remove role from user in progress
-  bool _isLoggingIn = false; // Connexion en cours
+  bool _isUpdatingUser = false;
+  bool _isDeletingUser = false;
+  bool _isUpdatingPassword = false;
+  bool _isAddRoleToUser = false;
+  bool _isRemoveRoleFromUser = false;
+  bool _isLoggingIn = false;
 
   // State for signup form
   String _firstName = '';
@@ -113,6 +113,11 @@ class UserProvider with ChangeNotifier {
   String get updatePassword => _updatePassword;
   // String get updateConfirmPassword => _updateConfirmPassword;
   Role? get updateRole => _updateRole;
+
+  // Getters pour le formulaire de débit
+  String get debitUsername => _debitUsername;
+  bool get isDebitingUser => _isDebitingUser;
+  bool get isDebitFormValid => _debitUsername.isNotEmpty;
 
   // Getter pour l'utilisateur consulté
   User? get consultedUser => _currentUser;
@@ -655,14 +660,10 @@ class UserProvider with ChangeNotifier {
     return _consultUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
   }
 
-  String? get debitUsernameError {
-    return _debitUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
-  }
-
   // Méthode pour filtrer par rôle
   List<User> getUsersByRole(String roleName) {
     return _users.where((user) {
-      return user.role?.name?.toUpperCase() == roleName.toUpperCase();
+      return user.role.name.toUpperCase() == roleName.toUpperCase();
     }).toList();
   }
 
@@ -799,7 +800,46 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Add role to an existing user
+  // ******** FOR VALIDATION TO ACCESS DBEIT PAGE ********
+  Future<bool> accessDebitPage() async {
+    if (!isDebitFormValid) {
+      _error = 'Veuillez saisir un nom d\'utilisateur';
+      notifyListeners();
+      return false;
+    }
+
+    _isDebitingUser = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      print('Opération de debit  par l\'utilisateur : $_debitUsername');
+
+      // Appel au service pour récupérer l'utilisateur
+      final user = await _service.getUserByUsername(_debitUsername);
+
+      _currentUser = user;
+      _isDebitingUser = false;
+      _error = '';
+      notifyListeners();
+
+      print('✅ Compte trouvé: ${user.username}');
+      return true;
+    } catch (e) {
+      _isDebitingUser = false;
+      _error = 'Portier non trouvé ou erreur de connexion';
+      notifyListeners();
+
+      print('❌ Erreur lors de la validation: $e');
+      return false;
+    }
+  }
+
+  String? get debitUsernameError {
+    return _debitUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
+  }
+
+  /*   // Add role to an existing user
   Future<bool> addRoleToExistingUser(int userId, int roleId) async {
     _isAddRoleToUser = true;
     _isLoading = true;
@@ -850,7 +890,7 @@ class UserProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
+  } */
 }
 
 /* 

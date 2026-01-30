@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/scanqr.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/DebitUsernameSection.dart';
-import 'package:senticket_front/UI/widgets/debitAccount/debitValidateBtn.dart';
+import 'package:senticket_front/UI/widgets/debitAccount/debitPage.dart';
+import 'package:senticket_front/UI/widgets/debitAccount/accessDebitPageBtn.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/infoContainer.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/ouContainer.dart';
 import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
 import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
 import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/provider/user_provider.dart';
 
 // Widget principal pour debiter un compte
 class DebitBody extends StatefulWidget {
@@ -58,16 +61,30 @@ class _DebitBodyState extends State<DebitBody> {
                 ],
                 border: Border.all(color: kPrimaryColor, width: 1),
               ),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  DebitUsernameSection(
-                    controller: _usernameController,
-                    onChanged: (value) => userProvider.setDebitUsername(value),
-                  ),
-                  SizeboxTemplate(),
-                  DebitValidateBtn(),
-                ],
+              child: Consumer<UserProvider>(
+                builder: (context, userProvider, child) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      DebitUsernameSection(
+                        controller: _usernameController,
+                        onChanged: (value) =>
+                            userProvider.setDebitUsername(value),
+                      ),
+                      SizeboxTemplate(),
+                      AccessDebitPageBtn(
+                        onFormSuccess: (int userId) {
+                          // Naviguer vers DebitPage avec l'ID de l'utilisateur
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => DebitPage(userId: userId),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
