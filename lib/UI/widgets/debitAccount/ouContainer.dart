@@ -11,11 +11,8 @@ class OuContainer extends StatelessWidget {
       height: size.height * 0.05,
       width: double.infinity,
       child: const Text(
-        "-----------------------OU-------------------------",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
+        "-----------OU-------------",
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
     );
   }

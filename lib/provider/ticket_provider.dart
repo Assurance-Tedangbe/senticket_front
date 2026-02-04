@@ -66,6 +66,7 @@ class TicketProvider with ChangeNotifier {
   List<Ticket> _studentTicketsForDebit = [];
   TicketType? _selectedTicketTypeForDebit;
   List<int> _selectedTicketIdsForDebit = [];
+  bool _isLoadingStudentTickets = false;
 
   // Les getters permettent un accès en lecture seule aux variables privées
 
@@ -97,6 +98,7 @@ class TicketProvider with ChangeNotifier {
   TicketType? get selectedTicketTypeForDebit => _selectedTicketTypeForDebit;
   List<int> get selectedTicketIdsForDebit => _selectedTicketIdsForDebit;
   int get selectedTicketsCount => _selectedTicketIdsForDebit.length;
+  bool get isLoadingStudentTickets => _isLoadingStudentTickets;
 
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
@@ -114,8 +116,9 @@ class TicketProvider with ChangeNotifier {
   List<Ticket> get selectedTickets =>
       _tickets.where((ticket) => ticket.isSelected).toList();
 
-  /* CHARGE TOUS LES TICKETS DEPUIS L'API
-   * @param forceRefresh : si true, ignore le cache et force le rechargement */
+  // ******* FOR LOADALLTICKETS OPERATION ********
+
+  /* @param forceRefresh : si true, ignore le cache et force le rechargement */
   Future<void> loadAllTickets({bool forceRefresh = false}) async {
     _isLoading = true; // active le chargement
     _error = ''; // efface les erreurs précédentes
@@ -272,6 +275,7 @@ class TicketProvider with ChangeNotifier {
     TicketType? ticketType,
   }) async {
     _isLoading = true;
+    _isLoadingStudentTickets = true;
     _error = '';
     _selectedTicketTypeForDebit = ticketType;
     notifyListeners();
@@ -299,11 +303,13 @@ class TicketProvider with ChangeNotifier {
           .toList();
 
       _error = '';
+      print("Tickets trouvés pour débit: ${_studentTicketsForDebit.length}");
     } catch (e) {
       _error = 'Erreur lors du chargement des tickets: $e';
       _studentTicketsForDebit.clear();
     } finally {
       _isLoading = false;
+      _isLoadingStudentTickets = false;
       notifyListeners();
     }
   }

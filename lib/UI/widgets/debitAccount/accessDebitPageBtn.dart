@@ -1,5 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/constants.dart';
+
+class AccessDebitPageBtn extends StatelessWidget {
+  final VoidCallback onPressed;
+  final bool isLoading;
+  final bool isFormValid;
+
+  const AccessDebitPageBtn({
+    super.key,
+    required this.onPressed,
+    this.isLoading = false,
+    this.isFormValid = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
+      width: 320,
+      height: 95,
+      child: ElevatedButton(
+        onPressed: isLoading || !isFormValid ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isFormValid && !isLoading
+              ? kPrimaryColor
+              : greyBorderColor,
+          shape: const BeveledRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+          textStyle: const TextStyle(
+            color: kSecondColor,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: isLoading
+            ? const CircularProgressIndicator(color: kSecondColor)
+            : const Text('Valider'),
+      ),
+    );
+  }
+}
+
+/* import 'package:flutter/material.dart';
+import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -101,3 +145,4 @@ class _DebitValidateBtnState extends State<DebitValidateBtn> {
     );
   }
 } */
+ */

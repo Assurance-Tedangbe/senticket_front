@@ -153,7 +153,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
           ),
           const SizedBox(height: 10),
           const Text(
-            'Seuls les étudiants peuvent acheter des tickets.',
+            'Seuls les ETUDIANTS peuvent acheter des tickets.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey),
           ),
@@ -250,4 +250,3 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     );
   }
 }
-

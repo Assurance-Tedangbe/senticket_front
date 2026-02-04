@@ -157,6 +157,8 @@ class TicketApiService {
         body: json.encode(debitAccountRequestDTO.toJson()),
       );
 
+      print("Status code débit: ${response.statusCode}");
+      print("Response body débit: ${response.body}");
       /*       if (response.statusCode != 200) {
         throw Exception('Erreur débit compte: ${response.statusCode}');
       }

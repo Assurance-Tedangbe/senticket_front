@@ -40,7 +40,7 @@ class UsernameConsultSection extends StatelessWidget {
                     offset: Offset(0, 2),
                   ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 2),
+                border: Border.all(color: kPrimaryColor, width: 1),
               ),
               child: TextFormField(
                 controller: controller,

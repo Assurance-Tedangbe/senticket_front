@@ -10,7 +10,7 @@ class InfoContainer extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       height: size.height * 0.09,
-      width: size.width * 0.9,
+      width: size.width * 1,
       decoration: BoxDecoration(
         color: textContainerColor,
         borderRadius: BorderRadius.circular(10),

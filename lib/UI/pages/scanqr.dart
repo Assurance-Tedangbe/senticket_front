@@ -1,4 +1,81 @@
+// UI/widgets/debitAccount/scan_qr.dart
 import 'package:flutter/material.dart';
+import 'package:senticket_front/constants.dart';
+
+class ScanQR extends StatefulWidget {
+  final Function(String)? onScanned;
+
+  const ScanQR({super.key, this.onScanned});
+
+  @override
+  State<ScanQR> createState() => _ScanQRState();
+}
+
+class _ScanQRState extends State<ScanQR> {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      width: size.width / 1.15,
+      height: 95,
+      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+      child: ElevatedButton(
+        onPressed: () {
+          // Simulation du scan QR - vous pouvez intégrer un scanner QR réel ici
+          // Pour l'instant, nous allons simuler avec une boîte de dialogue
+          _showQRInputDialog(context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: kPrimaryColor,
+          textStyle: const TextStyle(
+            color: kSecondColor,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: const Text('Scanner code QR'),
+      ),
+    );
+  }
+
+  void _showQRInputDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Entrer le nom d\'utilisateur'),
+        content: TextFormField(
+          decoration: const InputDecoration(
+            labelText: 'Nom d\'utilisateur',
+            hintText: 'Entrez le nom d\'utilisateur de l\'étudiant',
+          ),
+          onFieldSubmitted: (value) {
+            if (value.isNotEmpty) {
+              widget.onScanned?.call(value);
+              Navigator.pop(context);
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              final username = 'etudiant123'; // Exemple
+              widget.onScanned?.call(username);
+              Navigator.pop(context);
+            },
+            child: const Text('Simuler'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/* import 'package:flutter/material.dart';
 import 'package:senticket_front/constants.dart';
 
 class ScanQR extends StatefulWidget {
@@ -22,7 +99,7 @@ class _ScanQRState extends State<ScanQR> {
         style: ElevatedButton.styleFrom(
           backgroundColor: kPrimaryColor,
           textStyle: const TextStyle(
-            color: kSecondColor,
+            color: kThirdColor,
             fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
@@ -31,9 +108,9 @@ class _ScanQRState extends State<ScanQR> {
       ),
     );
   }
-}
+} */
 
-/*
+/* old
 // UI/widgets/debitAccount/scan_qr.dart
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';

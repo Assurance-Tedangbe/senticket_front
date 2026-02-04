@@ -61,9 +61,11 @@ class UserProvider with ChangeNotifier {
   String _updatePassword = '';
   Role? _updateRole;
 
-  // Debit form state
+  // DEBIT FORM STATE
   String _debitUsername = '';
-  bool _isDebitingUser = false;
+  bool _isSearchingUser = false;
+  User? _searchedUser; // Utilisateur recherché pour le débit
+  String? _debitUsernameError;
 
   UserProvider(this._service);
 
@@ -114,13 +116,25 @@ class UserProvider with ChangeNotifier {
   // String get updateConfirmPassword => _updateConfirmPassword;
   Role? get updateRole => _updateRole;
 
-  // Getters pour le formulaire de débit
-  String get debitUsername => _debitUsername;
-  bool get isDebitingUser => _isDebitingUser;
-  bool get isDebitFormValid => _debitUsername.isNotEmpty;
-
   // Getter pour l'utilisateur consulté
   User? get consultedUser => _currentUser;
+
+  // NOUVEAU: Getters pour l'état de débit
+  String get debitUsername => _debitUsername;
+  bool get isSearchingUser => _isSearchingUser;
+  User? get searchedUser => _searchedUser;
+  String? get debitUsernameError => _debitUsernameError;
+  bool get isDebitFormValid => _debitUsername.isNotEmpty;
+
+  // NOUVEAU: Vérifier si l'utilisateur courant est PORTIER
+  bool get isCurrentUserPorter {
+    return _currentUser?.role.name == 'PORTIER';
+  }
+
+  // NOUVEAU: Vérifier si l'utilisateur recherché est ETUDIANT
+  bool get isSearchedUserStudent {
+    return _searchedUser?.role.name == 'ETUDIANT';
+  }
 
   // setters for signup form
   void setFirstname(String value) {
@@ -231,9 +245,17 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Debit form setters
+  // NOUVEAU: Setters pour le formulaire de débit
   void setDebitUsername(String value) {
     _debitUsername = value;
+    _debitUsernameError =
+        null; // Réinitialiser l'erreur quand l'utilisateur tape
+    notifyListeners();
+  }
+
+  // NOUVEAU: Définir l'erreur de nom d'utilisateur pour débit
+  void setDebitUsernameError(String error) {
+    _debitUsernameError = error;
     notifyListeners();
   }
 
@@ -351,7 +373,7 @@ class UserProvider with ChangeNotifier {
 
     // Vérifiez que le rôle est sélectionné
     if (_role == null) {
-      print("❌ ERREUR CRITIQUE: _role est null dans submitSignup!");
+      print(" ERREUR CRITIQUE: _role est null dans submitSignup!");
       _error = 'Veuillez sélectionner un rôle';
       notifyListeners();
       return false;
@@ -448,10 +470,7 @@ class UserProvider with ChangeNotifier {
       print('ID: ${user.userId}');
       print('Rôle name: ${user.role.name}');
       /*  print('Email: ${user.email}');
-      print('Rôle id: ${user.role.roleId}');
-      print('firstname: ${user.firstName}');
-      print('lastname: ${user.lastName}');
-      print('password: ${user.password}'); */
+      print('Rôle id: ${user.role.roleId}'); */
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();
@@ -800,8 +819,66 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // ******** FOR DEBIT FORM ******** */
+
+  // NOUVEAU: Rechercher un utilisateur par nom d'utilisateur pour débit
+  Future<bool> searchUserByUsername(String username) async {
+    if (username.isEmpty) {
+      _debitUsernameError = 'Veuillez entrer un nom d\'utilisateur';
+      notifyListeners();
+      return false;
+    }
+
+    _isSearchingUser = true;
+    _searchedUser = null;
+    _debitUsernameError = null;
+    notifyListeners();
+
+    try {
+      print('🔍 Recherche de l\'utilisateur pour débit: $username');
+
+      // Appeler le service pour récupérer l'utilisateur
+      final user = await _service.getUserByUsername(username);
+
+      _searchedUser = user;
+      _isSearchingUser = false;
+      _debitUsernameError = null;
+      notifyListeners();
+
+      print(
+        '✅ Utilisateur trouvé: ${user.username} (Rôle: ${user.role?.name})',
+      );
+      return true;
+    } catch (e) {
+      _isSearchingUser = false;
+      _searchedUser = null;
+      _debitUsernameError = 'Utilisateur non trouvé ou erreur de connexion';
+      notifyListeners();
+
+      print('❌ Erreur lors de la recherche: $e');
+      return false;
+    }
+  }
+
+  // NOUVEAU: Validation du formulaire de débit
+  String? getDebitUsernameError() {
+    if (_debitUsername.isEmpty) {
+      return 'Le nom d\'utilisateur est requis';
+    }
+    return null;
+  }
+
+  // NOUVEAU: Réinitialiser l'état de débit
+  void resetDebitState() {
+    _debitUsername = '';
+    _isSearchingUser = false;
+    _searchedUser = null;
+    _debitUsernameError = null;
+    notifyListeners();
+  }
+
   // ******** FOR VALIDATION TO ACCESS DBEIT PAGE ********
-  Future<bool> accessDebitPage() async {
+  /*   Future<bool> accessDebitPage() async {
     if (!isDebitFormValid) {
       _error = 'Veuillez saisir un nom d\'utilisateur';
       notifyListeners();
@@ -837,7 +914,7 @@ class UserProvider with ChangeNotifier {
 
   String? get debitUsernameError {
     return _debitUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
-  }
+  } */
 
   /*   // Add role to an existing user
   Future<bool> addRoleToExistingUser(int userId, int roleId) async {

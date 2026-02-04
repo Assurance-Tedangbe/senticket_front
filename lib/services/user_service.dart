@@ -349,13 +349,22 @@ class UserApiService {
   // without cahe
   Future<User> getUserByUsername(String username) async {
     try {
+      print("Récupération de l'utilisateur par username: $username");
+
       final response = await http.get(
         Uri.parse('$baseUrl/username/$username'),
         headers: headers,
       );
 
+      print("Status code getUserByUsername: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
+
+        print(
+          "Utilisateur trouvé: ${userData['username']} (Rôle: ${userData['role']?['name']})",
+        );
         return User.fromJson(userData);
         /*  return User.fromJson(json.decode(response.body)); */
       } else if (response.statusCode == 404) {
@@ -369,6 +378,39 @@ class UserApiService {
       throw Exception('Erreur réseau: $e');
     }
   }
+
+  /*  Future<User> getUserByUsername(String username) async {
+    try {
+      print("Récupération de l'utilisateur par username: $username");
+
+      // Construire l'URL pour récupérer l'utilisateur par username
+      final response = await http.get(
+        Uri.parse('$baseUrl/username/$username'),
+        headers: headers,
+      );
+
+      print("Status code getUserByUsername: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        final user = User.fromJson(jsonData);
+        print(
+          "Utilisateur trouvé: ${user.username} (Rôle: ${user.role?.name})",
+        );
+        return user;
+      } else if (response.statusCode == 404) {
+        throw Exception('Utilisateur non trouvé');
+      } else {
+        throw Exception(
+          'Erreur lors de la récupération: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print("Erreur getUserByUsername: $e");
+      rethrow;
+    }
+  } */
 
   // UPDATE USER (PUT /api/users/{userId})
   Future<User> updateUser(User user) async {
