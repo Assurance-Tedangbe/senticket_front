@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/buyTicketBtn.dart';
-import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 
 class RequestSection extends StatefulWidget {
@@ -32,8 +31,6 @@ class _RequestSectionState extends State<RequestSection> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return Consumer<TicketProvider>(
       builder: (context, ticketProvider, child) {
         return Column(

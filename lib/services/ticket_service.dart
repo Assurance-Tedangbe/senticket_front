@@ -182,15 +182,17 @@ class TicketApiService {
     }
   }
 
-  // NEW: Get tickets by user with filters
-  Future<List<Ticket>> getTicketsByUser({
+  // Get purchased tickets by user (GET /api/tickets/user)
+  Future<List<Ticket>> getPurchasedTicketsByUser({
     required int userId,
     bool? booked,
     String? ticketStatus,
     String? ticketType,
   }) async {
     try {
-      print("Récupération des tickets pour l'utilisateur: $userId");
+      print(
+        "Récupération des tickets de type: $ticketType achetés par l'utilisateur: $userId",
+      );
 
       // Build query parameters
       final params = <String, String>{'userId': userId.toString()};
@@ -206,8 +208,9 @@ class TicketApiService {
       if (ticketType != null) {
         params['ticketType'] = ticketType;
       }
-
-      final uri = Uri.parse('$baseUrl/user').replace(queryParameters: params);
+      final uri = Uri.parse(
+        '$baseUrl/user/$userId/purchased',
+      ).replace(queryParameters: params);
       final response = await http.get(uri, headers: headers);
 
       if (response.statusCode == 200) {

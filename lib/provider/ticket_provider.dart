@@ -142,7 +142,7 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  // ******* FOR PURCHASETICKETS OPERATION ********
+  // ******* FOR PURCHASE TICKETS OPERATION ********
 
   // Pour gérer la sélection/désélection
   void toggleTicketSelection(int ticketId) {
@@ -208,7 +208,7 @@ class TicketProvider with ChangeNotifier {
 
     // Vérifier si l'utilisateur a le rôle ETUDIANT
     final user = userProvider.currentUser!;
-    final isStudent = user.role?.name?.toUpperCase() == 'ETUDIANT';
+    final isStudent = user.role.name.toUpperCase() == 'ETUDIANT';
 
     if (!isStudent) {
       _error = 'Seuls les étudiants peuvent acheter des tickets';
@@ -267,10 +267,10 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  // ******* FOR DEBIT OPERATION ********
+  // ******* FOR DEBIT ACCOUNT OPERATION ********
 
-  // Fetch student's booked tickets for debit
-  Future<void> fetchStudentTicketsForDebit({
+  // Fetch student's purchased tickets by user
+  Future<void> getPurchasedTicketsByUser({
     required int studentId,
     TicketType? ticketType,
   }) async {
@@ -281,7 +281,7 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _studentTicketsForDebit = await _service.getTicketsByUser(
+      _studentTicketsForDebit = await _service.getPurchasedTicketsByUser(
         userId: studentId,
         booked: true,
         ticketStatus: 'BOOKED',

@@ -3,6 +3,7 @@ import 'package:senticket_front/UI/pages/logout.dart';
 import 'package:senticket_front/UI/pages/research.dart';
 import 'package:senticket_front/UI/widgets/home/home.drawer.dart';
 import 'package:senticket_front/UI/widgets/home/myhome.body.dart';
+import 'package:senticket_front/constants.dart';
 
 class Home extends StatelessWidget {
   static const String _title = 'Bienvenue';
@@ -16,18 +17,21 @@ class Home extends StatelessWidget {
       drawer: const HomeDrawer(),
       appBar: AppBar(
         title: const Text(_title),
+        backgroundColor: kPrimaryColor,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
             tooltip: 'Rechercher des services',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const ServiceResearch())),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const ServiceResearch()),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Se déconnecter',
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => const LogOut())),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (context) => const LogOut())),
           ),
         ],
       ),

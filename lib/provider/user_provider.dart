@@ -64,12 +64,12 @@ class UserProvider with ChangeNotifier {
   // DEBIT FORM STATE
   String _debitUsername = '';
   bool _isSearchingUser = false;
-  User? _searchedUser; // Utilisateur recherché pour le débit
+  User? _searchedUser; // Utilisateur recherché
   String? _debitUsernameError;
 
   UserProvider(this._service);
 
-  // === GETTERS - Accès contrôlé à l'état ===
+  // GETTERS - Accès contrôlé à l'état ===
 
   // Main Getters
   List<User> get users =>
@@ -113,28 +113,17 @@ class UserProvider with ChangeNotifier {
   String get updateUsername => _updateUsername;
   String get updateEmail => _updateEmail;
   String get updatePassword => _updatePassword;
-  // String get updateConfirmPassword => _updateConfirmPassword;
   Role? get updateRole => _updateRole;
 
   // Getter pour l'utilisateur consulté
   User? get consultedUser => _currentUser;
 
-  // NOUVEAU: Getters pour l'état de débit
+  // Getters pour l'état de débit
   String get debitUsername => _debitUsername;
   bool get isSearchingUser => _isSearchingUser;
   User? get searchedUser => _searchedUser;
   String? get debitUsernameError => _debitUsernameError;
   bool get isDebitFormValid => _debitUsername.isNotEmpty;
-
-  // NOUVEAU: Vérifier si l'utilisateur courant est PORTIER
-  bool get isCurrentUserPorter {
-    return _currentUser?.role.name == 'PORTIER';
-  }
-
-  // NOUVEAU: Vérifier si l'utilisateur recherché est ETUDIANT
-  bool get isSearchedUserStudent {
-    return _searchedUser?.role.name == 'ETUDIANT';
-  }
 
   // setters for signup form
   void setFirstname(String value) {
@@ -235,17 +224,12 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /* void setUpdateConfirmPassword(String value) {
-    _updateConfirmPassword = value;
-    notifyListeners();
-  } */
-
   void setUpdateRole(Role value) {
     _updateRole = value;
     notifyListeners();
   }
 
-  // NOUVEAU: Setters pour le formulaire de débit
+  // **** Setters pour le formulaire de débit ****
   void setDebitUsername(String value) {
     _debitUsername = value;
     _debitUsernameError =
@@ -253,7 +237,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // NOUVEAU: Définir l'erreur de nom d'utilisateur pour débit
+  // Définir l'erreur de nom d'utilisateur pour débit
   void setDebitUsernameError(String error) {
     _debitUsernameError = error;
     notifyListeners();
@@ -821,7 +805,7 @@ class UserProvider with ChangeNotifier {
 
   // ******** FOR DEBIT FORM ******** */
 
-  // NOUVEAU: Rechercher un utilisateur par nom d'utilisateur pour débit
+  // Rechercher un utilisateur par nom d'utilisateur
   Future<bool> searchUserByUsername(String username) async {
     if (username.isEmpty) {
       _debitUsernameError = 'Veuillez entrer un nom d\'utilisateur';
@@ -855,20 +839,20 @@ class UserProvider with ChangeNotifier {
       _debitUsernameError = 'Utilisateur non trouvé ou erreur de connexion';
       notifyListeners();
 
-      print('❌ Erreur lors de la recherche: $e');
+      print('Erreur lors de la recherche: $e');
       return false;
     }
   }
 
-  // NOUVEAU: Validation du formulaire de débit
+  /* // NOUVEAU: Validation du formulaire de débit
   String? getDebitUsernameError() {
     if (_debitUsername.isEmpty) {
       return 'Le nom d\'utilisateur est requis';
     }
     return null;
-  }
+  } */
 
-  // NOUVEAU: Réinitialiser l'état de débit
+  // Réinitialiser l'état de débit
   void resetDebitState() {
     _debitUsername = '';
     _isSearchingUser = false;
@@ -876,45 +860,6 @@ class UserProvider with ChangeNotifier {
     _debitUsernameError = null;
     notifyListeners();
   }
-
-  // ******** FOR VALIDATION TO ACCESS DBEIT PAGE ********
-  /*   Future<bool> accessDebitPage() async {
-    if (!isDebitFormValid) {
-      _error = 'Veuillez saisir un nom d\'utilisateur';
-      notifyListeners();
-      return false;
-    }
-
-    _isDebitingUser = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      print('Opération de debit  par l\'utilisateur : $_debitUsername');
-
-      // Appel au service pour récupérer l'utilisateur
-      final user = await _service.getUserByUsername(_debitUsername);
-
-      _currentUser = user;
-      _isDebitingUser = false;
-      _error = '';
-      notifyListeners();
-
-      print('✅ Compte trouvé: ${user.username}');
-      return true;
-    } catch (e) {
-      _isDebitingUser = false;
-      _error = 'Portier non trouvé ou erreur de connexion';
-      notifyListeners();
-
-      print('❌ Erreur lors de la validation: $e');
-      return false;
-    }
-  }
-
-  String? get debitUsernameError {
-    return _debitUsername.isEmpty ? 'Le nom d\'utilisateur est requis' : null;
-  } */
 
   /*   // Add role to an existing user
   Future<bool> addRoleToExistingUser(int userId, int roleId) async {

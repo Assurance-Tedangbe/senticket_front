@@ -3,6 +3,7 @@ import 'package:senticket_front/UI/pages/logout.dart';
 import 'package:senticket_front/UI/pages/research.dart';
 import 'package:senticket_front/UI/widgets/porter/porterInterface.body.dart';
 import 'package:senticket_front/UI/widgets/porter/porter.drawer.dart';
+import 'package:senticket_front/constants.dart';
 
 class PorterInterface extends StatelessWidget {
   static const String _title = 'Interface portier';
@@ -15,18 +16,21 @@ class PorterInterface extends StatelessWidget {
       drawer: const PortierDrawer(),
       appBar: AppBar(
         title: const Text(_title),
+        backgroundColor: kPrimaryColor,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
             tooltip: 'Rechercher des services',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const ServiceResearch())),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const ServiceResearch()),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Se déconnecter',
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => const LogOut())),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (context) => const LogOut())),
           ),
         ],
       ),

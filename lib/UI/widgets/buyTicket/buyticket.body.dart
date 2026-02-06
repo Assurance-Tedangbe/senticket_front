@@ -92,7 +92,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                   style: TextStyle(
                     color: isLoggedIn
                         ? (isStudent ? kThirdColor : kPrimaryColor)
-                        : Colors.grey,
+                        : greyBorderColor,
                   ),
                 ),
               ],
@@ -155,7 +155,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
           const Text(
             'Seuls les ETUDIANTS peuvent acheter des tickets.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: greyBorderColor),
           ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
@@ -171,7 +171,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
             label: const Text('Se déconnecter'),
             style: ElevatedButton.styleFrom(
               backgroundColor: kPrimaryColor,
-              foregroundColor: Colors.white,
+              foregroundColor: kSecondColor,
             ),
           ),
         ],
@@ -184,21 +184,21 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
       padding: const EdgeInsets.symmetric(vertical: 40),
       child: Column(
         children: [
-          const Icon(Icons.lock_person, size: 80, color: Colors.grey),
+          const Icon(Icons.lock_person, size: 80, color: greyBorderColor),
           const SizedBox(height: 20),
           const Text(
             'Authentification requise',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              color: greyBorderColor,
             ),
           ),
           const SizedBox(height: 10),
           const Text(
             'Connectez-vous pour acheter des tickets',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: greyBorderColor),
           ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
@@ -212,7 +212,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
             label: const Text('Se connecter'),
             style: ElevatedButton.styleFrom(
               backgroundColor: kPrimaryColor,
-              foregroundColor: Colors.white,
+              foregroundColor: kSecondColor,
             ),
           ),
         ],
@@ -226,7 +226,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
       child: Container(
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color: kPrimaryColor.withOpacity(0.1),
+          color: kPrimaryColor,
           borderRadius: BorderRadius.circular(8.0),
           border: Border.all(color: kPrimaryColor),
         ),

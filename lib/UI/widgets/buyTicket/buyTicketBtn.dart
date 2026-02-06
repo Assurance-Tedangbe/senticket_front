@@ -77,7 +77,6 @@ class BuyTicketBtn extends StatelessWidget {
                         ),
                       ],
                     ),
-                    //  ),
                   ),
                 SizedBox(
                   width: size.width * 0.7,
@@ -135,7 +134,7 @@ class BuyTicketBtn extends StatelessWidget {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                kSecondColor,
+                                kThirdColor,
                               ),
                             ),
                           )
