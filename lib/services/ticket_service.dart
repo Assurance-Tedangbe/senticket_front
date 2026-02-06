@@ -152,7 +152,7 @@ class TicketApiService {
       );
 
       final response = await http.put(
-        Uri.parse('$baseUrl/debitAccount'),
+        Uri.parse('$baseUrl/debit'),
         headers: headers,
         body: json.encode(debitAccountRequestDTO.toJson()),
       );

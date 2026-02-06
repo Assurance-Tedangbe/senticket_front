@@ -300,26 +300,30 @@ class _DebitPageState extends State<DebitPage> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (ticketProvider
-                                .studentTicketsForDebit
-                                .isNotEmpty)
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    onPressed:
-                                        ticketProvider.selectAllTicketsForDebit,
-                                    child: const Text('Tout sélectionner'),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  OutlinedButton(
-                                    onPressed: ticketProvider
-                                        .deselectAllTicketsForDebit,
-                                    child: const Text('Tout désélectionner'),
-                                  ),
-                                ],
-                              ),
                           ],
                         ),
+                        if (ticketProvider.studentTicketsForDebit.isNotEmpty)
+                          Row(
+                            children: [
+                              OutlinedButton(
+                                onPressed:
+                                    ticketProvider.selectAllTicketsForDebit,
+                                child: const Text(
+                                  'Tout sélectionner',
+                                  style: TextStyle(color: kThirdColor),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              OutlinedButton(
+                                onPressed:
+                                    ticketProvider.deselectAllTicketsForDebit,
+                                child: const Text(
+                                  'Tout désélectionner',
+                                  style: TextStyle(color: kThirdColor),
+                                ),
+                              ),
+                            ],
+                          ),
 
                         const SizedBox(height: 10),
 
@@ -327,7 +331,7 @@ class _DebitPageState extends State<DebitPage> {
                           'Sélectionnés: $selectedCount ticket(s)',
                           style: TextStyle(
                             color: selectedCount > 0
-                                ? Colors.green
+                                ? kThirdColor
                                 : Colors.grey,
                             fontWeight: FontWeight.bold,
                           ),
@@ -366,21 +370,24 @@ class _DebitPageState extends State<DebitPage> {
                               backgroundColor: selectedCount > 0
                                   ? kPrimaryColor
                                   : greyBorderColor,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 10,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                             child: ticketProvider.isDebitingAccount
                                 ? const CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: kPrimaryColor,
                                   )
                                 : Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const Icon(
                                         Icons.account_balance_wallet,
-                                        color: Colors.white,
+                                        color: kSecondColor,
                                       ),
                                       const SizedBox(width: 10),
                                       Text(
@@ -388,7 +395,7 @@ class _DebitPageState extends State<DebitPage> {
                                         style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: kSecondColor,
                                         ),
                                       ),
                                     ],
@@ -412,31 +419,33 @@ class _DebitPageState extends State<DebitPage> {
     TicketProvider provider,
   ) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      color: ticket.isSelected ? Colors.green[50] : null,
+      margin: const EdgeInsets.symmetric(vertical: 1),
+      color: ticket.isSelected ? Colors.blue[50] : null,
       child: ListTile(
         leading: Checkbox(
           value: ticket.isSelected,
           onChanged: (value) {
             provider.toggleTicketSelectionForDebit(ticket.ticketId!);
           },
+          checkColor: kSecondColor,
+          activeColor: kPrimaryColor,
         ),
-        title: Text('Ticket #${ticket.ticketId}'),
-        subtitle: Column(
+        title: Text('Ticket ${ticket.ticketId}'),
+        /*  subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Type: ${ticket.ticketType.toString().split('.').last}'),
             Text('Prix: ${ticket.ticketPrice} FCFA'),
-            Text('Statut: ${ticket.ticketStatus.toString().split('.').last}'),
+            //Text('Statut: ${ticket.ticketStatus.toString().split('.').last}'),
             if (ticket.paymentCode.isNotEmpty)
               Text('Code: ${ticket.paymentCode}'),
             if (ticket.ticketCreationDate != null)
-              Text('Créé: ${_formatDate(ticket.ticketCreationDate)}'),
+              Text('Créé: ${_formatDate(ticket.ticketCreationDate!)}'),
           ],
-        ),
+        ), */
         trailing: Icon(
           ticket.isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-          color: ticket.isSelected ? Colors.green : Colors.grey,
+          color: ticket.isSelected ? kPrimaryColor : Colors.grey,
         ),
         onTap: () {
           provider.toggleTicketSelectionForDebit(ticket.ticketId!);
