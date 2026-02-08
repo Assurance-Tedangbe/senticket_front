@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/admin/createAccountIcon.dart';
 import 'package:senticket_front/UI/pages/updateUser.dart';
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/dataTableStyle.dart';
-import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/headTableStyle.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/headTableStyle.dart';
 import 'package:senticket_front/UI/widgets/consult.account/consult.data.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class _ListStudentsPageState extends State<ListStudentsPage> {
   // Filtrer les utilisateurs avec le rôle ETUDIANT
   List<User> _getStudents(List<User> allUsers) {
     return allUsers.where((user) {
-      return user.role?.name?.toUpperCase() == 'ETUDIANT';
+      return user.role.name.toUpperCase() == 'ETUDIANT';
     }).toList();
   }
 
@@ -81,7 +82,7 @@ class _ListStudentsPageState extends State<ListStudentsPage> {
                         'Compte ${user.username} supprimé avec succès',
                       ),
                       backgroundColor: validateBtnColor,
-                      duration: const Duration(seconds: 3),
+                      duration: const Duration(seconds: 5),
                     ),
                   );
                 } else {
@@ -91,7 +92,7 @@ class _ListStudentsPageState extends State<ListStudentsPage> {
                         'Erreur lors de la suppression: ${userProvider.error}',
                       ),
                       backgroundColor: redErrorColor,
-                      duration: const Duration(seconds: 3),
+                      duration: const Duration(seconds: 5),
                     ),
                   );
                 }
@@ -148,7 +149,7 @@ class _ListStudentsPageState extends State<ListStudentsPage> {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: CircularProgressIndicator(color: kPrimaryColor),
+                    child: CustomCircularProgressIndicator(),
                   ),
                 )
               else if (students.isEmpty)

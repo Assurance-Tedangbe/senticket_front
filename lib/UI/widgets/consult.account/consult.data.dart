@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -46,7 +47,7 @@ class _ConsultDataState extends State<ConsultData> {
       body: Consumer<UserProvider>(
         builder: (context, userProvider, child) {
           if (userProvider.isLoading && userProvider.currentUser == null) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CustomCircularProgressIndicator());
           }
 
           final user = userProvider.currentUser; // ← Données déjà disponibles

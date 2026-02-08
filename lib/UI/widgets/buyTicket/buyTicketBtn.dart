@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -103,7 +104,7 @@ class BuyTicketBtn extends StatelessWidget {
                                     '$selectedCount ticket(s) acheté(s) avec succès par $userName',
                                   ),
                                   backgroundColor: validateBtnColor,
-                                  duration: const Duration(seconds: 3),
+                                  duration: const Duration(seconds: 5),
                                 ),
                               );
                               onSuccess();
@@ -112,7 +113,7 @@ class BuyTicketBtn extends StatelessWidget {
                                 SnackBar(
                                   content: Text(ticketProvider.error),
                                   backgroundColor: redErrorColor,
-                                  duration: const Duration(seconds: 3),
+                                  duration: const Duration(seconds: 5),
                                 ),
                               );
                             }
@@ -131,12 +132,7 @@ class BuyTicketBtn extends StatelessWidget {
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                kThirdColor,
-                              ),
-                            ),
+                            child: CustomCircularProgressIndicator(),
                           )
                         : Text(
                             !isLoggedIn

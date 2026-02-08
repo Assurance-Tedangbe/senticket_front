@@ -3,7 +3,7 @@ import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/consult.account/consult.data.dart';
 import 'package:senticket_front/UI/widgets/consult.account/consultBtn.dart';
 import 'package:senticket_front/UI/widgets/consult.account/usernameConsultSection.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';

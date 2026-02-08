@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/updateUser/updateEmail.dart';
 import 'package:senticket_front/UI/widgets/updateUser/updateFirstName.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';

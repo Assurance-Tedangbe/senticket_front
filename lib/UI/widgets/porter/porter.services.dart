@@ -3,7 +3,7 @@ import 'package:senticket_front/UI/pages/debitAccount.dart';
 import 'package:senticket_front/UI/pages/scanqr.dart';
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 
 class PorterServices extends StatelessWidget {
   const PorterServices({super.key});

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -6,10 +7,7 @@ import 'package:senticket_front/provider/user_provider.dart';
 class UpdateUserBtn extends StatelessWidget {
   final VoidCallback onUpdateSuccess;
 
-  const UpdateUserBtn({
-    super.key,
-    required this.onUpdateSuccess,
-  });
+  const UpdateUserBtn({super.key, required this.onUpdateSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -22,35 +20,35 @@ class UpdateUserBtn extends StatelessWidget {
           child: ElevatedButton(
             onPressed:
                 userProvider.isUpdatingUser || !userProvider.isUpdateFormValid
-                    ? null
-                    : () async {
-                        final success = await userProvider.submitUpdate();
-                        if (success) {
-                          // Afficher un message de succès
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Compte modifié avec succès !'),
-                              backgroundColor: validateBtnColor,
-                            ),
-                          );
+                ? null
+                : () async {
+                    final success = await userProvider.submitUpdate();
+                    if (success) {
+                      // Afficher un message de succès
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Compte modifié avec succès !'),
+                          backgroundColor: validateBtnColor,
+                        ),
+                      );
 
-                          // Navigation ou callback
-                          onUpdateSuccess();
-                        } else {
-                          // Afficher l'erreur
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(userProvider.error),
-                              backgroundColor: redErrorColor,
-                            ),
-                          );
-                        }
-                      },
+                      // Navigation ou callback
+                      onUpdateSuccess();
+                    } else {
+                      // Afficher l'erreur
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(userProvider.error),
+                          backgroundColor: redErrorColor,
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor:
                   userProvider.isUpdateFormValid && !userProvider.isUpdatingUser
-                      ? kPrimaryColor
-                      : Colors.grey,
+                  ? kPrimaryColor
+                  : Colors.grey,
               shape: const BeveledRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
@@ -61,7 +59,7 @@ class UpdateUserBtn extends StatelessWidget {
               ),
             ),
             child: userProvider.isUpdatingUser
-                ? const CircularProgressIndicator(color: kSecondColor)
+                ? const CustomCircularProgressIndicator()
                 : const Text('Modifier'),
           ),
         );

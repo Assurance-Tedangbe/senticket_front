@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/signup/checksignin.btn.dart';
 import 'package:senticket_front/UI/widgets/signup/confirmpwdsection.dart';
 import 'package:senticket_front/UI/widgets/signup/emailsection.dart';

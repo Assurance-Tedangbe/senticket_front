@@ -4,7 +4,7 @@ import 'package:senticket_front/UI/widgets/admin/porter.mgmt.dart/manage.porter.
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/manage.student.dart';
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 
 class AdminServices extends StatelessWidget {
   const AdminServices({super.key});

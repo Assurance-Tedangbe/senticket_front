@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/cancelTransfertCredit.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.height.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.credit/amountSection.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.credit/passwordTrsfCreditSection.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.credit/recipientNumberSection.dart';
@@ -21,11 +21,7 @@ class TransfertBody extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Icon(
-              Icons.attach_money,
-              color: kPrimaryColor,
-              size: 70,
-            ),
+            const Icon(Icons.attach_money, color: kPrimaryColor, size: 70),
             const SizeboxHeight(),
             RecipientNumberSection(),
             const SizeboxHeightSession(),
@@ -34,18 +30,21 @@ class TransfertBody extends StatelessWidget {
             PasswordTrsfCreditSection(),
             const SizeboxHeightSession(),
             TrnasfertCreditBtn(),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-              IconButton(
-                iconSize: 60,
-                icon: const Icon(
-                  Icons.cancel,
-                  color: kPrimaryColor,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                IconButton(
+                  iconSize: 60,
+                  icon: const Icon(Icons.cancel, color: kPrimaryColor),
+                  tooltip: 'Annuler transfert crédit',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const CancelTrsfCredit(),
+                    ),
+                  ),
                 ),
-                tooltip: 'Annuler transfert crédit',
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const CancelTrsfCredit())),
-              ),
-            ]),
+              ],
+            ),
           ],
         ),
       ),

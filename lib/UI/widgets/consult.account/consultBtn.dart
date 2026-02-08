@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,8 @@ class ConsultBtn extends StatelessWidget {
           width: 320,
           height: 95,
           child: ElevatedButton(
-            onPressed: userProvider.isConsultingUser ||
+            onPressed:
+                userProvider.isConsultingUser ||
                     !userProvider.isConsultFormValid
                 ? null
                 : () async {
@@ -64,7 +66,8 @@ class ConsultBtn extends StatelessWidget {
                     }
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: userProvider.isConsultFormValid &&
+              backgroundColor:
+                  userProvider.isConsultFormValid &&
                       !userProvider.isConsultingUser
                   ? kPrimaryColor
                   : greyBorderColor,
@@ -78,7 +81,7 @@ class ConsultBtn extends StatelessWidget {
               ),
             ),
             child: userProvider.isConsultingUser
-                ? const CircularProgressIndicator(color: kSecondColor)
+                ? const CustomCircularProgressIndicator()
                 : const Text('Consulter'),
           ),
         );

@@ -7,7 +7,7 @@ import 'package:senticket_front/UI/pages/scanqr.dart';
 import 'package:senticket_front/UI/pages/transfert.ticket.dart';
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 
 class StudentServices extends StatelessWidget {
   const StudentServices({super.key});

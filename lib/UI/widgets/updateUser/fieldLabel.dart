@@ -9,10 +9,7 @@ class FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       fldLabel,
-      style: const TextStyle(
-        color: kThirdColor,
-        fontSize: 20,
-      ),
+      style: const TextStyle(color: kThirdColor, fontSize: 20),
     );
   }
 }

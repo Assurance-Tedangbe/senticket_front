@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/selectAllButton.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/ticketBBloc.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
@@ -59,9 +60,7 @@ class _TicketBSectionState extends State<TicketBSection> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ticketProvider.isLoading && ticketsB.isEmpty
-                    ? const Center(
-                        child: CircularProgressIndicator(color: cyanColor),
-                      )
+                    ? const Center(child: CustomCircularProgressIndicator())
                     : ticketsB.isEmpty
                     ? const Center(
                         child: Column(
@@ -117,4 +116,3 @@ class _TicketBSectionState extends State<TicketBSection> {
     );
   }
 }
-

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/constants.dart';
@@ -63,9 +64,9 @@ class SignupBtn extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               // Change la couleur selon l'état de validation
               backgroundColor: // ← ICI
-                  userProvider.isFormValid && !userProvider.isCreatingUser
-                      ? kPrimaryColor
-                      : greyBorderColor,
+              userProvider.isFormValid && !userProvider.isCreatingUser
+                  ? kPrimaryColor
+                  : greyBorderColor,
               shape: const BeveledRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
@@ -75,9 +76,11 @@ class SignupBtn extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            child: userProvider.isCreatingUser // ← ICI
+            child:
+                userProvider
+                    .isCreatingUser // ← ICI
                 ? // Affiche un indicateur de chargement pendant la création
-                const CircularProgressIndicator(color: kSecondColor)
+                  const CustomCircularProgressIndicator()
                 : const Text('Créer un compte'),
           ),
         );

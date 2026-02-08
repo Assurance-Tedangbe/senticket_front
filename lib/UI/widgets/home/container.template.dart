@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/constants.dart';
 
 class ContainerTemplate extends StatelessWidget {

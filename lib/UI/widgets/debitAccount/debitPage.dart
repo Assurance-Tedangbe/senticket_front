@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
@@ -57,7 +58,7 @@ class _DebitPageState extends State<DebitPage> {
         const SnackBar(
           content: Text('Veuillez sélectionner au moins un ticket'),
           backgroundColor: redErrorColor,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 5),
         ),
       );
       return;
@@ -70,7 +71,7 @@ class _DebitPageState extends State<DebitPage> {
         const SnackBar(
           content: Text('Seuls les PORTIERS peuvent débiter des comptes'),
           backgroundColor: redErrorColor,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 5),
         ),
       );
       return;
@@ -99,7 +100,7 @@ class _DebitPageState extends State<DebitPage> {
             '${ticketProvider.selectedTicketIdsForDebit.length} ticket(s) débité(s) avec succès pour ${widget.studentUsername}',
           ),
           backgroundColor: validateBtnColor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
 
@@ -115,7 +116,7 @@ class _DebitPageState extends State<DebitPage> {
         SnackBar(
           content: Text(ticketProvider.error),
           backgroundColor: redErrorColor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
     }
@@ -162,7 +163,8 @@ class _DebitPageState extends State<DebitPage> {
                   children: [
                     // Information de l'étudiant
                     Card(
-                      elevation: 3,
+                      elevation: 2,
+                      color: secondColor,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
@@ -178,7 +180,7 @@ class _DebitPageState extends State<DebitPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Étudiant: ${widget.studentUsername}',
+                                    'ÉTUDIANT: ${widget.studentUsername}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -217,7 +219,7 @@ class _DebitPageState extends State<DebitPage> {
                           borderSide: BorderSide(color: kPrimaryColor),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                          horizontal: 14,
                           vertical: 12,
                         ),
                       ),
@@ -254,7 +256,7 @@ class _DebitPageState extends State<DebitPage> {
                     // Liste des tickets
                     if (_selectedTicketType != null) ...[
                       if (ticketProvider.isLoadingStudentTickets)
-                        const Center(child: CircularProgressIndicator())
+                        const Center(child: CustomCircularProgressIndicator())
                       else if (ticketProvider.error.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -379,9 +381,7 @@ class _DebitPageState extends State<DebitPage> {
                               ),
                             ),
                             child: ticketProvider.isDebitingAccount
-                                ? const CircularProgressIndicator(
-                                    color: kPrimaryColor,
-                                  )
+                                ? CustomCircularProgressIndicator()
                                 : Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [

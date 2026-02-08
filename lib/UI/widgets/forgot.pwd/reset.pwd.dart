@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/forgot.pwd/forgotPwdConfirmpwdsection.dart';
 import 'package:senticket_front/UI/widgets/forgot.pwd/forgotPwdPasswordSection.dart';
 import 'package:senticket_front/UI/widgets/forgot.pwd/reset.btn.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.height.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
 import 'package:senticket_front/constants.dart';
 
 class ResetPwd extends StatefulWidget {
@@ -24,11 +24,7 @@ class _ResetPwdState extends State<ResetPwd> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(
-              Icons.lock_reset,
-              color: kPrimaryColor,
-              size: 70,
-            ),
+            Icon(Icons.lock_reset, color: kPrimaryColor, size: 70),
             SizeboxHeight(),
             ForgotPwdPasswordSection(),
             SizeboxHeight(),

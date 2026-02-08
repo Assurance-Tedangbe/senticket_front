@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -10,10 +11,7 @@ import 'package:provider/provider.dart';
 class LoginBtn extends StatelessWidget {
   final VoidCallback onLoginSuccess;
 
-  const LoginBtn({
-    super.key,
-    required this.onLoginSuccess,
-  });
+  const LoginBtn({super.key, required this.onLoginSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -26,35 +24,35 @@ class LoginBtn extends StatelessWidget {
           child: ElevatedButton(
             onPressed:
                 userProvider.isLoggingIn || !userProvider.isLoginFormValid
-                    ? null // Désactivé si validation échoue
-                    : () async {
-                        final success = await userProvider.submitLogin();
-                        if (success) {
-                          // Afficher un message de succès
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Connexion réussie !'),
-                              backgroundColor: validateBtnColor,
-                            ),
-                          );
+                ? null // Désactivé si validation échoue
+                : () async {
+                    final success = await userProvider.submitLogin();
+                    if (success) {
+                      // Afficher un message de succès
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Connexion réussie !'),
+                          backgroundColor: validateBtnColor,
+                        ),
+                      );
 
-                          // Navigation ou callback
-                          onLoginSuccess();
-                        } else {
-                          // Afficher l'erreur
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(userProvider.error),
-                              backgroundColor: redErrorColor,
-                            ),
-                          );
-                        }
-                      },
+                      // Navigation ou callback
+                      onLoginSuccess();
+                    } else {
+                      // Afficher l'erreur
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(userProvider.error),
+                          backgroundColor: redErrorColor,
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor:
                   userProvider.isLoginFormValid && !userProvider.isLoggingIn
-                      ? kPrimaryColor
-                      : greyBorderColor,
+                  ? kPrimaryColor
+                  : greyBorderColor,
               shape: const BeveledRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
@@ -65,7 +63,7 @@ class LoginBtn extends StatelessWidget {
               ),
             ),
             child: userProvider.isLoggingIn
-                ? const CircularProgressIndicator(color: kSecondColor)
+                ? const CustomCircularProgressIndicator()
                 : const Text('Se connecter'),
           ),
         );

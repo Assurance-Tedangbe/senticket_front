@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/updateUser.dart';
 import 'package:senticket_front/UI/widgets/admin/createAccountIcon.dart';
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/dataTableStyle.dart';
-import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/headTableStyle.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/headTableStyle.dart';
 import 'package:senticket_front/UI/widgets/consult.account/consult.data.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
   // Filtrer les utilisateurs avec le rôle AGENT
   List<User> _getAgents(List<User> allUsers) {
     return allUsers.where((user) {
-      return user.role?.name?.toUpperCase() == 'AGENT';
+      return user.role.name.toUpperCase() == 'AGENT';
     }).toList();
   }
 
@@ -89,7 +90,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
         SnackBar(
           content: Text('Compte ${agent.username} supprimé avec succès'),
           backgroundColor: validateBtnColor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
     } else {
@@ -97,7 +98,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
         SnackBar(
           content: Text('Erreur lors de la suppression: ${userProvider.error}'),
           backgroundColor: redErrorColor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
     }
@@ -169,7 +170,7 @@ class _ListAgentsPageState extends State<ListAgentsPage> {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
-                    child: CircularProgressIndicator(color: kPrimaryColor),
+                    child: CustomCircularProgressIndicator(),
                   ),
                 )
               else if (agents.isEmpty)

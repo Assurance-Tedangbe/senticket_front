@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/deactivateAccount.dart';
 import 'package:senticket_front/UI/pages/home.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.height.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -31,8 +31,9 @@ class _ActivateAccountBodyState extends State<ActivateAccountBody> {
             showCloseIcon: true,
             title: "Succès",
             desc: "compte active",
-            btnOkOnPress: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => Home())),
+            btnOkOnPress: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (context) => Home())),
           ).show();
         },
       );
@@ -48,9 +49,13 @@ class _ActivateAccountBodyState extends State<ActivateAccountBody> {
           style: ElevatedButton.styleFrom(
             backgroundColor: kPrimaryColor,
             shape: const BeveledRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5))),
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
             textStyle: const TextStyle(
-                color: kSecondColor, fontSize: 15, fontWeight: FontWeight.bold),
+              color: kSecondColor,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           child: const Text('Activer compte'),
         ),
@@ -70,18 +75,21 @@ class _ActivateAccountBodyState extends State<ActivateAccountBody> {
             const SizeboxHeight(),
             //  manageActivateBtn(),
             activationBtnAnimated(),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-              IconButton(
-                iconSize: 40,
-                icon: const Icon(
-                  Icons.no_accounts,
-                  color: kPrimaryColor,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                IconButton(
+                  iconSize: 40,
+                  icon: const Icon(Icons.no_accounts, color: kPrimaryColor),
+                  tooltip: 'désactiver compte',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DeactivateAccount(),
+                    ),
+                  ),
                 ),
-                tooltip: 'désactiver compte',
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => DeactivateAccount())),
-              ),
-            ]),
+              ],
+            ),
           ],
         ),
       ),
@@ -95,10 +103,7 @@ Widget manageNumberAccount() {
     children: <Widget>[
       const Text(
         'N° compte etudiant',
-        style: TextStyle(
-          color: kThirdColor,
-          fontSize: 15,
-        ),
+        style: TextStyle(color: kThirdColor, fontSize: 15),
       ),
       const SizedBox(height: 10),
       Container(
@@ -106,29 +111,29 @@ Widget manageNumberAccount() {
         height: 50,
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
-            color: kSecondColor,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: const [
-              BoxShadow(
-                  color: boxshadowColor, blurRadius: 6, offset: Offset(0, 2))
-            ],
-            border: Border.all(color: kPrimaryColor, width: 3)),
+          color: kSecondColor,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: boxshadowColor,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
+          border: Border.all(color: kPrimaryColor, width: 3),
+        ),
         child: const TextField(
           keyboardType: TextInputType.number,
-          style: TextStyle(
-            color: enterTextFieldColor,
-          ),
+          style: TextStyle(color: enterTextFieldColor),
           decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14),
-              prefixIcon: Icon(Icons.person, color: kPrimaryColor),
-              hintText: 'N° compte etudiant',
-              hintStyle: TextStyle(
-                color: kPrimaryColor,
-                fontSize: 12,
-              )),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.only(top: 14),
+            prefixIcon: Icon(Icons.person, color: kPrimaryColor),
+            hintText: 'N° compte etudiant',
+            hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
+          ),
         ),
-      )
+      ),
     ],
   );
 }

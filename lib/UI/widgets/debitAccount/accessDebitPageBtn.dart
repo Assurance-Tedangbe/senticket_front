@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 
 class AccessDebitPageBtn extends StatelessWidget {
@@ -35,11 +36,8 @@ class AccessDebitPageBtn extends StatelessWidget {
           ),
         ),
         child: isLoading
-            ? const CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(kThirdColor),
-              )
-            : const Text('Valider'),
+            ? CustomCircularProgressIndicator()
+            : const Text('Valider', style: TextStyle(color: kSecondColor)),
       ),
     );
   }

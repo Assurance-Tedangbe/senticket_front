@@ -8,8 +8,8 @@ import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/requestSection.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/ticketASection.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/ticketBSection.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.height.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 
 class BuyTicketBody extends StatefulWidget {

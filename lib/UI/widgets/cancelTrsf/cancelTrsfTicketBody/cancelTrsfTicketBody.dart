@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/cancelTrsf/cancelTrsfTicketBody/cancelTrsfTicketBtn.dart';
 import 'package:senticket_front/UI/widgets/cancelTrsf/cancelTrsfTicketBody/referenceNumberCancelTrsfTicketSection.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/numberTicketsSection.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/passwordTrsfTicketSection.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/recipientNumberTrsfTicketSection.dart';
@@ -33,7 +33,7 @@ class CancelTrsfTicketBody extends StatelessWidget {
             SizeboxHeightSession(),
             PasswordTrsfTicketSection(),
             SizeboxHeightSession(),
-            CancelTrsfTicketBtn()
+            CancelTrsfTicketBtn(),
           ],
         ),
       ),

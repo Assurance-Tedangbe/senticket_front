@@ -7,8 +7,8 @@ import 'package:senticket_front/UI/widgets/debitAccount/DebitUsernameSection.dar
 import 'package:senticket_front/UI/widgets/debitAccount/debitPage.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/accessDebitPageBtn.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/infoContainer.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
-import 'package:senticket_front/UI/widgets/home/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
@@ -60,7 +60,7 @@ class _DebitBodyState extends State<DebitBody> {
           const SnackBar(
             content: Text('Le compte à débiter doit être pour un ETUDIANT'),
             backgroundColor: redErrorColor,
-            duration: Duration(seconds: 3),
+            duration: Duration(seconds: 5),
           ),
         );
         return;
@@ -81,7 +81,7 @@ class _DebitBodyState extends State<DebitBody> {
         SnackBar(
           content: Text(userProvider.debitUsernameError ?? 'Erreur inconnue'),
           backgroundColor: redErrorColor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
     }

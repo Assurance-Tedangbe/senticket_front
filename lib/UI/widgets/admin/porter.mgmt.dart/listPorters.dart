@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/updateUser.dart';
 import 'package:senticket_front/UI/widgets/admin/createAccountIcon.dart';
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/dataTableStyle.dart';
-import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/headTableStyle.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/headTableStyle.dart';
 import 'package:senticket_front/UI/widgets/consult.account/consult.data.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
   // Filtrer les utilisateurs avec le rôle PORTIER
   List<User> _getPortiers(List<User> allUsers) {
     return allUsers.where((user) {
-      return user.role?.name?.toUpperCase() == 'PORTIER';
+      return user.role.name.toUpperCase() == 'PORTIER';
     }).toList();
   }
 
@@ -98,7 +99,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
         SnackBar(
           content: Text('Compte ${portier.username} supprimé avec succès'),
           backgroundColor: Colors.green,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
     } else {
@@ -106,7 +107,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
         SnackBar(
           content: Text('Erreur lors de la suppression: ${userProvider.error}'),
           backgroundColor: redErrorColor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 5),
         ),
       );
     }
@@ -176,7 +177,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
-                    child: CircularProgressIndicator(color: kPrimaryColor),
+                    child: CustomCircularProgressIndicator(),
                   ),
                 )
               else if (portiers.isEmpty)

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/manage.student.dart';
-import 'package:senticket_front/UI/widgets/home/sizebox.template.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -29,13 +29,15 @@ class _DeleteStudentState extends State<DeleteStudent> {
           actions: <Widget>[
             TextButton(
               child: const Text('ANNULER'),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ManageStudent())),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ManageStudent()),
+              ),
             ),
             TextButton(
               child: const Text('OUI'),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ManageStudent())),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ManageStudent()),
+              ),
             ),
           ],
         );
@@ -53,9 +55,13 @@ class _DeleteStudentState extends State<DeleteStudent> {
         style: ElevatedButton.styleFrom(
           backgroundColor: kPrimaryColor,
           shape: const BeveledRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8))),
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+          ),
           textStyle: const TextStyle(
-              color: kSecondColor, fontSize: 18, fontWeight: FontWeight.bold),
+            color: kSecondColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         child: const Text('Supprimer'),
       ),
