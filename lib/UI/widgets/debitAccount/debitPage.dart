@@ -97,7 +97,7 @@ class _DebitPageState extends State<DebitPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '${ticketProvider.selectedTicketIdsForDebit.length} ticket(s) débité(s) avec succès pour ${widget.studentUsername}',
+            'Ticket(s) débité(s) avec succès pour ${widget.studentUsername}',
           ),
           backgroundColor: validateBtnColor,
           duration: const Duration(seconds: 5),
@@ -139,13 +139,14 @@ class _DebitPageState extends State<DebitPage> {
             ),
             backgroundColor: kPrimaryColor,
           ),
+          backgroundColor: secondColor,
           body: Background(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
               child: Container(
                 alignment: Alignment.center,
-                height: size.height,
                 width: size.width,
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
                 decoration: BoxDecoration(
                   color: secondColor,
                   borderRadius: BorderRadius.circular(10),
@@ -163,7 +164,6 @@ class _DebitPageState extends State<DebitPage> {
                   children: [
                     // Information de l'étudiant
                     Card(
-                      elevation: 2,
                       color: secondColor,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -172,7 +172,7 @@ class _DebitPageState extends State<DebitPage> {
                             const Icon(
                               Icons.person,
                               size: 40,
-                              color: Colors.blue,
+                              color: kPrimaryColor,
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -263,16 +263,16 @@ class _DebitPageState extends State<DebitPage> {
                           decoration: BoxDecoration(
                             color: Colors.red[50],
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.red),
+                            border: Border.all(color: redErrorColor),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error, color: Colors.red),
+                              const Icon(Icons.error, color: redErrorColor),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
                                   ticketProvider.error,
-                                  style: const TextStyle(color: Colors.red),
+                                  style: const TextStyle(color: redErrorColor),
                                 ),
                               ),
                             ],
@@ -285,7 +285,9 @@ class _DebitPageState extends State<DebitPage> {
                             child: Center(
                               child: Text(
                                 'Aucun ticket de type ${_selectedTicketType == TicketType.a ? 'A' : 'B'} acheté',
-                                style: const TextStyle(color: Colors.grey),
+                                style: const TextStyle(
+                                  color: enterTextFieldColor,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -385,17 +387,12 @@ class _DebitPageState extends State<DebitPage> {
                                 : Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(
-                                        Icons.account_balance_wallet,
-                                        color: kSecondColor,
-                                      ),
-                                      const SizedBox(width: 10),
                                       Text(
                                         'Débiter $selectedCount ticket(s)',
                                         style: const TextStyle(
+                                          color: kSecondColor,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: kSecondColor,
                                         ),
                                       ),
                                     ],
@@ -405,7 +402,7 @@ class _DebitPageState extends State<DebitPage> {
                     ],
                   ],
                 ),
-              ), //ici
+              ),
             ),
           ),
         );
@@ -418,38 +415,48 @@ class _DebitPageState extends State<DebitPage> {
     Ticket ticket,
     TicketProvider provider,
   ) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 1),
-      color: ticket.isSelected ? Colors.blue[50] : null,
-      child: ListTile(
-        leading: Checkbox(
-          value: ticket.isSelected,
-          onChanged: (value) {
-            provider.toggleTicketSelectionForDebit(ticket.ticketId!);
-          },
-          checkColor: kSecondColor,
-          activeColor: kPrimaryColor,
-        ),
-        title: Text('Ticket ${ticket.ticketId}'),
-        /*  subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Type: ${ticket.ticketType.toString().split('.').last}'),
-            Text('Prix: ${ticket.ticketPrice} FCFA'),
-            //Text('Statut: ${ticket.ticketStatus.toString().split('.').last}'),
-            if (ticket.paymentCode.isNotEmpty)
-              Text('Code: ${ticket.paymentCode}'),
-            if (ticket.ticketCreationDate != null)
-              Text('Créé: ${_formatDate(ticket.ticketCreationDate!)}'),
-          ],
-        ), */
-        trailing: Icon(
-          ticket.isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-          color: ticket.isSelected ? kPrimaryColor : Colors.grey,
-        ),
-        onTap: () {
-          provider.toggleTicketSelectionForDebit(ticket.ticketId!);
-        },
+    return SingleChildScrollView(
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: [
+          Card(
+            margin: const EdgeInsets.symmetric(vertical: 0.5),
+            color: ticket.isSelected ? Colors.blue[50] : null,
+            child: ListTile(
+              leading: Checkbox(
+                value: ticket.isSelected,
+                onChanged: (value) {
+                  provider.toggleTicketSelectionForDebit(ticket.ticketId!);
+                },
+                checkColor: kSecondColor,
+                activeColor: kPrimaryColor,
+              ),
+              title: Text('Ticket ${ticket.ticketId}'),
+              /*  subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                  Text('Type: ${ticket.ticketType.toString().split('.').last}'),
+                  Text('Prix: ${ticket.ticketPrice} FCFA'),
+                  Text('Statut: ${ticket.ticketStatus.toString().split('.').last}'),
+                  if (ticket.paymentCode.isNotEmpty)
+                     Text('Code: ${ticket.paymentCode}'),
+                  if (ticket.ticketCreationDate != null)
+                     Text('Créé: ${_formatDate(ticket.ticketCreationDate!)}'),
+                  ],
+                 ), */
+              /*  trailing: Icon(
+                  ticket.isSelected
+                        ? Icons.check_circle
+                        : Icons.radio_button_unchecked,
+                        color: ticket.isSelected ? kPrimaryColor : Colors.grey,
+              ), */
+              onTap: () {
+                provider.toggleTicketSelectionForDebit(ticket.ticketId!);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

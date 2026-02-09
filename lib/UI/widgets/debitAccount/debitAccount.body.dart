@@ -172,7 +172,6 @@ class _DebitBodyState extends State<DebitBody> {
                     onChanged: (value) {
                       userProvider.setDebitUsername(value);
                     },
-                    //  errorText: userProvider.debitUsernameError,
                   );
                 },
               ),

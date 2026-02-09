@@ -62,7 +62,7 @@ class TicketProvider with ChangeNotifier {
   TicketProvider(this._service);
   // Le constructeur reçoit une instance de TicketApiService en paramètre (dependency injection)
 
-  // NEW: State for debit operation
+  // State for debit operation
   List<Ticket> _studentTicketsForDebit = [];
   TicketType? _selectedTicketTypeForDebit;
   List<int> _selectedTicketIdsForDebit = [];
@@ -390,35 +390,6 @@ class TicketProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // old
-  /*  Future<bool> debitAccount(
-    DebitAccountRequestDTO debitAccountRequestDTO,
-  ) async {
-    _isDebitingAccount = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.debitAccount(
-        debitAccountRequestDTO,
-      ); // "demande à l'API de débiter le compte"
-
-      _error = '';
-      print(
-        "Compte de ${debitAccountRequestDTO.debitStudentDTO.username} débité",
-      );
-      return true;
-    } catch (e) {
-      _error = 'Erreur débit compte: ${e.toString()}';
-      print("Erreur debitAccount: $e");
-      return false;
-    } finally {
-      _isDebitingAccount = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  } */
 
   // Reset debit state
   void resetDebitState() {

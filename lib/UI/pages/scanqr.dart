@@ -36,7 +36,11 @@ class _ScanQRState extends State<ScanQR> {
         ),
         child: const Text(
           'Scanner code QR',
-          style: TextStyle(color: kSecondColor),
+          style: TextStyle(
+            color: kSecondColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

@@ -28,19 +28,12 @@ class _ConsultBodyState extends State<ConsultBody> {
     super.dispose();
   }
 
-  /* void _onConsultSuccess() {
-    // Navigation vers la page d'affichage des données
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => ConsultData()),
-    );
-  } */
-
   @override
   Widget build(BuildContext context) {
     return Background(
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -58,7 +51,6 @@ class _ConsultBodyState extends State<ConsultBody> {
                     ),
                     const SizeboxTemplate(),
                     ConsultBtn(
-                      // onConsultSuccess: _onConsultSuccess,
                       onConsultSuccess: (int userId) {
                         // Naviguer vers ConsultData avec l'ID de l'utilisateur
                         Navigator.of(context).push(

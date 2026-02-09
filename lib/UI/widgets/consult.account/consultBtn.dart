@@ -19,12 +19,16 @@ class ConsultBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
-          width: 320,
-          height: 95,
+          // width: 335,
+          // height: 95,
+          width: size.width,
+          height: size.height / 8.0,
           child: ElevatedButton(
             onPressed:
                 userProvider.isConsultingUser ||
@@ -71,18 +75,25 @@ class ConsultBtn extends StatelessWidget {
                       !userProvider.isConsultingUser
                   ? kPrimaryColor
                   : greyBorderColor,
-              shape: const BeveledRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
               textStyle: const TextStyle(
                 color: kSecondColor,
-                fontSize: 15,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             child: userProvider.isConsultingUser
                 ? const CustomCircularProgressIndicator()
-                : const Text('Consulter'),
+                : const Text(
+                    'Consulter',
+                    style: TextStyle(
+                      color: kSecondColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         );
       },

@@ -44,7 +44,7 @@ class _TicketBSectionState extends State<TicketBSection> {
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
-              height: size.height / 6.0,
+              height: size.height / 5.0,
               decoration: BoxDecoration(
                 color: ticketSectionColor,
                 borderRadius: const BorderRadius.all(Radius.circular(17.0)),

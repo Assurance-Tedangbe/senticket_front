@@ -80,7 +80,7 @@ class BuyTicketBtn extends StatelessWidget {
                     ),
                   ),
                 SizedBox(
-                  width: size.width * 0.7,
+                  width: size.width * 0.8,
                   height: size.height / 14.0,
                   child: ElevatedButton(
                     onPressed:
@@ -125,7 +125,7 @@ class BuyTicketBtn extends StatelessWidget {
                           ? greyBorderColor
                           : kPrimaryColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: isProcessing
@@ -141,8 +141,8 @@ class BuyTicketBtn extends StatelessWidget {
                                 ? 'Non permis'
                                 : 'Acheter ticket(s) ',
                             style: TextStyle(
-                              color: kThirdColor,
-                              fontSize: 15,
+                              color: kSecondColor,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

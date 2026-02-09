@@ -64,7 +64,14 @@ class LoginBtn extends StatelessWidget {
             ),
             child: userProvider.isLoggingIn
                 ? const CustomCircularProgressIndicator()
-                : const Text('Se connecter'),
+                : const Text(
+                    'Se connecter',
+                    style: TextStyle(
+                      color: kSecondColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         );
       },

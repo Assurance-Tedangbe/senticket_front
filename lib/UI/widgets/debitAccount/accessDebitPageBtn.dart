@@ -16,28 +16,38 @@ class AccessDebitPageBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
-      width: 320,
-      height: 95,
+      /* width: 320,
+      height: 95, */
+      width: size.width * 0.99,
+      height: size.height / 8.0,
       child: ElevatedButton(
         onPressed: isLoading || !isFormValid ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: isFormValid && !isLoading
               ? kPrimaryColor
               : greyBorderColor,
-          shape: const BeveledRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
           textStyle: const TextStyle(
             color: kSecondColor,
-            fontSize: 15,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         child: isLoading
             ? CustomCircularProgressIndicator()
-            : const Text('Valider', style: TextStyle(color: kSecondColor)),
+            : const Text(
+                'Valider',
+                style: TextStyle(
+                  color: kSecondColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }

@@ -35,7 +35,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
           child: Background(
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(4.0, 0, 4.0, 0),
                 child: SizedBox(
@@ -50,14 +50,14 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
                       else
                         _buildLoginRequired(),
 
-                      const SizeboxTemplate(),
+                      /* const SizeboxTemplate(),
                       // En-tête d'authentification
                       _buildAuthHeader(
                         context,
                         userProvider,
                         isLoggedIn,
                         isStudent,
-                      ),
+                      ), */
                     ],
                   ),
                 ),
@@ -127,8 +127,9 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
               _buildErrorDisplay(ticketProvider),
             const TicketASection(),
             const SizeboxTemplate(),
+            const SizeboxTemplate(),
             const TicketBSection(),
-            const SizeboxHeight(),
+            const SizeboxTemplate(),
             const RequestSection(),
           ],
         );
