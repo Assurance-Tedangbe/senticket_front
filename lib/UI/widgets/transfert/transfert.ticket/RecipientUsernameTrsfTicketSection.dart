@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
-class NumberTicketsSection extends StatefulWidget {
-  const NumberTicketsSection({super.key});
+class RecipientUsernameTrsfTicketSection extends StatefulWidget {
+  const RecipientUsernameTrsfTicketSection({super.key});
 
   @override
-  State<NumberTicketsSection> createState() => _NumberTicketsSectionState();
+  State<RecipientUsernameTrsfTicketSection> createState() =>
+      _RecipientUsernameTrsfTicketSectionState();
 }
 
-class _NumberTicketsSectionState extends State<NumberTicketsSection> {
+class _RecipientUsernameTrsfTicketSectionState
+    extends State<RecipientUsernameTrsfTicketSection> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Label(text: 'Nombre de ticket(s) du type sélectionné'),
+        const Label(text: 'Nom d\'utilisateur destinataire'),
         const SizedBox(height: 10),
         Container(
           width: 300,
@@ -39,8 +41,8 @@ class _NumberTicketsSectionState extends State<NumberTicketsSection> {
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14),
-              prefixIcon: Icon(Icons.attach_money, color: kPrimaryColor),
-              hintText: 'Nombre de ticket',
+              prefixIcon: Icon(Icons.person, color: kPrimaryColor),
+              hintText: 'Nom d\'utilisateur destinataire',
               hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
             ),
           ),

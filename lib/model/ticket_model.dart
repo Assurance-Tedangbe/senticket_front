@@ -212,23 +212,57 @@ class DebitStudentDTO {
   }
 }
 
-class TransferTicketsRequestDTO {
-  final int fromStudentId;
-  final int toStudentId;
-  final List<int> selectedTicketIdsToTransfer;
+class TransfertTicketRequestDTO {
+  final SenderDTO senderDTO;
+  final RecipientDTO recipentDTO;
+  final int numberTicketToTransfer;
 
-  TransferTicketsRequestDTO({
-    required this.fromStudentId,
-    required this.toStudentId,
-    required this.selectedTicketIdsToTransfer,
+  TransfertTicketRequestDTO({
+    required this.senderDTO,
+    required this.recipentDTO,
+    required this.numberTicketToTransfer,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'fromStudentId': fromStudentId,
-      'toStudentId': toStudentId,
-      'selectedTicketIdsToTransfer': selectedTicketIdsToTransfer,
+      'senderDTO': senderDTO.toJson(),
+      'recipientDTO': recipentDTO.toJson(),
+      'numberTicketToTransfer': numberTicketToTransfer,
     };
+  }
+}
+
+class SenderDTO {
+  final int senderId;
+  final String senderUsername;
+
+  SenderDTO({required this.senderId, required this.senderUsername});
+  factory SenderDTO.fromJson(Map<String, dynamic> json) {
+    return SenderDTO(
+      senderId: json['senderId'] as int,
+      senderUsername: json['senderUsername'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'senderId': senderId, 'senderUsername': senderUsername};
+  }
+}
+
+class RecipientDTO {
+  final int recipientId;
+  final String recipientUsername;
+
+  RecipientDTO({required this.recipientId, required this.recipientUsername});
+  factory RecipientDTO.fromJson(Map<String, dynamic> json) {
+    return RecipientDTO(
+      recipientId: json['recipientId'] as int,
+      recipientUsername: json['recipientUsername'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'recipientId': recipientId, 'recipientUsername': recipientUsername};
   }
 }
 

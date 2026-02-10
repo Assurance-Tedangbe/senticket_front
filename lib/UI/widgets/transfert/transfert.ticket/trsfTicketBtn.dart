@@ -13,18 +13,29 @@ class _TransfertTicketBtnState extends State<TransfertTicketBtn> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
-      width: 320,
+      width: 330,
       height: 95,
       child: ElevatedButton(
-        onPressed: () => print('validate pressed'),
+        onPressed: () => print('pressed'),
         style: ElevatedButton.styleFrom(
           backgroundColor: kPrimaryColor,
-          shape: const BeveledRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5))),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
           textStyle: const TextStyle(
-              color: kSecondColor, fontSize: 15, fontWeight: FontWeight.bold),
+            color: kSecondColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        child: const Text('Valider'),
+        child: const Text(
+          'Transférer ticket(s)',
+          style: TextStyle(
+            color: kSecondColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
