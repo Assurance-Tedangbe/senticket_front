@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
@@ -43,9 +43,7 @@ class UpdateConfirmPasswordSection extends StatelessWidget {
                 controller: controller,
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true,
-                style: const TextStyle(
-                  color: enterTextFieldColor,
-                ),
+                style: const TextStyle(color: enterTextFieldColor),
                 onChanged: onChanged,
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.only(top: 11),

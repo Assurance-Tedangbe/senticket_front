@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -7,9 +7,11 @@ class LastNameSection extends StatelessWidget {
   final TextEditingController controller; // ← ICI
   final ValueChanged<String>? onChanged; // ⭐ NOUVEAU
 
-  const LastNameSection(
-      {super.key, required this.controller, this.onChanged // ← ICI
-      });
+  const LastNameSection({
+    super.key,
+    required this.controller,
+    this.onChanged, // ← ICI
+  });
 
   /* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
 

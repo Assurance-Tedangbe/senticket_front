@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
 class AmountSection extends StatefulWidget {
@@ -22,28 +22,28 @@ class _AmountSectionState extends State<AmountSection> {
           height: 50,
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-              color: kSecondColor,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))
-              ],
-              border: Border.all(color: kPrimaryColor, width: 3)),
-          child: const TextField(
-            style: TextStyle(
-              color: Colors.black87,
-            ),
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(top: 14),
-                prefixIcon: Icon(Icons.attach_money, color: kPrimaryColor),
-                hintText: 'Montant',
-                hintStyle: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 12,
-                )),
+            color: kSecondColor,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
+            border: Border.all(color: kPrimaryColor, width: 3),
           ),
-        )
+          child: const TextField(
+            style: TextStyle(color: Colors.black87),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14),
+              prefixIcon: Icon(Icons.attach_money, color: kPrimaryColor),
+              hintText: 'Montant',
+              hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
+            ),
+          ),
+        ),
       ],
     );
   }

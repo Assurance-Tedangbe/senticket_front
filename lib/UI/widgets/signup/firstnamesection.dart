@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -14,7 +14,7 @@ import 'package:senticket_front/constants.dart';
 // L'ENFANT utilise seulement
 class FirstNameSection extends StatelessWidget {
   final TextEditingController
-      controller; // ← ICI : UTILISATION SEULEMENT(REÇU EN PARAMÈTRE)
+  controller; // ← ICI : UTILISATION SEULEMENT(REÇU EN PARAMÈTRE)
   final ValueChanged<String>? onChanged; // ⭐ NOUVEAU
 
   const FirstNameSection({
@@ -49,8 +49,10 @@ class FirstNameSection extends StatelessWidget {
                 offset: Offset(0, 2),
               ),
             ],
-            border:
-                Border.all(color: kPrimaryColor, width: 3), // Bordure colorée
+            border: Border.all(
+              color: kPrimaryColor,
+              width: 3,
+            ), // Bordure colorée
           ),
           height: 50, // Hauteur fixe
           child: TextFormField(
@@ -71,7 +73,9 @@ class FirstNameSection extends StatelessWidget {
               prefixIcon: Icon(Icons.person, color: kPrimaryColor),
               hintText: 'Prénom', // Texte indicatif
               hintStyle: TextStyle(
-                  color: kPrimaryColor, fontSize: 12), // Style du hint
+                color: kPrimaryColor,
+                fontSize: 12,
+              ), // Style du hint
             ),
           ),
         ),

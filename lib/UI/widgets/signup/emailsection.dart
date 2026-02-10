@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -19,7 +19,7 @@ class EmailSection extends StatelessWidget {
     this.onChanged, // ← ICI
   });
 
-/* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
+  /* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
    ce widget a besoin d'accéder à des données dynamiques du Provider :
    userProvider.emailError → Validation en temps réel */
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -13,7 +13,7 @@ class UsernameSection extends StatelessWidget {
     this.onChanged, // ← ICI
   });
 
-/* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
+  /* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
 
   @override
   Widget build(BuildContext context) {

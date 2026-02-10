@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -22,36 +22,32 @@ class _ForgotPwdPasswordSectionState extends State<ForgotPwdPasswordSection> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-              color: kSecondColor,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                    color: boxshadowColor, blurRadius: 6, offset: Offset(0, 2))
-              ],
-              border: Border.all(color: kPrimaryColor, width: 3)),
+            color: kSecondColor,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                color: boxshadowColor,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
+            border: Border.all(color: kPrimaryColor, width: 3),
+          ),
           height: 50,
           child: const TextField(
             keyboardType: TextInputType.visiblePassword,
             obscureText: true,
-            style: TextStyle(
-              color: enterTextFieldColor,
-            ),
+            style: TextStyle(color: enterTextFieldColor),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.only(top: 11),
               prefixIcon: Icon(Icons.password, color: kPrimaryColor),
               hintText: 'Mot de passe',
-              hintStyle: TextStyle(
-                color: kPrimaryColor,
-                fontSize: 12,
-              ),
-              suffixIcon: Icon(
-                Icons.visibility_off,
-                color: kPrimaryColor,
-              ),
+              hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
+              suffixIcon: Icon(Icons.visibility_off, color: kPrimaryColor),
               border: InputBorder.none,
             ),
           ),
-        )
+        ),
       ],
     );
   }

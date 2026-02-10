@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
@@ -77,9 +77,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                 controller: widget.controller,
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: !_isPasswordVisible,
-                style: const TextStyle(
-                  color: enterTextFieldColor,
-                ),
+                style: const TextStyle(color: enterTextFieldColor),
                 onChanged: (value) {
                   if (widget.onChanged != null) {
                     widget.onChanged!(value);
@@ -159,10 +157,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                 padding: const EdgeInsets.only(top: 4, left: 8),
                 child: Text(
                   'Le mot de passe actuel est masqué pour sécurité',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                 ),
               ),
           ],
