@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
-class RecipientUsernameTrsfTicketSection extends StatefulWidget {
-  const RecipientUsernameTrsfTicketSection({super.key});
+class SenderPasswordTrsfTicket extends StatefulWidget {
+  const SenderPasswordTrsfTicket({super.key});
 
   @override
-  State<RecipientUsernameTrsfTicketSection> createState() =>
-      _RecipientUsernameTrsfTicketSectionState();
+  State<SenderPasswordTrsfTicket> createState() =>
+      _SenderPasswordTrsfTicketState();
 }
 
-class _RecipientUsernameTrsfTicketSectionState
-    extends State<RecipientUsernameTrsfTicketSection> {
+class _SenderPasswordTrsfTicketState extends State<SenderPasswordTrsfTicket> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Label(text: 'Nom d\'utilisateur destinataire'),
+        const Label(text: 'Votre mot de passe'),
         const SizedBox(height: 10),
         Container(
           width: 300,
@@ -33,17 +32,19 @@ class _RecipientUsernameTrsfTicketSectionState
                 offset: Offset(0, 2),
               ),
             ],
-            border: Border.all(color: kPrimaryColor, width: 1),
+            border: Border.all(color: kPrimaryColor, width: 2),
           ),
           child: const TextField(
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.visiblePassword,
+            obscureText: true,
             style: TextStyle(color: enterTextFieldColor),
             decoration: InputDecoration(
-              border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14),
-              prefixIcon: Icon(Icons.person, color: kPrimaryColor),
-              hintText: 'Nom d\'utilisateur destinataire',
+              prefixIcon: Icon(Icons.lock, color: kPrimaryColor),
+              hintText: 'Mot de passe',
               hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
+              suffixIcon: Icon(Icons.visibility_off, color: kPrimaryColor),
+              border: InputBorder.none,
             ),
           ),
         ),

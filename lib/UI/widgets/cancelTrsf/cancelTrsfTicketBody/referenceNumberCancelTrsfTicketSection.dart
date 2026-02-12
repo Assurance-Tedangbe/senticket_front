@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
 class ReferenceNumberCancelTrsfTicketSection extends StatefulWidget {
@@ -24,29 +24,29 @@ class _ReferenceNumberCancelTrsfTicketSectionState
           height: 50,
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-              color: kSecondColor,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                    color: boxshadowColor, blurRadius: 6, offset: Offset(0, 2))
-              ],
-              border: Border.all(color: kPrimaryColor, width: 3)),
+            color: kSecondColor,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                color: boxshadowColor,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
+            border: Border.all(color: kPrimaryColor, width: 3),
+          ),
           child: const TextField(
             keyboardType: TextInputType.number,
-            style: TextStyle(
-              color: enterTextFieldColor,
-            ),
+            style: TextStyle(color: enterTextFieldColor),
             decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(top: 14),
-                prefixIcon: Icon(Icons.person, color: kPrimaryColor),
-                hintText: 'N° de référence',
-                hintStyle: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 12,
-                )),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14),
+              prefixIcon: Icon(Icons.person, color: kPrimaryColor),
+              hintText: 'N° de référence',
+              hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
+            ),
           ),
-        )
+        ),
       ],
     );
   }

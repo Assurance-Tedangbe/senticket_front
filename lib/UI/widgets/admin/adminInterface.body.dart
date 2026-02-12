@@ -8,7 +8,7 @@ class AdminBody extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
         child: SizedBox(

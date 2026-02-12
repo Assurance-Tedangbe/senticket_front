@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
-class PasswordTrsfTicketSection extends StatefulWidget {
-  const PasswordTrsfTicketSection({super.key});
+class RecipientUsernameTrsfTicket extends StatefulWidget {
+  const RecipientUsernameTrsfTicket({super.key});
 
   @override
-  State<PasswordTrsfTicketSection> createState() =>
-      _PasswordTrsfTicketSectionState();
+  State<RecipientUsernameTrsfTicket> createState() =>
+      _RecipientUsernameTrsfTicketState();
 }
 
-class _PasswordTrsfTicketSectionState extends State<PasswordTrsfTicketSection> {
+class _RecipientUsernameTrsfTicketState
+    extends State<RecipientUsernameTrsfTicket> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Label(text: 'Votre mot de passe'),
+        const Label(text: 'Nom d\'utilisateur destinataire'),
         const SizedBox(height: 10),
         Container(
           width: 300,
@@ -32,19 +33,17 @@ class _PasswordTrsfTicketSectionState extends State<PasswordTrsfTicketSection> {
                 offset: Offset(0, 2),
               ),
             ],
-            border: Border.all(color: kPrimaryColor, width: 1),
+            border: Border.all(color: kPrimaryColor, width: 2),
           ),
           child: const TextField(
-            keyboardType: TextInputType.visiblePassword,
-            obscureText: true,
+            keyboardType: TextInputType.number,
             style: TextStyle(color: enterTextFieldColor),
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.only(top: 14),
-              prefixIcon: Icon(Icons.lock, color: kPrimaryColor),
-              hintText: 'Mot de passe',
-              hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
-              suffixIcon: Icon(Icons.visibility_off, color: kPrimaryColor),
               border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14),
+              prefixIcon: Icon(Icons.person, color: kPrimaryColor),
+              hintText: 'Nom d\'utilisateur destinataire',
+              hintStyle: TextStyle(color: kPrimaryColor, fontSize: 12),
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/historic/historic.body.dart';
+import 'package:senticket_front/constants.dart';
 
 class Historic extends StatelessWidget {
   static const String _title = 'Historique';
@@ -9,7 +10,7 @@ class Historic extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: const Text(_title)),
+      appBar: AppBar(title: const Text(_title), backgroundColor: kPrimaryColor),
       body: HistoricBody(),
     );
   }

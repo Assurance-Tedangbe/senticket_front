@@ -124,10 +124,10 @@ class RootView extends StatelessWidget {
         "/log-out": (context) => const LogOut(),
         // "/activate-account": (context) => const ActivateAccount(),
         // "/deactivate-account": (context) => const DeactivateAccount(),
-        // "/transfert-credit": (context) => const TransfertCredit(),
-        // "/cancel-transfert-credit": (context) => const CancelTrsfCredit(),
         // "/credit-account": (context) => const CreditAccount(),
         // "/cancel-recharge": (context) => const CancelRecharge(),
+        // "/transfert-credit": (context) => const TransfertCredit(),
+        // "/cancel-transfert-credit": (context) => const CancelTrsfCredit(),
       },
       initialRoute: "/cover",
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.credit/label.dart';
 import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -68,7 +68,8 @@ class ConfirmPwdSection extends StatelessWidget {
                   suffixIcon: IconButton(
                     icon: Icon(
                       // Change l'icône selon l'état de visibilité
-                      userProvider.isPasswordVisible // ← ICI
+                      userProvider
+                              .isPasswordVisible // ← ICI
                           ? Icons.visibility
                           : Icons.visibility_off,
                       color: kPrimaryColor,

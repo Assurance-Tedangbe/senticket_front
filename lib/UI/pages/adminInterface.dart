@@ -19,14 +19,14 @@ class AdminInterface extends StatelessWidget {
         backgroundColor: kPrimaryColor,
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search, color: kThirdColor),
             tooltip: 'Rechercher des services',
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const ServiceResearch()),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: kThirdColor),
             tooltip: 'Se déconnecter',
             onPressed: () => Navigator.of(
               context,

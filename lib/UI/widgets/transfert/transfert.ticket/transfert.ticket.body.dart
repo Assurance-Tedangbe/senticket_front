@@ -6,8 +6,8 @@ import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/numberTicketsSection.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/passwordTrsfTicketSection.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/RecipientUsernameTrsfTicketSection.dart';
+import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/senderPasswordTrsfTicket.dart';
+import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/recipientUsernameTrsfTicket.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/ticketTypeSection.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/trsfTicketBtn.dart';
 import 'package:senticket_front/constants.dart';
@@ -133,7 +133,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
           children: <Widget>[
             const Icon(Icons.send_rounded, color: kPrimaryColor, size: 70),
             const SizeboxHeight(),
-            RecipientUsernameTrsfTicketSection(),
+            RecipientUsernameTrsfTicket(),
             const SizeboxHeightSession(),
             Label(text: 'Type de ticket à transférer'),
             const SizedBox(height: 10),
@@ -178,7 +178,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
             ),
             NumberTicketsSection(),
             const SizeboxHeightSession(),
-            PasswordTrsfTicketSection(),
+            SenderPasswordTrsfTicket(),
             const SizeboxHeightSession(),
             TransfertTicketBtn(),
             Row(

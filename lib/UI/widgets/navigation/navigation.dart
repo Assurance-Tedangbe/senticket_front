@@ -24,62 +24,63 @@ class _NavigationState extends State<Navigation> {
   Widget build(BuildContext context) {
     return KeyboardVisibilityProvider(
       child: SafeArea(
-          child: Scaffold(
-        /*  appBar: index == 2
+        child: Scaffold(
+          /*  appBar: index == 2
             ? AppBar(): null,*/
-        body: selectedContent(index: index),
-        bottomNavigationBar:
-            //index == 3
-            //     ? null :
-            CurvedNavigationBar(
-          letIndexChange: (value) => true,
-          index: index,
-          onTap: (selectedIndex) {
-            setState(() {
-              index = selectedIndex;
-            });
-          },
-          backgroundColor: navigationBackgroundColor,
-          color: kPrimaryColor,
-          items: const [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BottomIcon(bottomicon: Icons.home),
-                TextAsTooltip(text: "Accueil")
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BottomIcon(bottomicon: Icons.person),
-                TextAsTooltip(text: "Interface Etudiant")
-              ],
-            ),
-            Column(
+          body: selectedContent(index: index),
+          bottomNavigationBar:
+              //index == 3
+              //     ? null :
+              CurvedNavigationBar(
+                letIndexChange: (value) => true,
+                index: index,
+                onTap: (selectedIndex) {
+                  setState(() {
+                    index = selectedIndex;
+                  });
+                },
+                backgroundColor: navigationBackgroundColor,
+                color: kPrimaryColor,
+                items: const [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BottomIcon(bottomicon: Icons.home),
+                      TextAsTooltip(text: "Accueil"),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BottomIcon(bottomicon: Icons.person),
+                      TextAsTooltip(text: "Interface Etudiant"),
+                    ],
+                  ),
+                  /* Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 BottomIcon(bottomicon: Icons.person_3_outlined),
                 TextAsTooltip(text: "Interface Agent")
               ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BottomIcon(bottomicon: Icons.person_4),
-                TextAsTooltip(text: "Interface Portier")
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BottomIcon(bottomicon: Icons.manage_accounts),
-                TextAsTooltip(text: "Portail Admin")
-              ],
-            ),
-          ],
+            ), */
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BottomIcon(bottomicon: Icons.person_4),
+                      TextAsTooltip(text: "Interface Portier"),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BottomIcon(bottomicon: Icons.manage_accounts),
+                      TextAsTooltip(text: "Portail Admin"),
+                    ],
+                  ),
+                ],
+              ),
         ),
-      )),
+      ),
     );
   }
 
@@ -92,13 +93,13 @@ class _NavigationState extends State<Navigation> {
       case 1:
         widget = const StudentInterface();
         break;
-      case 2:
+      /*  case 2:
         widget = const AgentInterface();
-        break;
-      case 3:
+        break; */
+      case 2:
         widget = const PorterInterface();
         break;
-      case 4:
+      case 3:
         widget = const AdminInterface();
         break;
     }
