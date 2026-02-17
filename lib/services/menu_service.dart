@@ -1,14 +1,7 @@
-import 'dart:convert';
+/* import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/model/menu_model.dart';
 
-/* 
-  - Service combiné qui gère :
-  - Appels HTTP vers l'API Spring Boot pour les menus
-  - Cache simple des données
-  - Logique métier légère
-  - Transformation des données 
-*/
 class MenuApiService {
   static const String baseUrl = 'http://192.168.1.4:8080/api/menus';
 
@@ -24,9 +17,7 @@ class MenuApiService {
   DateTime? _lastFetchTime; // Dernière récupération
   static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
 
-  // -------------------------
-  // 1. CREATE MENU (POST /api/menus)
-  // -------------------------
+ 
   Future<Menu> createMenu(Menu menu) async {
     // "Je vais créer un menu via POST /api/menus et retourner le menu créé"
     try {
@@ -36,13 +27,15 @@ class MenuApiService {
         // "J'envoie une requête POST :"
         Uri.parse(baseUrl), // Convertit l'URL string en objet Uri
         headers: headers, // Utilise les headers configurés
-        body:
-            json.encode(menu.toJson()), // Convertit l'objet Menu → JSON string
+        body: json.encode(
+          menu.toJson(),
+        ), // Convertit l'objet Menu → JSON string
       );
 
       if (response.statusCode == 201) {
-        final newMenu = Menu.fromJson(json
-            .decode(response.body)); // "Convertit la réponse JSON → objet Menu"
+        final newMenu = Menu.fromJson(
+          json.decode(response.body),
+        ); // "Convertit la réponse JSON → objet Menu"
 
         print("Menu créé avec ID: ${newMenu.menuId}");
 
@@ -59,15 +52,12 @@ class MenuApiService {
     }
   }
 
-  // -------------------------
-  // 2. READ ALL MENUS (GET /api/menus)
-  // -------------------------
-  // Utilise le cache pour éviter les appels API inutiles
   Future<List<Menu>> getAllMenus({bool forceRefresh = false}) async {
     // "Vérifie si le cache est encore valide"
     final now = DateTime.now();
 
-    final cacheValide = _lastFetchTime != null &&
+    final cacheValide =
+        _lastFetchTime != null &&
         now.difference(_lastFetchTime!) < cacheDuration;
 
     // "Retourne le cache si valide et pas de force refresh"
@@ -80,16 +70,14 @@ class MenuApiService {
     try {
       print("Récupération des menus depuis l'API");
 
-      final response = await http.get(
-        Uri.parse(baseUrl),
-        headers: headers,
-      );
+      final response = await http.get(Uri.parse(baseUrl), headers: headers);
 
       if (response.statusCode == 200) {
         // "Convertit la réponse JSON → liste d'objets Menu"
 
-        final List<dynamic> jsonList =
-            json.decode(response.body); // "JSON string → Liste d'objets Dart"
+        final List<dynamic> jsonList = json.decode(
+          response.body,
+        ); // "JSON string → Liste d'objets Dart"
 
         _cachedMenus = jsonList
             .map((json) => Menu.fromJson(json))
@@ -116,9 +104,7 @@ class MenuApiService {
     }
   }
 
-  // -------------------------
-  // 3. READ MENU BY ID (GET /api/menus/{menuId})
-  // -------------------------
+ 
   Future<Menu> getMenuById(String menuId) async {
     try {
       print("Récupération du menu ID: $menuId");
@@ -163,9 +149,7 @@ class MenuApiService {
     }
   }
 
-  // -------------------------
-  // 4. UPDATE MENU (PUT /api/menus/{menuId})
-  // -------------------------
+ 
   Future<Menu> updateMenu(Menu menu) async {
     try {
       print("Mise à jour du menu ID: ${menu.menuId}");
@@ -196,9 +180,7 @@ class MenuApiService {
     }
   }
 
-  // -------------------------
-  // 5. DELETE MENU (DELETE /api/menus/{menuId})
-  // -------------------------
+ 
   Future<void> deleteMenu(String menuId) async {
     try {
       print("Suppression du menu ID: $menuId");
@@ -233,10 +215,12 @@ class MenuApiService {
     final queryLower = query.toLowerCase();
 
     return _cachedMenus
-        .where((menu) =>
-            menu.menuName.toLowerCase().contains(queryLower) ||
-            menu.menuType.toLowerCase().contains(queryLower) ||
-            menu.menuDescription.toLowerCase().contains(queryLower))
+        .where(
+          (menu) =>
+              menu.menuName.toLowerCase().contains(queryLower) ||
+              menu.menuType.toLowerCase().contains(queryLower) ||
+              menu.menuDescription.toLowerCase().contains(queryLower),
+        )
         .toList();
   }
 
@@ -261,12 +245,14 @@ class MenuApiService {
 
     if (menu.menuDescription.length < 3) {
       throw Exception(
-          'La description du menu doit contenir au moins 3 caractères');
+        'La description du menu doit contenir au moins 3 caractères',
+      );
     }
 
     if (menu.menuDescription.length > 100) {
       throw Exception(
-          'La description du menu ne peut pas dépasser 100 caractères');
+        'La description du menu ne peut pas dépasser 100 caractères',
+      );
     }
   }
 
@@ -277,28 +263,5 @@ class MenuApiService {
     _lastFetchTime = null;
     print("Cache menus vidé");
   }
-
-  // "Filtre les menus par type"
-  List<Menu> filterMenusByType(String menuType) {
-    print("Filtrer les menus par type: $menuType");
-
-    if (menuType.isEmpty) return _cachedMenus;
-
-    return _cachedMenus
-        .where((menu) => menu.menuType.toLowerCase() == menuType.toLowerCase())
-        .toList();
-  }
-
-  // "Trie les menus par nom (ordre alphabétique)"
-  List<Menu> sortMenusByName(bool ascendingOrder) {
-    print("Trie les menus par nom: $ascendingOrder");
-
-    final sortedMenus = List<Menu>.from(_cachedMenus);
-
-    sortedMenus.sort((a, b) => ascendingOrder
-        ? a.menuName.compareTo(b.menuName)
-        : b.menuName.compareTo(a.menuName));
-
-    return sortedMenus;
-  }
 }
+ */

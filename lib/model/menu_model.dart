@@ -1,4 +1,4 @@
-class Menu {
+/* class Menu {
   final int? menuId;
   final String menuName;
   final String menuType;
@@ -64,3 +64,4 @@ class Menu {
     return menuId.hashCode;
   } */
 }
+ */

@@ -1,32 +1,15 @@
-import 'package:flutter/foundation.dart';
+/* import 'package:flutter/foundation.dart';
 import 'package:senticket_front/model/consulter_menu_model.dart';
 import 'package:senticket_front/model/menu_model.dart';
 import 'package:senticket_front/services/consulter_menu_service.dart';
 
-/*
-  Rôle Principal: Gestionnaire d'état centralisé pour les consultations de menus
-  Votre ConsulterMenuProvider sert de cerveau central qui :
-   - Stocke l'état de toutes les consultations / gère l'état de l'interface utilisateur 
-   - Coordonne les opérations CRUD / actions sur les consultations 
-   - Gère le loading et les erreurs
-   - Notifie l'UI des changements / notifie les changements aux écouteurs
-
-  Gère l'état de toutes les opérations du ConsulterMenuApiService
-*/
 class ConsulterMenuProvider with ChangeNotifier {
-  // "Crée une classe qui peut notifier ses écouteurs des changements"
-
-  // "_" signifie que ces variables sont privées
-
   final ConsulterMenuApiService _service;
 
-  // === INTERNAL STATE FOR ALL OPERATIONS ===
-
-  // "État principal"
   List<ConsulterMenu> _consulterMenus =
       []; // "Liste vide pour stocker toutes les consultations"
   ConsulterMenu?
-      _currentConsulterMenu; // "Consultation actuellement sélectionnée (peut être null)"
+  _currentConsulterMenu; // "Consultation actuellement sélectionnée (peut être null)"
   bool _isLoading = false; // "Indicateur de chargement (initialement false)"
   String _error = ''; // "Stocke les messages d'erreur (initialement vide)"
 
@@ -37,9 +20,6 @@ class ConsulterMenuProvider with ChangeNotifier {
 
   ConsulterMenuProvider(this._service);
 
-  // === GETTERS - Accès contrôlé à l'état ===
-
-  // "Getters principaux"
   List<ConsulterMenu> get consulterMenus =>
       _consulterMenus; // "Permet à d'autres classes de lire `_consulterMenus` mais pas de le modifier"
   ConsulterMenu? get currentConsulterMenu => _currentConsulterMenu;
@@ -63,11 +43,12 @@ class ConsulterMenuProvider with ChangeNotifier {
 
     try {
       _consulterMenus = await _service.getAllConsulterMenus(
-          forceRefresh:
-              forceRefresh); // "Demande au service de me donner toutes les consultations"
+        forceRefresh: forceRefresh,
+      ); // "Demande au service de me donner toutes les consultations"
       _error = ''; // "Confirme qu'il n'y a pas d'erreurs"
       print(
-          "Chargement réussi : ${_consulterMenus.length} consultations de menus");
+        "Chargement réussi : ${_consulterMenus.length} consultations de menus",
+      );
     } catch (e) {
       _error = e.toString(); // "Stocke l'erreur"
       print("Erreur loadAllConsulterMenus: $e");
@@ -89,12 +70,15 @@ class ConsulterMenuProvider with ChangeNotifier {
       _service.validateConsulterMenuData(consulterMenu);
 
       final newConsulterMenu = await _service.createConsulterMenu(
-          consulterMenu); // "demande au service de créer cette consultation dans l'API"
+        consulterMenu,
+      ); // "demande au service de créer cette consultation dans l'API"
       _consulterMenus.add(
-          newConsulterMenu); // "Si ça fonctionne, ajoute la nouvelle consultation à ma liste locale"
+        newConsulterMenu,
+      ); // "Si ça fonctionne, ajoute la nouvelle consultation à ma liste locale"
       _error = ''; // "Efface les erreurs"
       print(
-          "Consultation de menu créée avec succès: ${newConsulterMenu.consulterMenuId}");
+        "Consultation de menu créée avec succès: ${newConsulterMenu.consulterMenuId}",
+      );
       return true; // "Succès"
     } catch (e) {
       _error = 'Erreur création consultation: ${e.toString()}';
@@ -117,13 +101,13 @@ class ConsulterMenuProvider with ChangeNotifier {
       _service.validateConsulterMenuData(consulterMenu);
 
       final updatedConsulterMenu = await _service.updateConsulterMenu(
-          consulterMenu); // "demande à l'API de mettre à jour cette consultation"
+        consulterMenu,
+      ); // "demande à l'API de mettre à jour cette consultation"
 
       // "Met à jour dans la liste locale"
-      final index = _consulterMenus.indexWhere((cm) =>
-          cm.consulterMenuId ==
-          consulterMenu
-              .consulterMenuId); // "cherche la position de cette consultation dans ma liste"
+      final index = _consulterMenus.indexWhere(
+        (cm) => cm.consulterMenuId == consulterMenu.consulterMenuId,
+      ); // "cherche la position de cette consultation dans ma liste"
       if (index != -1) {
         _consulterMenus[index] =
             updatedConsulterMenu; // "Si j'ai trouvé la consultation (index != -1), je remplace l'ancienne version par la nouvelle"
@@ -131,7 +115,8 @@ class ConsulterMenuProvider with ChangeNotifier {
 
       _error = '';
       print(
-          "Consultation de menu mise à jour avec succès: ${updatedConsulterMenu.consulterMenuId}");
+        "Consultation de menu mise à jour avec succès: ${updatedConsulterMenu.consulterMenuId}",
+      );
       return true;
     } catch (e) {
       _error = 'Erreur mise à jour consultation: ${e.toString()}';
@@ -152,11 +137,13 @@ class ConsulterMenuProvider with ChangeNotifier {
 
     try {
       await _service.deleteConsulterMenu(
-          consulterMenuId); // "demande à l'API de supprimer la consultation avec cet ID"
+        consulterMenuId,
+      ); // "demande à l'API de supprimer la consultation avec cet ID"
 
       // "supprime la consultation de la liste locale"
       _consulterMenus.removeWhere(
-          (consulterMenu) => consulterMenu.consulterMenuId == consulterMenuId);
+        (consulterMenu) => consulterMenu.consulterMenuId == consulterMenuId,
+      );
 
       _error = '';
       print("Consultation avec cet ID supprimée: $consulterMenuId");
@@ -181,7 +168,8 @@ class ConsulterMenuProvider with ChangeNotifier {
 
     try {
       _currentConsulterMenu = await _service.getConsulterMenuById(
-          consulterMenuId); // "demande une consultation spécifique par son id à l'API et la stocke dans _currentConsulterMenu"
+        consulterMenuId,
+      ); // "demande une consultation spécifique par son id à l'API et la stocke dans _currentConsulterMenu"
       _error = '';
       print("Consultation de menu chargée par ID: $consulterMenuId");
     } catch (e) {
@@ -217,7 +205,9 @@ class ConsulterMenuProvider with ChangeNotifier {
 
   // "Filtre les consultations par période"
   List<ConsulterMenu> filterConsulterMenusByDateRange(
-      DateTime startDate, DateTime endDate) {
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     return _service.filterConsulterMenusByDateRange(startDate, endDate);
   }
 
@@ -252,7 +242,8 @@ class ConsulterMenuProvider with ChangeNotifier {
   Future<void> refreshData() async {
     await loadAllConsulterMenus(forceRefresh: true);
   }
-/* 
+
+  /* 
   // "Obtient les statistiques de consultation"
   Map<String, dynamic> getConsultationStatistics() {
     return _service.getConsultationStatistics();
@@ -325,3 +316,4 @@ class ConsulterMenuProvider with ChangeNotifier {
     return await createNewConsulterMenu(newConsultation);
   }  */
 }
+ */

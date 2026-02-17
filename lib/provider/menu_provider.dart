@@ -1,27 +1,12 @@
-import 'package:flutter/foundation.dart';
+/* import 'package:flutter/foundation.dart';
 import 'package:senticket_front/model/menu_model.dart';
 import 'package:senticket_front/services/menu_service.dart';
 
-/*
-  Rôle Principal: Gestionnaire d'état centralisé pour les menus
-  Votre MenuProvider sert de cerveau central qui :
-   - Stocke l'état de tous les menus / gère l'état de l'interface utilisateur 
-   - Coordonne les opérations CRUD / actions sur les menus 
-   - Gère le loading et les erreurs
-   - Notifie l'UI des changements / notifie les changements aux écouteurs
 
-  Gère l'état de toutes les opérations du MenuApiService
-*/
 class MenuProvider with ChangeNotifier {
-  // "Crée une classe qui peut notifier ses écouteurs des changements"
-
-  // "_" signifie que ces variables sont privées
 
   final MenuApiService _service;
 
-  // === INTERNAL STATE FOR ALL OPERATIONS ===
-
-  // "État principal"
   List<Menu> _menus = []; // "Liste vide pour stocker tous les menus"
   Menu? _currentMenu; // "Menu actuellement sélectionné (peut être null)"
   bool _isLoading = false; // "Indicateur de chargement (initialement false)"
@@ -34,9 +19,6 @@ class MenuProvider with ChangeNotifier {
 
   MenuProvider(this._service);
 
-  // === GETTERS - Accès contrôlé à l'état ===
-
-  // "Getters principaux"
   List<Menu> get menus =>
       _menus; // "Permet à d'autres classes de lire `_menus` mais pas de le modifier"
   Menu? get currentMenu => _currentMenu;
@@ -221,39 +203,5 @@ class MenuProvider with ChangeNotifier {
   Future<void> refreshData() async {
     await loadAllMenus(forceRefresh: true);
   }
-
-  /*  // "Obtient tous les types de menus uniques"
-  List<String> getUniqueMenuTypes() {
-    final types = _menus.map((menu) => menu.menuType).toSet().toList();
-    types.sort();
-    return types;
-  }
-
-  // "Vérifie si un nom de menu existe déjà"
-  bool doesMenuNameExist(String menuName) {
-    return _menus
-        .any((menu) => menu.menuName.toLowerCase() == menuName.toLowerCase());
-  }
-
-  // "Obtient un menu par son nom"
-  Menu? getMenuByName(String menuName) {
-    try {
-      return _menus.firstWhere(
-          (menu) => menu.menuName.toLowerCase() == menuName.toLowerCase());
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // "Obtient les statistiques des menus"
-  Map<String, int> getMenuStatistics() {
-    final statistics = <String, int>{};
-
-    // "Compte par type de menu"
-    for (final menu in _menus) {
-      statistics[menu.menuType] = (statistics[menu.menuType] ?? 0) + 1;
-    }
-
-    return statistics;
-  } */
 }
+ */

@@ -1,4 +1,4 @@
-import 'package:senticket_front/model/menu_model.dart';
+/* import 'package:senticket_front/model/menu_model.dart';
 
 class ConsulterMenu {
   final int? consulterMenuId;
@@ -97,3 +97,4 @@ class UserDTO {
     };
   }
 }
+ */

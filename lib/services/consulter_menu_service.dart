@@ -1,15 +1,9 @@
-import 'dart:convert';
+/* import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/model/consulter_menu_model.dart';
 import 'package:senticket_front/model/menu_model.dart';
 
-/* 
-  - Service combiné qui gère :
-  - Appels HTTP vers l'API Spring Boot pour les consultations de menus
-  - Cache simple des données
-  - Logique métier légère
-  - Transformation des données 
-*/
+
 class ConsulterMenuApiService {
   static const String baseUrl = 'http://192.168.1.4:8080/api/consulter_menus';
 
@@ -444,3 +438,4 @@ class ConsulterMenuApiService {
     return userCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   }
 }
+ */
