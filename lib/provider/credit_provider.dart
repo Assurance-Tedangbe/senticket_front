@@ -1,21 +1,9 @@
-import 'package:flutter/foundation.dart'; // "Importe les bases de Flutter, dont ChangeNotifier"
+/* import 'package:flutter/foundation.dart'; // "Importe les bases de Flutter, dont ChangeNotifier"
 import 'package:senticket_front/model/credit_model.dart';
 import 'package:senticket_front/services/credit_service.dart';
 
-/*
-  Rôle Principal: Gestionnaire d'état centralisé pour les crédits
-  Votre CreditProvider sert de cerveau central qui :
-   - Stocke l'état de tous les crédits / gère l'état de l'interface utilisateur 
-   - Coordonne les opérations CRUD / actions sur les crédits 
-   - Gère le loading et les erreurs
-   - Notifie l'UI des changements / notifie les changements aux écouteurs
 
-  Gère l'état de toutes les opérations du CreditApiService
-*/
 class CreditProvider with ChangeNotifier {
-  // "Crée une classe qui peut notifier ses écouteurs des changements"
-
-  // "_" signifie que ces variables sont privées
 
   final CreditApiService _service;
 
@@ -336,63 +324,5 @@ class CreditProvider with ChangeNotifier {
   String getUserWithMostCredits() {
     return _service.getUserWithMostCredits();
   }
-/* 
-  // "Obtient les crédits récents (derniers 30 jours)"
-  List<Credit> getRecentCredits() {
-    final oneMonthAgo = DateTime.now().subtract(const Duration(days: 30));
-    return _credits
-        .where((credit) => credit.creditDate.isAfter(oneMonthAgo))
-        .toList();
-  }
-
-  // "Obtient les crédits d'aujourd'hui"
-  List<Credit> getTodayCredits() {
-    final today = DateTime.now();
-    return _credits
-        .where((credit) =>
-            credit.creditDate.year == today.year &&
-            credit.creditDate.month == today.month &&
-            credit.creditDate.day == today.day)
-        .toList();
-  }
-
-  // "Obtient le nombre total de crédits"
-  int getTotalCredits() {
-    return _credits.length;
-  }
-
-  // "Obtient le montant total de tous les crédits"
-  double getTotalCreditsAmount() {
-    return _credits.fold(0.0, (sum, credit) => sum + credit.creditAmount);
-  }
-
-  // "Obtient le montant moyen des crédits"
-  double getAverageCreditAmount() {
-    return _credits.isEmpty ? 0.0 : getTotalCreditsAmount() / _credits.length;
-  }
-
-  // "Obtient le crédit le plus élevé"
-  Credit? getHighestCredit() {
-    if (_credits.isEmpty) return null;
-    return _credits.reduce((a, b) => a.creditAmount > b.creditAmount ? a : b);
-  }
-
-  // "Obtient le crédit le plus bas"
-  Credit? getLowestCredit() {
-    if (_credits.isEmpty) return null;
-    return _credits.reduce((a, b) => a.creditAmount < b.creditAmount ? a : b);
-  }
-
-   // "Crée un crédit rapide (avec date actuelle)"
-  Future<bool> createQuickCredit(
-      double amount, AccountDTO accountDTO, UserDTO userDTO) async {
-    final newCredit = Credit(
-      creditDate: DateTime.now(),
-      creditAmount: amount,
-      accountDTO: accountDTO,
-      userDTO: userDTO,
-    );
-
-    return await createNewCredit(newCredit);
-  }  */
 }
+ */

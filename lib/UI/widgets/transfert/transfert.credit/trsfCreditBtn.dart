@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:senticket_front/constants.dart';
 
 class TrnasfertCreditBtn extends StatefulWidget {
@@ -29,3 +29,4 @@ class _TrnasfertCreditBtnState extends State<TrnasfertCreditBtn> {
     );
   }
 }
+ */

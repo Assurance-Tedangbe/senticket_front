@@ -1,4 +1,4 @@
-class Credit {
+/* class Credit {
   final int? creditId;
   final DateTime creditDate;
   final double creditAmount;
@@ -130,3 +130,4 @@ class UserDTO {
     };
   }
 }
+ */

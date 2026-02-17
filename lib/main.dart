@@ -24,28 +24,16 @@ import 'package:senticket_front/bloc/historic.bloc.dart';
 import 'package:senticket_front/bloc/services.bloc.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/consulter_menu_provider.dart';
-import 'package:senticket_front/provider/credit_provider.dart';
-import 'package:senticket_front/provider/debit_provider.dart';
 import 'package:senticket_front/provider/menu_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:senticket_front/services/consulter_menu_service.dart';
-import 'package:senticket_front/services/credit_service.dart';
-import 'package:senticket_front/services/debit_service.dart';
 import 'package:senticket_front/services/menu_service.dart';
 import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/pages/activateAccount.dart';
-import 'package:senticket_front/UI/pages/cancelRecharge.dart';
-import 'package:senticket_front/UI/pages/cancelTransfertCredit.dart';
-import 'package:senticket_front/services/account_service.dart';
-import 'package:senticket_front/UI/pages/transfertCredit.dart';
-import 'package:senticket_front/provider/account_provider.dart';
-import 'package:senticket_front/UI/pages/creditAccount.dart';
-import 'package:senticket_front/UI/pages/deactivateAccount.dart';
 
 void main() {
   runApp(const MyApp());
@@ -61,8 +49,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ServicesBloc()),
         BlocProvider(create: (context) => HistoricBloc()),
         /* ChangeNotifierProvider<AuthProvider>(
-      create: (context) => AuthProvider(AuthService()),
-    ), */
+           create: (context) => AuthProvider(AuthService()),
+        ), */
         ChangeNotifierProvider<RoleProvider>(
           create: (context) => RoleProvider(RoleApiService()),
         ),
@@ -72,20 +60,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<TicketProvider>(
           create: (context) => TicketProvider(TicketApiService()),
         ),
-        /*  ChangeNotifierProvider<AccountProvider>(
-        create: (context) => AccountProvider(AccountApiService()),
-      ), */
         ChangeNotifierProvider<MenuProvider>(
           create: (context) => MenuProvider(MenuApiService()),
         ),
         ChangeNotifierProvider<ConsulterMenuProvider>(
           create: (context) => ConsulterMenuProvider(ConsulterMenuApiService()),
-        ),
-        ChangeNotifierProvider<DebitProvider>(
-          create: (context) => DebitProvider(DebitApiService()),
-        ),
-        ChangeNotifierProvider<CreditProvider>(
-          create: (context) => CreditProvider(CreditApiService()),
         ),
       ],
       child: const RootView(),
@@ -122,12 +101,6 @@ class RootView extends StatelessWidget {
         "/agent": (context) => const AgentInterface(),
         "/settings": (context) => const SettingsPage(),
         "/log-out": (context) => const LogOut(),
-        // "/activate-account": (context) => const ActivateAccount(),
-        // "/deactivate-account": (context) => const DeactivateAccount(),
-        // "/credit-account": (context) => const CreditAccount(),
-        // "/cancel-recharge": (context) => const CancelRecharge(),
-        // "/transfert-credit": (context) => const TransfertCredit(),
-        // "/cancel-transfert-credit": (context) => const CancelTrsfCredit(),
       },
       initialRoute: "/cover",
     );

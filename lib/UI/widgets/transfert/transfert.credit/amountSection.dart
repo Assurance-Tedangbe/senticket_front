@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
@@ -48,3 +48,4 @@ class _AmountSectionState extends State<AmountSection> {
     );
   }
 }
+ */

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.credit/transfert.credit.body.dart';
 
 class TransfertCredit extends StatelessWidget {
@@ -15,3 +15,4 @@ class TransfertCredit extends StatelessWidget {
         body: const TransfertBody());
   }
 }
+ */

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/activateAccount.body.dart';
 
 class ActivateAccount extends StatelessWidget {
@@ -13,3 +13,4 @@ class ActivateAccount extends StatelessWidget {
         body: const ActivateAccountBody());
   }
 }
+ */

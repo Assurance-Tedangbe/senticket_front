@@ -1,14 +1,8 @@
-import 'dart:convert';
+/* import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/model/credit_model.dart';
 
-/* 
-  - Service combiné qui gère :
-  - Appels HTTP vers l'API Spring Boot pour les crédits
-  - Cache simple des données
-  - Logique métier légère
-  - Transformation des données 
-*/
+
 class CreditApiService {
   static const String baseUrl = 'http://192.168.1.4:8080/api/credits';
 
@@ -545,3 +539,4 @@ class CreditApiService {
     return userCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   }
 }
+ */

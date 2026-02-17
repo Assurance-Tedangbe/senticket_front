@@ -1,4 +1,4 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
+/* import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/deactivateAccount.dart';
 import 'package:senticket_front/UI/pages/home.dart';
@@ -136,4 +136,4 @@ Widget manageNumberAccount() {
       ),
     ],
   );
-}
+} */
