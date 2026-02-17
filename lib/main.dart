@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:senticket_front/UI/pages/adminInterface.dart';
-import 'package:senticket_front/UI/pages/agentInterface.dart';
 import 'package:senticket_front/UI/pages/buyTicket.dart';
 import 'package:senticket_front/UI/pages/cancelTransfertTicket.dart';
 import 'package:senticket_front/UI/pages/consultAccount.dart';
@@ -23,17 +22,18 @@ import 'package:senticket_front/UI/pages/updateProfile.dart';
 import 'package:senticket_front/bloc/historic.bloc.dart';
 import 'package:senticket_front/bloc/services.bloc.dart';
 import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/provider/consulter_menu_provider.dart';
-import 'package:senticket_front/provider/menu_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
-import 'package:senticket_front/services/consulter_menu_service.dart';
-import 'package:senticket_front/services/menu_service.dart';
 import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/pages/agentInterface.dart';
+import 'package:senticket_front/provider/consulter_menu_provider.dart';
+import 'package:senticket_front/provider/menu_provider.dart';
+import 'package:senticket_front/services/consulter_menu_service.dart';
+import 'package:senticket_front/services/menu_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,12 +60,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<TicketProvider>(
           create: (context) => TicketProvider(TicketApiService()),
         ),
-        ChangeNotifierProvider<MenuProvider>(
+        /*         ChangeNotifierProvider<MenuProvider>(
           create: (context) => MenuProvider(MenuApiService()),
         ),
         ChangeNotifierProvider<ConsulterMenuProvider>(
           create: (context) => ConsulterMenuProvider(ConsulterMenuApiService()),
-        ),
+        ), */
       ],
       child: const RootView(),
     );
@@ -98,7 +98,7 @@ class RootView extends StatelessWidget {
         "/update-profile": (context) => const UpdateProfile(),
         "/porter": (context) => const PorterInterface(),
         "/debit-account": (context) => const DebitAccount(),
-        "/agent": (context) => const AgentInterface(),
+        // "/agent": (context) => const AgentInterface(),
         "/settings": (context) => const SettingsPage(),
         "/log-out": (context) => const LogOut(),
       },

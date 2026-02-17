@@ -2,13 +2,13 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:senticket_front/UI/pages/adminInterface.dart';
-import 'package:senticket_front/UI/pages/agentInterface.dart';
 import 'package:senticket_front/UI/pages/home.dart';
 import 'package:senticket_front/UI/pages/porterInterface.dart';
 import 'package:senticket_front/UI/pages/studentInterface.dart';
 import 'package:senticket_front/UI/widgets/navigation/bottomIcon.dart';
 import 'package:senticket_front/UI/widgets/navigation/bottomText.dart';
 import 'package:senticket_front/constants.dart';
+//import 'package:senticket_front/UI/pages/agentInterface.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -57,12 +57,12 @@ class _NavigationState extends State<Navigation> {
                     ],
                   ),
                   /* Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BottomIcon(bottomicon: Icons.person_3_outlined),
-                TextAsTooltip(text: "Interface Agent")
-              ],
-            ), */
+                       mainAxisAlignment: MainAxisAlignment.center,
+                       children: [
+                          BottomIcon(bottomicon: Icons.person_3_outlined),
+                          TextAsTooltip(text: "Interface Agent")
+                    ],
+                   ), */
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
