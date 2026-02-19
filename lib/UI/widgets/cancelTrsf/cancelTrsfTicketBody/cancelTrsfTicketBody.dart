@@ -4,7 +4,6 @@ import 'package:senticket_front/UI/widgets/cancelTrsf/cancelTrsfTicketBody/cance
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/numberTicketsSection.dart';
 import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/senderPasswordTrsfTicket.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/ticketTypeSection.dart';
 
 class CancelTrsfTicketBody extends StatelessWidget {
   const CancelTrsfTicketBody({super.key});
@@ -22,14 +21,16 @@ class CancelTrsfTicketBody extends StatelessWidget {
             SizeboxHeightSession(), 
             // RecipientNumberTrsfTicket(),
             //SizeboxHeightSession(), */
-            NumberTicketsSection(),
+
+            //  NumberTicketsSection(),
             SizeboxHeightSession(),
-            Padding(
+            /* Padding(
               padding: EdgeInsets.fromLTRB(25.0, 0.0, 8.0, 0.0),
               child: TicketTypeSection(),
             ),
-            SizeboxHeightSession(),
-            SenderPasswordTrsfTicket(),
+            SizeboxHeightSession(), */
+
+            // SenderPasswordTrsfTicket(),
             SizeboxHeightSession(),
             CancelTrsfTicketBtn(),
           ],

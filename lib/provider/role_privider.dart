@@ -2,14 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:senticket_front/model/role_model.dart';
 import 'package:senticket_front/services/role_service.dart';
 
-/* 
-   Gestionnaire d'état COMPLET pour les rôles
-   Responsabilités :
-    - Gérer l'état de l'interface utilisateur
-    - Coordonner les opérations avec le Service
-    - Notifier les écouteurs des changements d'état
-    - Maintenir la cohérence des données locales 
-*/
 class RoleProvider with ChangeNotifier {
   final RoleApiService _roleservice;
 
@@ -59,8 +51,8 @@ class RoleProvider with ChangeNotifier {
 
   // === MÉTHODES D'ACTION PRINCIPALES ===
 
-  /* Charge tous les rôles depuis le service
-    Gère complètement l'état de chargement et les erreurs */
+  // ************************ READ ALL ROLES **************************
+
   Future<void> loadAllRoles({bool forceRefresh = false}) async {
     _isLoading = true; // Active l'indicateur de chargement global
     _error = ''; // Réinitialise les erreurs globales
@@ -79,6 +71,9 @@ class RoleProvider with ChangeNotifier {
       notifyListeners(); // Notifie l'UI de la fin de l'opération
     }
   }
+}
+  /*            SUPPL METHODS 
+ // ************************** CREATE ROLE ***************************
 
   /* Crée un nouveau rôle avec gestion complète de l'état */
   Future<bool> createNewRole(Role role) async {
@@ -108,7 +103,7 @@ class RoleProvider with ChangeNotifier {
     }
   }
 
-  // Met à jour un rôle existant avec gestion complète de l'état
+  // ************************** UPDATE ROLE ***************************
   Future<bool> updateExistingRole(Role role) async {
     _isUpdatingRole = true; // Active l'état spécifique de mise à jour
     _updateRoleError = ''; // Réinitialise l'erreur de mise à jour
@@ -146,7 +141,7 @@ class RoleProvider with ChangeNotifier {
     }
   }
 
-  // Supprime un rôle avec gestion complète de l'état
+  // ************************** DELETE ROLE ***************************
   Future<bool> deleteExistingRole(int roleId) async {
     _isDeletingRole = true; // Active l'état spécifique de suppression
     _deleteRoleError = ''; // Réinitialise l'erreur de suppression
@@ -181,7 +176,7 @@ class RoleProvider with ChangeNotifier {
     }
   }
 
-  // Charge un rôle spécifique par son ID
+  // ************************** READ SINGLE ROLE ***************************
   Future<void> loadRoleById(int roleId) async {
     _isFetchingRole = true; // Active l'état spécifique de récupération
     _fetchRoleError = ''; // Réinitialise l'erreur de récupération
@@ -205,7 +200,7 @@ class RoleProvider with ChangeNotifier {
     }
   }
 
-  // Charge un rôle spécifique par son nom
+  // ************************** READ SINGLE ROLE BY NAME ***************************
   Future<void> loadRoleByName(String roleName) async {
     _isFetchingRole = true; // Active l'état spécifique de récupération
     _fetchRoleError = ''; // Réinitialise l'erreur de récupération
@@ -227,7 +222,7 @@ class RoleProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
+  } 
 
   // === MÉTHODES UTILITAIRES - OPÉRATIONS LOCALES ===
 
@@ -299,7 +294,8 @@ class RoleProvider with ChangeNotifier {
     _roleservice.clearCache();
     print("🗑️ Cache des rôles vidé via Provider");
   }
-}
+  */
+
 
 /* 
  FONCTIONNALITÉS AVANCÉES fournis par le service et le provider de role:

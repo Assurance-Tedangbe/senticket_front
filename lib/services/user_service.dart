@@ -25,7 +25,7 @@ class UserApiService {
   DateTime? _lastFetchTime; // Dernière récupération
   static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
 
-  // 1. CREATE USER (POST /api/users)
+  // ****************** CREATE USER (POST /api/users) **********************
   Future<User> createUser(User user) async {
     try {
       print('Envoi de la requête POST pour créer un utilisateur');
@@ -54,7 +54,6 @@ class UserApiService {
         }
 
         try {
-          // Essayez de parser le JSON
           final Map<String, dynamic> newUser = json.decode(
             response.body,
           ); // Converts the JSON response → User object
@@ -65,29 +64,28 @@ class UserApiService {
 
           return User.fromJson(newUser);
         } catch (e) {
-          print('❌ Erreur de parsing JSON: $e');
+          print(' Erreur de parsing JSON: $e');
           // Fallback : retournez l'utilisateur original
           return user;
         }
       } else {
-        print('❌ Statut HTTP non attendu: ${response.statusCode}');
+        print(' Statut HTTP non attendu: ${response.statusCode}');
         throw Exception(
           'Erreur création utilisateur - Code HTTP: ${response.statusCode}',
         );
       }
     } catch (e) {
-      //  print("❌ Erreur création: $e");
       throw Exception('Erreur réseau: $e');
     }
   }
 
-  // LOGIN USER (POST /api/auth/login)
+  // ****************** LOGIN USER (POST /api/auth/login) **********************
   Future<User> login(String username, String password) async {
     try {
       print('🔐 Tentative de connexion pour: $username');
 
       final response = await http.post(
-        Uri.parse('$authUrl/login'), // ⭐ Ajustez l'URL selon votre API
+        Uri.parse('$authUrl/login'),
         headers: headers,
         body: json.encode({'username': username, 'password': password}),
       );
@@ -127,8 +125,8 @@ class UserApiService {
           print('✅ Format de réponse détecté (avec objet user)');
 
           final userData = responseData['user'] as Map<String, dynamic>;
-          print(' userData conteúdo: $userData');
-          print(' responseData conteúdo: $responseData');
+          print(' userData : $userData');
+          print(' responseData : $responseData');
 
           return User.fromJson(userData);
         }
@@ -209,22 +207,6 @@ class UserApiService {
     }
   }
 
-  // Méthode pour obtenir les headers avec authentification
-  Future<Map<String, String>> getAuthHeaders() async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-
-    // Si vous avez un token, l'ajouter aux headers
-    // final token = await _getToken();
-    // if (token != null) {
-    //   headers['Authorization'] = 'Bearer $token';
-    // }
-
-    return headers;
-  }
-
   // READ ALL USERS (GET /api/users)
   // Uses caching to avoid unnecessary API calls
   Future<List<User>> getAllUsers({bool forceRefresh = false}) async {
@@ -282,10 +264,9 @@ class UserApiService {
   }
 
   // READ USER BY ID (GET /api/users/{userId})
-  // Déclaration d'une méthode asynchrone qui retourne un objet User
   Future<User> getUserById(int userId) async {
     try {
-      print("Retrieving user ID: $userId");
+      print("Retrieving user with ID: $userId");
 
       // Recherche d'abord dans le cache local pour éviter un appel API inutile
       final cachedUser = _cachedUsers.firstWhere(
@@ -380,36 +361,13 @@ class UserApiService {
   }
 
   /*  Future<User> getUserByUsername(String username) async {
-    try {
-      print("Récupération de l'utilisateur par username: $username");
-
-      // Construire l'URL pour récupérer l'utilisateur par username
-      final response = await http.get(
-        Uri.parse('$baseUrl/username/$username'),
-        headers: headers,
-      );
-
-      print("Status code getUserByUsername: ${response.statusCode}");
-      print("Response body: ${response.body}");
-
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final user = User.fromJson(jsonData);
         print(
           "Utilisateur trouvé: ${user.username} (Rôle: ${user.role?.name})",
         );
-        return user;
-      } else if (response.statusCode == 404) {
-        throw Exception('Utilisateur non trouvé');
-      } else {
-        throw Exception(
-          'Erreur lors de la récupération: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      print("Erreur getUserByUsername: $e");
-      rethrow;
-    }
+        return user; 
   } */
 
   // UPDATE USER (PUT /api/users/{userId})
@@ -445,30 +403,6 @@ class UserApiService {
     }
   }
 
-  // UPDATE PASSWORD (PUT /api/users/password/{userId})
-  // without cahe
-  Future<void> updatePassword(int userId, String newPassword) async {
-    try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/password/$userId'),
-        headers: headers,
-        body: json.encode(
-          newPassword,
-        ), // Sends only the new password (not the entire User object)"
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Erreur mise à jour mot de passe: ${response.statusCode}',
-        );
-      }
-
-      print("Password updated for user with ID: $userId");
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
   // DELETE USER (DELETE /api/users/{userId})
   Future<void> deleteUser(int userId) async {
     try {
@@ -496,26 +430,6 @@ class UserApiService {
     }
   }
 
-  // Searching for users in the local cache
-  List<User> searchUsers(String query) {
-    print("searching for users with query: $query");
-
-    if (query.isEmpty) return _cachedUsers;
-
-    final queryLower = query.toLowerCase();
-
-    return _cachedUsers
-        .where(
-          (user) =>
-              user.username.toLowerCase().contains(queryLower) ||
-              user.email.toLowerCase().contains(queryLower) ||
-              user.firstName.toLowerCase().contains(queryLower) ||
-              user.lastName.toLowerCase().contains(queryLower) ||
-              user.role.name.toLowerCase().contains(queryLower),
-        )
-        .toList();
-  }
-
   // Basic validation of user data
   void validateUserData(User user) {
     if (user.username.length < 3) {
@@ -539,6 +453,68 @@ class UserApiService {
       throw Exception('Email invalide');
     }
   }
+}
+  //********** Suppl services not used ************
+  /*
+  // UPDATE PASSWORD (PUT /api/users/password/{userId})
+  // without cahe
+  Future<void> updatePassword(int userId, String newPassword) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/password/$userId'),
+        headers: headers,
+        body: json.encode(
+          newPassword,
+        ), // Sends only the new password (not the entire User object)"
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Erreur mise à jour mot de passe: ${response.statusCode}',
+        );
+      }
+
+      print("Password updated for user with ID: $userId");
+    } catch (e) {
+      throw Exception('Erreur réseau: $e');
+    }
+  }
+
+  
+   // Méthode pour obtenir les headers avec authentification
+  Future<Map<String, String>> getAuthHeaders() async {
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // Si vous avez un token, l'ajouter aux headers
+    // final token = await _getToken();
+    // if (token != null) {
+    //   headers['Authorization'] = 'Bearer $token';
+    // }
+    return headers;
+  }
+
+   // Searching for users in the local cache
+  List<User> searchUsers(String query) {
+    print("searching for users with query: $query");
+
+    if (query.isEmpty) return _cachedUsers;
+
+    final queryLower = query.toLowerCase();
+
+    return _cachedUsers
+        .where(
+          (user) =>
+              user.username.toLowerCase().contains(queryLower) ||
+              user.email.toLowerCase().contains(queryLower) ||
+              user.firstName.toLowerCase().contains(queryLower) ||
+              user.lastName.toLowerCase().contains(queryLower) ||
+              user.role.name.toLowerCase().contains(queryLower),
+        )
+        .toList();
+  }
 
   // Clear the cache (useful for forcing a refresh)
   void clearCache() {
@@ -546,9 +522,9 @@ class UserApiService {
     _cachedUsers.clear();
     _lastFetchTime = null;
     print("🗑️ Cache utilisateurs vidé");
-  }
+  } */
 
-  // Dans UserApiService, ajoutez cette méthode pour forcer le rafraîchissement du cache
+  /* // Dans UserApiService, ajoutez cette méthode pour forcer le rafraîchissement du cache
   void invalidateUserCache(int userId) {
     // Retirer l'utilisateur du cache pour forcer une nouvelle récupération
     _cachedUsers.removeWhere((user) => user.userId == userId);
@@ -577,9 +553,7 @@ class UserApiService {
   }
 
   // REMOVE ROLE FROM USER (DELETE /api/users/{userId}/roles/{roleId})
-  // without cahe
   Future<void> removeRoleFromUser(int userId, int roleId) async {
-    print("Remove role : $roleId from user : $userId");
     try {
       final response = await http.delete(
         Uri.parse('$baseUrl/$userId/roles/$roleId'),
@@ -594,49 +568,4 @@ class UserApiService {
     } catch (e) {
       throw Exception('Erreur réseau: $e');
     }
-  }
-}
-
-  /* 
-   RÉSUMÉ DU PATTERN GÉNÉRAL
-   Chaque méthode suit le même schéma :
-
-     static Future<Type> nomMéthode(paramètres) async {
-     try {
-        1. 🟡 CONSTRUCTION DE LA REQUÊTE
-          final response = await http.méthode(
-          Uri.parse(url),
-          headers: headers,
-          body: données?,
-         );
-
-        2. 🟢 VÉRIFICATION DE LA RÉPONSE
-      if (response.statusCode == codeSuccès) {
-
-        3. ✅ TRANSFORMATION DES DONNÉES
-         return transformation(response.body);
-         } else {
-        4. ❌ ERREUR HTTP
-                 throw Exception('Message: ${response.statusCode}');
-                }
-    
-          } catch (e) {
-        5. 🔴 ERREUR RÉSEAU
-                throw Exception('Erreur réseau: $e');
-          }
-       }
-   */
-
-  /* 
-   CONVERSION DES DONNÉES
-   Flux de données dans les deux sens :
-
-   VERS L'API (Envoi)
-   Objet User Dart → user.toJson() → Map → json.encode() → String JSON → HTTP Body
-   
-   DEPUIS L'API (Réception)
-   HTTP Body → String JSON → json.decode() → Map → User.fromJson() → Objet User Dart
-
-   Ce service est le pont essentiel entre votre app Flutter et votre API Spring Boot ! 🌉
-   */
-
+  } */

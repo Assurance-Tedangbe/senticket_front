@@ -4,14 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/role_model.dart';
 
-/* 
-   Service combiné pour la gestion des rôles
-   Combine les responsabilités du Service et du Repository :
-    - Appels HTTP vers l'API Spring Boot
-    - Cache simple des données
-    - Logique métier légère
-    - Transformation des données
- */
 class RoleApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/roles';
 
@@ -20,8 +12,6 @@ class RoleApiService {
     'Content-Type': 'application/json', // Type de contenu qu'on envoie
     'Accept': 'application/json', // Type de contenu qu'on accepte en retour
   };
-
-  // === SYSTÈME DE CACHE ===
 
   // Cache en mémoire pour stocker la liste des rôles
   List<Role> _cachedRoles = [];
@@ -32,44 +22,66 @@ class RoleApiService {
   // Durée de validité du cache (10 minutes pour les rôles qui changent peu)
   static const Duration cacheDuration = Duration(minutes: 10);
 
-  /*  Future<void> testConnection() async {
-    final url = Uri.parse('http://192.168.1.4:8080/api/roles');
-
-    try {
-      // Test avec HttpClient
-      final httpClient = HttpClient();
-
-      final request = await httpClient.getUrl(url);
-      final response = await request.close();
-
-      print('✅ Connexion réussie - Status: ${response.statusCode}');
-
-      // Test avec ping
-      final result = await Process.run('ping', ['-c', '1', '192.168.1.4']);
-      print('Ping result: ${result.stdout}');
-
-      httpClient.close();
-    } catch (e) {
-      print('❌ Erreur de connexion: $e');
-
-      // Vérifier l'accessibilité du port
-      try {
-        final socket = await Socket.connect('192.168.1.4', 8080,
-            timeout: Duration(seconds: 5));
-        print('✅ Port 8080 accessible');
-        socket.destroy();
-      } catch (e) {
-        print('❌ Port 8082 inaccessible: $e');
-      }
-    }
-  }*/
-
   // === MÉTHODES PRINCIPALES - CORRESPONDANT AUX ENDPOINTS DU CONTROLLER ===
 
-  // CREATE : POST /api/roles
+  // *********************** READ ALL ROLES **************************
+  Future<List<Role>> getAllRoles({bool forceRefresh = false}) async {
+    // Vérification de la validité du cache
+    final now = DateTime.now();
+    final cacheValide =
+        _lastFetchTime != null &&
+        now.difference(_lastFetchTime!) < cacheDuration;
+
+    // Retourne les données du cache si valides et non forcées
+    if (!forceRefresh && cacheValide && _cachedRoles.isNotEmpty) {
+      print("📦 Retourne ${_cachedRoles.length} rôles depuis le cache");
+      return _cachedRoles;
+    }
+
+    try {
+      print(" Récupération des rôles");
+
+      // Appel HTTP GET vers l'API
+      final response = await http.get(Uri.parse(baseUrl), headers: headers);
+
+      print(' Status Code: ${response.statusCode}');
+      print(' Response Body : ${response.body}');
+
+      // Vérification du code HTTP 200 (OK) comme dans le Controller
+      if (response.statusCode == 200) {
+        print(' 200 OK - succès');
+
+        // JSON response → Role object list
+        final List<dynamic> jsonList = json.decode(response.body);
+        _cachedRoles = jsonList.map((json) => Role.fromJson(json)).toList();
+        _lastFetchTime = DateTime.now(); // Mise à jour du timestamp
+
+        print("${_cachedRoles.length} rôles récupérés et mis en cache");
+        return _cachedRoles;
+      } else {
+        throw Exception(
+          'Erreur récupération rôles - Code HTTP: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print(" Erreur lors de la récupération des rôles: $e");
+
+      // Fallback stratégique : retourne le cache même expiré si pas de réseau
+      if (_cachedRoles.isNotEmpty) {
+        print(" API inaccessible - Retourne cache expiré en fallback");
+        return _cachedRoles;
+      }
+
+      throw Exception('Erreur réseau: $e');
+    }
+  }
+}
+
+/* //  SUPPL METHODS not used yet
+  // ************************** CREATE ROLE ***************************
   Future<Role> createRole(Role role) async {
     try {
-      print("🔄 Création d'un nouveau rôle: ${role.name}");
+      print(" Création d'un nouveau rôle: ${role.name}");
 
       // Validation des données avant envoi à l'API
       _validateRoleData(role);
@@ -105,60 +117,7 @@ class RoleApiService {
     }
   }
 
-  // READ ALL : GET /api/roles
-  Future<List<Role>> getAllRoles({bool forceRefresh = false}) async {
-    // Vérification de la validité du cache
-    final now = DateTime.now();
-    final cacheValide =
-        _lastFetchTime != null &&
-        now.difference(_lastFetchTime!) < cacheDuration;
-
-    // Retourne les données du cache si valides et non forcées
-    if (!forceRefresh && cacheValide && _cachedRoles.isNotEmpty) {
-      print("📦 Retourne ${_cachedRoles.length} rôles depuis le cache");
-      return _cachedRoles;
-    }
-
-    try {
-      print("🌐 Récupération des rôles depuis l'API Spring Boot");
-
-      // Appel HTTP GET vers l'API
-      final response = await http.get(Uri.parse(baseUrl), headers: headers);
-
-      print(' Status Code: ${response.statusCode}');
-      print(' Response Body (RAW): ${response.body}');
-      print(' Response Body Length: ${response.body.length}');
-
-      // Vérification du code HTTP 200 (OK) comme dans le Controller
-      if (response.statusCode == 200) {
-        print(' 200 OK - succès de la récupération des rôles');
-
-        // JSON response → Role object list
-        final List<dynamic> jsonList = json.decode(response.body);
-        _cachedRoles = jsonList.map((json) => Role.fromJson(json)).toList();
-        _lastFetchTime = DateTime.now(); // Mise à jour du timestamp
-
-        print("${_cachedRoles.length} rôles récupérés et mis en cache");
-        return _cachedRoles;
-      } else {
-        throw Exception(
-          'Erreur récupération rôles - Code HTTP: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      print(" Erreur lors de la récupération des rôles: $e");
-
-      // Fallback stratégique : retourne le cache même expiré si pas de réseau
-      if (_cachedRoles.isNotEmpty) {
-        print(" API inaccessible - Retourne cache expiré en fallback");
-        return _cachedRoles;
-      }
-
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  // READ BY ID  : GET /api/roles/{roleId}
+  // ************************ READ ROLE BY ID **************************
   Future<Role> getRoleById(int roleId) async {
     try {
       print("🔄 Récupération du rôle par ID: $roleId");
@@ -199,7 +158,7 @@ class RoleApiService {
     }
   }
 
-  // READ BY NAME  : GET /api/roles/name/{roleName}
+  // ************************ READ ROLE BY NAME **************************
   Future<Role> getRoleByName(String roleName) async {
     try {
       print("🔄 Récupération du rôle par nom: $roleName");
@@ -228,7 +187,7 @@ class RoleApiService {
     }
   }
 
-  // UPDATE : PUT /api/roles/{roleId}
+  // ************************** UPDATE ROLE ***************************
   Future<Role> updateRole(Role role) async {
     try {
       print("🔄 Mise à jour du rôle ID: ${role.roleId}");
@@ -264,7 +223,7 @@ class RoleApiService {
     }
   }
 
-  // DELETE : /api/roles/{roleId}
+  // ************************** DELETE ROLE ***************************
   Future<void> deleteRole(int roleId) async {
     try {
       print("🔄 Suppression du rôle ID: $roleId");
@@ -289,9 +248,9 @@ class RoleApiService {
       print(" Erreur lors de la suppression du rôle: $e");
       throw Exception('Erreur suppression rôle: $e');
     }
-  }
+  } 
 
-  // === MÉTHODES UTILITAIRES - LOGIQUE MÉTIER LÉGÈRE ===
+  // === MÉTHODES UTILITAIRES
 
   /*  Recherche des rôles dans le cache local selon un critère
       Utilise le cache pour des performances optimales  */
@@ -362,4 +321,4 @@ class RoleApiService {
     // basée sur l'utilisation réelle des rôles
     return _cachedRoles.take(limit).toList();
   }
-}
+  */

@@ -29,11 +29,6 @@ import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/pages/agentInterface.dart';
-import 'package:senticket_front/provider/consulter_menu_provider.dart';
-import 'package:senticket_front/provider/menu_provider.dart';
-import 'package:senticket_front/services/consulter_menu_service.dart';
-import 'package:senticket_front/services/menu_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,12 +55,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<TicketProvider>(
           create: (context) => TicketProvider(TicketApiService()),
         ),
-        /*         ChangeNotifierProvider<MenuProvider>(
-          create: (context) => MenuProvider(MenuApiService()),
-        ),
-        ChangeNotifierProvider<ConsulterMenuProvider>(
-          create: (context) => ConsulterMenuProvider(ConsulterMenuApiService()),
-        ), */
       ],
       child: const RootView(),
     );
