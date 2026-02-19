@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
-class SenderPasswordTrsfTicket extends StatefulWidget {
-  const SenderPasswordTrsfTicket({super.key});
+class SenderPasswordTrsfTicket extends StatelessWidget {
+  final TextEditingController controller;
+  const SenderPasswordTrsfTicket({super.key, required this.controller});
 
-  @override
-  State<SenderPasswordTrsfTicket> createState() =>
-      _SenderPasswordTrsfTicketState();
-}
-
-class _SenderPasswordTrsfTicketState extends State<SenderPasswordTrsfTicket> {
   @override
   Widget build(BuildContext context) {
     return Column(

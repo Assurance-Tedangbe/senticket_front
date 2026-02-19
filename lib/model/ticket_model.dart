@@ -183,6 +183,7 @@ class DebitPorterDTO {
   final String porterUsername;
 
   DebitPorterDTO({required this.porterId, required this.porterUsername});
+
   factory DebitPorterDTO.fromJson(Map<String, dynamic> json) {
     return DebitPorterDTO(
       porterId: json['porterId'] as int,
@@ -200,6 +201,7 @@ class DebitStudentDTO {
   final String username;
 
   DebitStudentDTO({required this.debitStudentId, required this.username});
+
   factory DebitStudentDTO.fromJson(Map<String, dynamic> json) {
     return DebitStudentDTO(
       debitStudentId: json['debitStudentId'] as int,
@@ -215,19 +217,22 @@ class DebitStudentDTO {
 class TransfertTicketRequestDTO {
   final SenderDTO senderDTO;
   final RecipientDTO recipentDTO;
-  final int numberTicketToTransfer;
+  final TicketType ticketType;
+  final int numberOfTicketsToTransfer;
 
   TransfertTicketRequestDTO({
     required this.senderDTO,
     required this.recipentDTO,
-    required this.numberTicketToTransfer,
+    required this.ticketType,
+    required this.numberOfTicketsToTransfer,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'senderDTO': senderDTO.toJson(),
       'recipientDTO': recipentDTO.toJson(),
-      'numberTicketToTransfer': numberTicketToTransfer,
+      'ticketType': ticketType.toBackend, // "A" ou "B"
+      'numberOfTicketsToTransfer': numberOfTicketsToTransfer,
     };
   }
 }
@@ -235,17 +240,27 @@ class TransfertTicketRequestDTO {
 class SenderDTO {
   final int senderId;
   final String senderUsername;
+  final String senderPassword;
 
-  SenderDTO({required this.senderId, required this.senderUsername});
+  SenderDTO({
+    required this.senderId,
+    required this.senderUsername,
+    required this.senderPassword,
+  });
   factory SenderDTO.fromJson(Map<String, dynamic> json) {
     return SenderDTO(
       senderId: json['senderId'] as int,
       senderUsername: json['senderUsername'] as String,
+      senderPassword: json['senderPassword'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'senderId': senderId, 'senderUsername': senderUsername};
+    return {
+      'senderId': senderId,
+      'senderUsername': senderUsername,
+      'senderPassword': senderPassword,
+    };
   }
 }
 
@@ -254,6 +269,7 @@ class RecipientDTO {
   final String recipientUsername;
 
   RecipientDTO({required this.recipientId, required this.recipientUsername});
+
   factory RecipientDTO.fromJson(Map<String, dynamic> json) {
     return RecipientDTO(
       recipientId: json['recipientId'] as int,
@@ -267,39 +283,38 @@ class RecipientDTO {
 }
 
 class CancelTransferTicketsRequestDTO {
-  final int originalSenderUserId;
-  final int currentOwnerUserId;
+  final CancelTransferDTO cancelTransferDTO;
   final List<int> ticketIdsToCancel;
 
   CancelTransferTicketsRequestDTO({
-    required this.originalSenderUserId,
-    required this.currentOwnerUserId,
+    required this.cancelTransferDTO,
     required this.ticketIdsToCancel,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'originalSenderUserId': originalSenderUserId,
-      'currentOwnerUserId': currentOwnerUserId,
+      'cancelTransferDTO': cancelTransferDTO.toJson(),
       'ticketIdsToCancel': ticketIdsToCancel,
     };
   }
 }
 
-/* class AccountDTO {
-  final int? accountId;
-  final String accountNumber;
+class CancelTransferDTO {
+  final int transactionId;
+  final SenderDTO originalSenderDTO;
+  final RecipientDTO currentOwnerDTO;
 
-  AccountDTO({this.accountId, required this.accountNumber});
-
-  factory AccountDTO.fromJson(Map<String, dynamic> json) {
-    return AccountDTO(
-      accountId: json['accountId'],
-      accountNumber: json['accountNumber'] ?? '',
-    );
-  }
+  CancelTransferDTO({
+    required this.transactionId,
+    required this.originalSenderDTO,
+    required this.currentOwnerDTO,
+  });
 
   Map<String, dynamic> toJson() {
-    return {'accountId': accountId, 'accountNumber': accountNumber};
+    return {
+      'transactionId': transactionId,
+      'originalSenderDTO': originalSenderDTO.toJson(),
+      'currentOwnerDTO': currentOwnerDTO.toJson(),
+    };
   }
-} */
+}

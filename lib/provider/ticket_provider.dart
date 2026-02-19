@@ -28,7 +28,6 @@ class TicketProvider with ChangeNotifier {
 
   final TicketApiService _service;
   // Instance du service qui gère les appels API - injectée via le constructeur
-
   // Pas besoin de stocker UserProvider ici, on le récupère via Provider.of dans les méthodes
 
   List<Ticket> _tickets =
@@ -93,7 +92,7 @@ class TicketProvider with ChangeNotifier {
   bool get isCancelingTransfer => _isCancelingTransfer;
   bool get isDebitingAccount => _isDebitingAccount;
 
-  // NEW: Getters for debit operation
+  // Getters for debit operation
   List<Ticket> get studentTicketsForDebit => _studentTicketsForDebit;
   TicketType? get selectedTicketTypeForDebit => _selectedTicketTypeForDebit;
   List<int> get selectedTicketIdsForDebit => _selectedTicketIdsForDebit;
@@ -116,7 +115,7 @@ class TicketProvider with ChangeNotifier {
   List<Ticket> get selectedTickets =>
       _tickets.where((ticket) => ticket.isSelected).toList();
 
-  // ******* FOR LOADALLTICKETS OPERATION ********
+  // ******************** FOR LOADING ALL TICKETS OPERATION *************************
 
   /* @param forceRefresh : si true, ignore le cache et force le rechargement */
   Future<void> loadAllTickets({bool forceRefresh = false}) async {
@@ -142,7 +141,7 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  // ******* FOR PURCHASE TICKETS OPERATION ********
+  // ********************* FOR PURCHASING TICKETS OPERATION ***********************
 
   // Pour gérer la sélection/désélection
   void toggleTicketSelection(int ticketId) {
@@ -267,7 +266,7 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  // ******* FOR DEBIT ACCOUNT OPERATION ********
+  // ******************** FOR DEBIT ACCOUNT OPERATION *******************
 
   // Fetch student's purchased tickets by user
   Future<void> getPurchasedTicketsByUser({
@@ -312,12 +311,6 @@ class TicketProvider with ChangeNotifier {
       _isLoadingStudentTickets = false;
       notifyListeners();
     }
-  }
-
-  // Set selected ticket type for debit
-  void setSelectedTicketTypeForDebit(TicketType? type) {
-    _selectedTicketTypeForDebit = type;
-    notifyListeners();
   }
 
   // Toggle ticket selection for debit
@@ -400,28 +393,27 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /*
+  // ******************** FOR TRANSFER TICKETS OPERATION ************************
+
   // 🔄 TRANSFERT DE TICKETS ENTRE UTILISATEURS
   // @param request : DTO contenant les infos de transfert
-  Future<bool> transferTickets(
-    TransferTicketsRequestDTO transferTicketsRequestDTO,
-  ) async {
+  Future<bool> transferTickets(TransfertTicketRequestDTO request) async {
     _isTransferringTickets = true;
     _isLoading = true;
+    _error = '';
     notifyListeners();
 
     try {
       await _service.transferTickets(
-        transferTicketsRequestDTO,
+        request,
       ); // "demande à l'API de transférer les tickets"
-
       _error = '';
       print(
-        "Tickets transférés de ${transferTicketsRequestDTO.fromStudentId} vers ${transferTicketsRequestDTO.toStudentId}",
+        "Transfert de tickets de ${request.senderDTO.senderUsername} vers ${request.recipentDTO.recipientUsername} réussi",
       );
       return true;
     } catch (e) {
-      _error = 'Erreur transfert tickets: ${e.toString()}';
+      _error = 'Erreur lors du transfert des tickets: ${e.toString()}';
       print("Erreur transferTickets: $e");
       return false;
     } finally {
@@ -431,6 +423,7 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
+  /*
   /* ↩️ ANNULATION D'UN TRANSFERT DE TICKETS
    *  @param request : DTO contenant les infos d'annulation */
   Future<bool> cancelTransferTickets(
@@ -460,6 +453,12 @@ class TicketProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+   /*  // Set selected ticket type for debit
+  void setSelectedTicketTypeForDebit(TicketType? type) {
+    _selectedTicketTypeForDebit = type;
+    notifyListeners();
+  } */
 
   /*➕ CREATION DE NOUVEAUX TICKETS */
   Future<bool> createNewTickets(

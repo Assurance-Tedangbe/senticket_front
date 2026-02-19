@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
-import 'package:senticket_front/enums/ticket_status.dart';
-import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 
 /* 
@@ -227,6 +225,47 @@ class TicketApiService {
     } catch (e) {
       print("Erreur récupération tickets utilisateur: $e");
       throw Exception('Erreur réseau: $e');
+    }
+  }
+
+  Future<void> transferTickets(
+    TransfertTicketRequestDTO transfertTicketRequestDTO,
+  ) async {
+    try {
+      print(
+        "Transfert de(s) tickets(s) de: ${transfertTicketRequestDTO.senderDTO.senderUsername} vers toStudentId: ${transfertTicketRequestDTO.recipentDTO.recipientUsername}",
+      );
+      print("Expéditeur ID: ${transfertTicketRequestDTO.senderDTO.senderId}");
+      print(
+        "Destinataire: ${transfertTicketRequestDTO.recipentDTO.recipientUsername}",
+      );
+      print("Type: ${transfertTicketRequestDTO.ticketType}");
+      print(
+        "Nbr tickets: ${transfertTicketRequestDTO.numberOfTicketsToTransfer}",
+      );
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/transferTickets'),
+        headers: headers,
+        body: json.encode(transfertTicketRequestDTO.toJson()),
+      );
+
+      print("Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        print("Transfert réussi");
+        return;
+      } else {
+        final errorBody = json.decode(response.body);
+        final errorMessage =
+            errorBody['message'] ??
+            'Erreur de transfert: ${response.statusCode}';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print("Erreur lors du transfert: $e");
+      rethrow;
     }
   }
 }

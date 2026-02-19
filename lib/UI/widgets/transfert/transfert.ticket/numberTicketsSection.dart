@@ -2,14 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
 
-class NumberTicketsSection extends StatefulWidget {
-  const NumberTicketsSection({super.key});
+class NumberTicketsSection extends StatelessWidget {
+  final TextEditingController controller;
+  const NumberTicketsSection({super.key, required this.controller});
 
-  @override
-  State<NumberTicketsSection> createState() => _NumberTicketsSectionState();
-}
-
-class _NumberTicketsSectionState extends State<NumberTicketsSection> {
   @override
   Widget build(BuildContext context) {
     return Column(
