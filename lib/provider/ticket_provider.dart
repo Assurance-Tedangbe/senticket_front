@@ -8,15 +8,13 @@ import 'package:provider/provider.dart';
 
 /*
   Rôle Principal: Gestionnaire d'état centralisé pour les tickets
-  Votre TicketProvider sert de cerveau central qui :
-   - Stocke l'état de tous les tickets / gère l'état de l'interface utilisateur 
-   - Coordonne les opérations CRUD / actions sur les tickets 
+  Il sert de cerveau central:
+   - Stocke l'état des tickets/gère l'état de l'UI
+   - Coordonne les opérations sur les tickets 
    - Gère le loading et les erreurs
-   - Notifie l'UI des changements / notifie les changements aux écouteurs
+   - Notifie l'UI des changements/notifie les changements aux écouteurs
 
-  Gère l'état de toutes les opérations du TicketApiService.
-  Il sert d'intermédiaire entre l'interface utilisateur et les services backend
-
+  Il sert d'intermédiaire entre l'UI et les services backend
   role(État UI + Coordination). Le Provider travaille avec les enums Dart, pas les conversions
 */
 class TicketProvider with ChangeNotifier {
@@ -43,19 +41,19 @@ class TicketProvider with ChangeNotifier {
   // Stocke le dernier message d'erreur rencontré, vide string signifie aucune erreur
 
   // Ces booléens permettent de savoir quelle opération est en cours
-
-  bool _isCreatingTickets = false; // Création de nouveaux tickets en cours
-  // True uniquement pendant la création de nouveaux tickets
-
+  bool _isPurchasingTickets =
+      false; // Achat en cours. True only during purchase operation
+  bool _isDebitingAccount = false;
+  bool _isTransferringTickets = false;
+  bool _isCancelingTransfer = false;
+  /*    
+  bool _isCreatingTickets = false;
   bool _isUpdatingTicket = false;
   bool _isDeletingTicket = false;
   bool _isUpdatingTicketStatus = false;
   bool _isBookingTicket = false;
   bool _isUnbookingTicket = false;
-  bool _isPurchasingTickets = false;
-  bool _isTransferringTickets = false;
-  bool _isCancelingTransfer = false;
-  bool _isDebitingAccount = false;
+ ; */
 
   // CONSTRUCTEUR
   TicketProvider(this._service);
@@ -66,6 +64,10 @@ class TicketProvider with ChangeNotifier {
   TicketType? _selectedTicketTypeForDebit;
   List<int> _selectedTicketIdsForDebit = [];
   bool _isLoadingStudentTickets = false;
+
+  // State for transfer operation
+  int _numberOfTicketsToTransfer = 0;
+  String? _numberOfTicketsError;
 
   // Les getters permettent un accès en lecture seule aux variables privées
 
@@ -80,17 +82,18 @@ class TicketProvider with ChangeNotifier {
   String get error => _error; // Retourne le dernier message d'erreur rencontré
 
   // GETTERS POUR LES ETATS SPECIFIQUES
-  bool get isCreatingTickets =>
-      _isCreatingTickets; // Indique si une création de tickets est en cours
+  bool get isPurchasingTickets =>
+      _isPurchasingTickets; // Indique si un achat est en cours
+  bool get isTransferringTickets => _isTransferringTickets;
+  bool get isDebitingAccount => _isDebitingAccount;
+  bool get isCancelingTransfer => _isCancelingTransfer;
+  /*  
+  bool get isCreatingTickets => _isCreatingTickets;
   bool get isUpdatingTicket => _isUpdatingTicket;
   bool get isDeletingTicket => _isDeletingTicket;
   bool get isUpdatingTicketStatus => _isUpdatingTicketStatus;
   bool get isBookingTicket => _isBookingTicket;
-  bool get isUnbookingTicket => _isUnbookingTicket;
-  bool get isPurchasingTickets => _isPurchasingTickets;
-  bool get isTransferringTickets => _isTransferringTickets;
-  bool get isCancelingTransfer => _isCancelingTransfer;
-  bool get isDebitingAccount => _isDebitingAccount;
+  bool get isUnbookingTicket => _isUnbookingTicket; */
 
   // Getters for debit operation
   List<Ticket> get studentTicketsForDebit => _studentTicketsForDebit;
@@ -98,6 +101,10 @@ class TicketProvider with ChangeNotifier {
   List<int> get selectedTicketIdsForDebit => _selectedTicketIdsForDebit;
   int get selectedTicketsCount => _selectedTicketIdsForDebit.length;
   bool get isLoadingStudentTickets => _isLoadingStudentTickets;
+
+  // Getters for transfer operation
+  int get numberOfTicketsToTransfer => _numberOfTicketsToTransfer;
+  String? get numberOfTicketsError => _numberOfTicketsError;
 
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
@@ -114,6 +121,19 @@ class TicketProvider with ChangeNotifier {
 
   List<Ticket> get selectedTickets =>
       _tickets.where((ticket) => ticket.isSelected).toList();
+
+  // Setters for transfer operation
+
+  void setNumberOfTicketsToTransfer(int value) {
+    _numberOfTicketsToTransfer = value;
+    _numberOfTicketsError = null;
+    notifyListeners();
+  }
+
+  void setNumberOfTicketsError(String error) {
+    _numberOfTicketsError = error;
+    notifyListeners();
+  }
 
   // ******************** FOR LOADING ALL TICKETS OPERATION *************************
 

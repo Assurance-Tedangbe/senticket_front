@@ -3,16 +3,6 @@ import 'package:senticket_front/model/role_model.dart';
 import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/services/user_service.dart';
 
-/*
-  Rôle Principal: Gestionnaire d'état entralisé pour les utilisateurs
-  Votre UserProvider sert de cerveau central qui :
-   - Stocke l'état de tous les utilisateurs / gére l'état de l'interface utilisateur 
-   - Coordonne les opérations CRUD / actions utilisateur 
-   - Gère le loading et les erreurs
-   - Notifie l'UI des changements / notifie les changements aux écouteurs
-
-  Gère l'état de toutes les opérations du UserApiService
-*/
 class UserProvider with ChangeNotifier {
   //Creates a class that can notify its listeners of changes
   // _ means these variables are private
@@ -29,10 +19,10 @@ class UserProvider with ChangeNotifier {
   bool _isCreatingUser = false; // Creation in progress
   bool _isUpdatingUser = false;
   bool _isDeletingUser = false;
-  bool _isUpdatingPassword = false;
-  bool _isAddRoleToUser = false;
-  bool _isRemoveRoleFromUser = false;
   bool _isLoggingIn = false;
+  /*   bool _isUpdatingPassword = false;
+  bool _isAddRoleToUser = false;
+  bool _isRemoveRoleFromUser = false; */
 
   // State for signup form
   String _firstName = '';
@@ -67,6 +57,16 @@ class UserProvider with ChangeNotifier {
   User? _searchedUser; // Utilisateur recherché
   String? _debitUsernameError;
 
+  // TRANSFER FORM STATE: pour la recherche du destinataire
+  String _transferRecipientUsername = '';
+  bool _isSearchingRecipient = false;
+  User? _searchedRecipient;
+  String? _transferRecipientError;
+
+  String _senderPassword = '';
+  String? _senderPasswordError;
+  //String? _recipientError;
+
   UserProvider(this._service);
 
   // GETTERS - Accès contrôlé à l'état ===
@@ -82,10 +82,10 @@ class UserProvider with ChangeNotifier {
   bool get isCreatingUser => _isCreatingUser;
   bool get isUpdatingUser => _isUpdatingUser;
   bool get isDeletingUser => _isDeletingUser;
-  bool get isUpdatingPassword => _isUpdatingPassword;
-  bool get isAddRoleToUser => _isAddRoleToUser;
-  bool get isRemoveRoleFromUser => _isRemoveRoleFromUser;
   bool get isLoggingIn => _isLoggingIn;
+  /*   bool get isUpdatingPassword => _isUpdatingPassword;
+  bool get isAddRoleToUser => _isAddRoleToUser;
+  bool get isRemoveRoleFromUser => _isRemoveRoleFromUser; */
 
   // Signup Getters
   String get firstName => _firstName;
@@ -124,6 +124,16 @@ class UserProvider with ChangeNotifier {
   User? get searchedUser => _searchedUser;
   String? get debitUsernameError => _debitUsernameError;
   bool get isDebitFormValid => _debitUsername.isNotEmpty;
+
+  // Getters for transfer form
+  String get transferRecipientUsername => _transferRecipientUsername;
+  User? get searchedRecipient => _searchedRecipient;
+  String? get transferRecipientError => _transferRecipientError;
+  bool get isSearchingRecipient => _isSearchingRecipient;
+  bool get isTransferFormValid =>
+      _transferRecipientUsername.isNotEmpty; //&& _searchedRecipient != null;
+  String get senderPassword => _senderPassword;
+  String? get senderPasswordError => _senderPasswordError;
 
   // **************** setters for signup form ***************
   void setFirstname(String value) {
@@ -240,6 +250,32 @@ class UserProvider with ChangeNotifier {
   // Définir l'erreur de nom d'utilisateur pour débit
   void setDebitUsernameError(String error) {
     _debitUsernameError = error;
+    notifyListeners();
+  }
+
+  // ************** Setters pour transfer form ***************
+  void setTransferRecipientUsername(String value) {
+    _transferRecipientUsername = value;
+    _transferRecipientError = null;
+    notifyListeners();
+  }
+
+  // Définir l'erreur de nom d'utilisateur pour transfert
+  void setTransferRecipientError(String error) {
+    _transferRecipientError = error;
+    notifyListeners();
+  }
+
+  // Définir l'erreur de nom d'utilisateur pour transfert
+  void setSenderPassword(String value) {
+    _senderPassword = value;
+    _senderPasswordError = null;
+    notifyListeners();
+  }
+
+  // Définir l'erreur de nom d'utilisateur pour transfert
+  void setSenderPasswordError(String error) {
+    _senderPasswordError = error;
     notifyListeners();
   }
 
@@ -696,7 +732,7 @@ class UserProvider with ChangeNotifier {
 
   // ********************** FOR DEBIT FORM ************************
 
-  // Rechercher un utilisateur par nom d'utilisateur
+  // Search user by username (generic, can be used for both debit and transfer)
   Future<bool> searchUserByUsername(String username) async {
     if (username.isEmpty) {
       _debitUsernameError = 'Veuillez entrer un nom d\'utilisateur';
@@ -707,6 +743,10 @@ class UserProvider with ChangeNotifier {
     _isSearchingUser = true;
     _searchedUser = null;
     _debitUsernameError = null;
+    // Réinitialiser l'erreur de transfert
+    // _isSearchingRecipient = true;
+    // _searchedRecipient = null;
+    _transferRecipientError = null;
     notifyListeners();
 
     try {
@@ -719,14 +759,22 @@ class UserProvider with ChangeNotifier {
       _searchedUser = user;
       _isSearchingUser = false;
       _debitUsernameError = null;
+      //for transfer form
+      _searchedRecipient = user;
+      _isSearchingRecipient = false;
+      // _transferRecipientError = null;
       notifyListeners();
 
-      print('Utilisateur trouvé: ${user.username} (Rôle: ${user.role?.name})');
+      print('Utilisateur trouvé: ${user.username} (Rôle: ${user.role.name})');
       return true;
     } catch (e) {
       _isSearchingUser = false;
       _searchedUser = null;
       _debitUsernameError = 'Utilisateur non trouvé ';
+      //for transfer form
+      _transferRecipientError = 'Utilisateur non trouvé';
+      _searchedRecipient = null;
+      _isSearchingRecipient = false;
       notifyListeners();
 
       print('Erreur lors de la recherche: $e');
@@ -734,12 +782,47 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  /*  // Search user by username (generic, can be used for both debit and transfer)
+  Future<bool> searchUserByUsername(String username) async {
+    _isSearchingUser = true;
+    _transferRecipientError = null;
+    notifyListeners();
+
+    try {
+      // Assuming you have a method in UserApiService to get user by username
+      final user = await _service.getUserByUsername(username);
+      _searchedRecipient = user;
+      _isSearchingRecipient = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _transferRecipientError = 'Utilisateur non trouvé';
+      _searchedRecipient = null;
+      _isSearchingRecipient = false;
+      notifyListeners();
+      return false;
+    }
+  } */
+
   // Réinitialiser l'état de débit
   void resetDebitState() {
     _debitUsername = '';
     _isSearchingUser = false;
     _searchedUser = null;
     _debitUsernameError = null;
+    notifyListeners();
+  }
+
+  // ********************** FOR TRANSFERT TICKET(S) FORM ************************
+
+  // Réinitialiser l'état de transfert
+  void resetTransferState() {
+    _transferRecipientUsername = '';
+    _senderPassword = '';
+    _isSearchingRecipient = false;
+    _searchedRecipient = null;
+    _transferRecipientError = null;
+    _senderPasswordError = null;
     notifyListeners();
   }
 

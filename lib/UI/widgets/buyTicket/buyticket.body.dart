@@ -8,7 +8,6 @@ import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/requestSection.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/ticketASection.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/ticketBSection.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 
@@ -66,55 +65,6 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildAuthHeader(
-    BuildContext context,
-    UserProvider userProvider,
-    bool isLoggedIn,
-    bool isStudent,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          const SizedBox(width: 12),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isLoggedIn
-                      ? ' ${userProvider.currentUser!.username} connecté (${userProvider.currentUser!.role.name})'
-                      : '',
-                  style: TextStyle(
-                    color: isLoggedIn
-                        ? (isStudent ? kThirdColor : kPrimaryColor)
-                        : greyBorderColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (isLoggedIn)
-            IconButton(
-              onPressed: () {
-                userProvider.currentUser = null;
-                userProvider.resetLoginForm();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Déconnexion réussie'),
-                    backgroundColor: kPrimaryColor,
-                  ),
-                );
-              },
-              icon: const Icon(Icons.logout, color: kPrimaryColor),
-              tooltip: 'Se déconnecter',
-            ),
-        ],
-      ),
     );
   }
 
@@ -251,3 +201,53 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     );
   }
 }
+
+/* Widget _buildAuthHeader(
+  BuildContext context,
+  UserProvider userProvider,
+  bool isLoggedIn,
+  bool isStudent,
+) {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    margin: const EdgeInsets.only(bottom: 16),
+    child: Row(
+      children: [
+        const SizedBox(width: 12),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isLoggedIn
+                    ? ' ${userProvider.currentUser!.username} connecté (${userProvider.currentUser!.role.name})'
+                    : '',
+                style: TextStyle(
+                  color: isLoggedIn
+                      ? (isStudent ? kThirdColor : kPrimaryColor)
+                      : greyBorderColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isLoggedIn)
+          IconButton(
+            onPressed: () {
+              userProvider.currentUser = null;
+              userProvider.resetLoginForm();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Déconnexion réussie'),
+                  backgroundColor: kPrimaryColor,
+                ),
+              );
+            },
+            icon: const Icon(Icons.logout, color: kPrimaryColor),
+            tooltip: 'Se déconnecter',
+          ),
+      ],
+    ),
+  );
+}
+ */
