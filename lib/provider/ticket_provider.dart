@@ -68,6 +68,8 @@ class TicketProvider with ChangeNotifier {
   // State for transfer operation
   int _numberOfTicketsToTransfer = 0;
   String? _numberOfTicketsError;
+  String?
+  _numberOfTicketsIsInvalid; // Stocke les erreurs liées au nombre de tickets à transférer
 
   // Les getters permettent un accès en lecture seule aux variables privées
 
@@ -105,6 +107,7 @@ class TicketProvider with ChangeNotifier {
   // Getters for transfer operation
   int get numberOfTicketsToTransfer => _numberOfTicketsToTransfer;
   String? get numberOfTicketsError => _numberOfTicketsError;
+  String? get numberOfTicketsIsInvalid => _numberOfTicketsIsInvalid;
 
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
@@ -132,6 +135,11 @@ class TicketProvider with ChangeNotifier {
 
   void setNumberOfTicketsError(String error) {
     _numberOfTicketsError = error;
+    notifyListeners();
+  }
+
+  void setNumberOfTicketsIsInvalid(String error) {
+    _numberOfTicketsIsInvalid = error;
     notifyListeners();
   }
 

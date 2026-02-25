@@ -35,10 +35,10 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     // Réinitialiser l'état de recherche au chargement
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final ticketProvider = Provider.of<TicketProvider>(
+      /* final ticketProvider = Provider.of<TicketProvider>(
         context,
         listen: false,
-      );
+      ); */
       // Si vous avez une méthode resetTransferState, appelez-la ici
       //userProvider.resetTransferState();
       userProvider.setTransferRecipientUsername('');
@@ -97,6 +97,17 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     }
   }
 
+  Future<void> _numberTicketsIsValid(TicketProvider ticketProvider) async {
+    final numberText = _numberController.text.trim();
+    final number = int.tryParse(numberText);
+    if (number == null || number <= 0) {
+      ticketProvider.setNumberOfTicketsIsInvalid(
+        'Le nombre doit être un entier positif',
+      );
+      return;
+    }
+  }
+
   Future<void> _onTransferPressed() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
@@ -139,12 +150,13 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
     final number = int.tryParse(numberText);
     if (number == null || number <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      await _numberTicketsIsValid(ticketProvider);
+      /*  ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Le nombre doit être un entier positif'),
           backgroundColor: redErrorColor,
         ),
-      );
+      ); */
       return;
     }
 
@@ -266,7 +278,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         ),
         const SizedBox(height: 10),
         const Text(
-          'Connectez-vous en tant qu\'étudiant pour transférer des tickets',
+          'Connectez-vous pour pouvoir transférer des tickets',
           textAlign: TextAlign.center,
           style: TextStyle(color: greyBorderColor),
         ),
@@ -280,7 +292,11 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
           },
           icon: const Icon(Icons.login),
           label: const Text('Se connecter'),
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kPrimaryColor,
+            foregroundColor: kSecondColor,
+          ),
+          /* style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor), */
         ),
       ],
     );
