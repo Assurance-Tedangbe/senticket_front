@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
 class UsernameSection extends StatelessWidget {
@@ -38,14 +38,15 @@ class UsernameSection extends StatelessWidget {
                 offset: Offset(0, 2),
               ),
             ],
-            border: Border.all(color: kPrimaryColor, width: 3),
+            border: Border.all(color: kPrimaryColor, width: 1),
           ),
           height: 50,
           child: TextFormField(
             controller: controller, // ← ICI
             keyboardType: TextInputType.text, // Clavier standard
             style: const TextStyle(color: enterTextFieldColor),
-            onChanged: onChanged, // ⭐ UTILISÉ ICI
+            onChanged: onChanged,
+            cursorColor: kPrimaryColor,
             decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 11),

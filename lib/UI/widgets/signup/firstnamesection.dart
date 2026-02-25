@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
 /*
@@ -49,24 +49,21 @@ class FirstNameSection extends StatelessWidget {
                 offset: Offset(0, 2),
               ),
             ],
-            border: Border.all(
-              color: kPrimaryColor,
-              width: 3,
-            ), // Bordure colorée
+            border: Border.all(color: kPrimaryColor, width: 1),
           ),
-          height: 50, // Hauteur fixe
+          height: 50,
           child: TextFormField(
-            controller:
-                controller, // ← ICI :UTILISATION: 2. Lier le contrôleur au TextField
+            controller: controller, // Lier le contrôleur au TextField
             keyboardType: TextInputType.text, // Type de clavier texte
             style: const TextStyle(color: enterTextFieldColor),
-            onChanged: onChanged, // ⭐ UTILISÉ ICI
+            onChanged: onChanged,
             /* (value) {
               // Appel au Provider pour mettre à jour l'état
               // ↓ Seulement un appel pour écrire dans le Provider
               Provider.of<UserProvider>(context, listen: false)
-                  .firstname(value); // ← ICI
+                  .firstname(value); 
             }, */
+            cursorColor: kPrimaryColor,
             decoration: const InputDecoration(
               border: InputBorder.none, // Pas de bordure interne
               contentPadding: EdgeInsets.only(top: 11), // Padding interne

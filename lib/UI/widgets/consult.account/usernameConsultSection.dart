@@ -47,6 +47,7 @@ class UsernameConsultSection extends StatelessWidget {
                 keyboardType: TextInputType.text,
                 style: const TextStyle(color: enterTextFieldColor),
                 onChanged: onChanged,
+                cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.only(top: 14),
@@ -57,7 +58,7 @@ class UsernameConsultSection extends StatelessWidget {
                     fontSize: 12,
                   ),
                   // Affichage des erreurs de validation
-                  errorText: userProvider.consultUsernameError,
+                  // errorText: userProvider.consultUsernameError,
                 ),
               ),
             ),

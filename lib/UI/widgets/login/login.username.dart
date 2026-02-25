@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/login/loginLabel.dart';
-import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class LoginUsernameSection extends StatelessWidget {
     this.onChanged,
   });
 
-/* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
+  /* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
 
   @override
   Widget build(BuildContext context) {
@@ -45,16 +45,15 @@ class LoginUsernameSection extends StatelessWidget {
                     offset: Offset(0, 2),
                   ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 3),
+                border: Border.all(color: kPrimaryColor, width: 1),
               ),
               height: 60,
               child: TextFormField(
                 controller: controller, // ← ICI
                 keyboardType: TextInputType.text,
-                style: const TextStyle(
-                  color: enterTextFieldColor,
-                ),
-                onChanged: onChanged, // ⭐ UTILISÉ ICI
+                style: const TextStyle(color: enterTextFieldColor),
+                onChanged: onChanged,
+                cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.only(top: 14),
@@ -65,7 +64,7 @@ class LoginUsernameSection extends StatelessWidget {
                     fontSize: 12,
                   ),
                   // Affichage des erreurs de validation
-                  errorText: userProvider.loginUsernameError, // ← ICI
+                  // errorText: userProvider.loginUsernameError, // ← ICI
                 ),
               ),
             ),

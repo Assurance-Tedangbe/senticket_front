@@ -3,7 +3,7 @@ import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/model/role_model.dart';
 
@@ -55,7 +55,7 @@ class RoleSection extends StatelessWidget {
                     offset: Offset(0, 2),
                   ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 3),
+                border: Border.all(color: kPrimaryColor, width: 1),
               ),
               height: 50,
               child: Padding(
@@ -72,8 +72,8 @@ class RoleSection extends StatelessWidget {
                       )
                     : // Affiche la liste déroulante une fois les données chargées
                       DropdownButtonFormField<Role>(
-                        // ⭐ CHANGEMENT : Utilise la valeur sélectionnée
-                        value: roleProvider.roles.isNotEmpty
+                        // ⭐ Utilise la valeur sélectionnée
+                        initialValue: roleProvider.roles.isNotEmpty
                             ? roleProvider.roles.first
                             : null,
                         iconDisabledColor: kThirdColor,
@@ -88,11 +88,9 @@ class RoleSection extends StatelessWidget {
                           contentPadding: EdgeInsets.only(bottom: 10),
                         ),
                         onChanged: (Role? value) {
-                          onRoleChanged(
-                            value,
-                          ); // ⭐ CHANGEMENT : Passe l'objet Role
+                          onRoleChanged(value); // ⭐ Passe l'objet Role
 
-                          // ⭐ EN PLUS : Mettez à jour le UserProvider
+                          // ⭐ Mettez à jour le UserProvider
                           if (value != null) {
                             final userProvider = Provider.of<UserProvider>(
                               context,

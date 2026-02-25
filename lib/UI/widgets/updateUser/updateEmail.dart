@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -32,7 +32,7 @@ class UpdateEmail extends StatelessWidget {
                     offset: Offset(0, 2),
                   ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 3),
+                border: Border.all(color: kPrimaryColor, width: 1),
               ),
               height: 50,
               child: TextFormField(
@@ -40,6 +40,7 @@ class UpdateEmail extends StatelessWidget {
                 keyboardType: TextInputType.emailAddress,
                 style: const TextStyle(color: enterTextFieldColor),
                 onChanged: onChanged,
+                cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.only(top: 11),

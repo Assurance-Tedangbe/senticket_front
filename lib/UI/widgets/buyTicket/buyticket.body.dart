@@ -147,7 +147,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
           ),
           const SizedBox(height: 10),
           const Text(
-            'Connectez-vous pour acheter des tickets',
+            'Connectez-vous pour pouvoir acheter des tickets',
             textAlign: TextAlign.center,
             style: TextStyle(color: greyBorderColor),
           ),

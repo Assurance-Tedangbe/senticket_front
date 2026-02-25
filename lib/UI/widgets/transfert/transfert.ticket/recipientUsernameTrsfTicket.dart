@@ -47,6 +47,7 @@ class RecipientUsernameTrsfTicket extends StatelessWidget {
                   userProvider.setTransferRecipientUsername(value);
                   onChanged?.call(value);
                 },
+                cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.only(top: 14),

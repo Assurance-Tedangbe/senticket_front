@@ -47,6 +47,7 @@ class SenderPasswordTrsfTicket extends StatelessWidget {
                   userProvider.setSenderPassword(value);
                   onChanged?.call(value);
                 },
+                cursorColor: kPrimaryColor,
                 keyboardType: TextInputType.visiblePassword,
                 style: const TextStyle(color: enterTextFieldColor),
                 decoration: InputDecoration(

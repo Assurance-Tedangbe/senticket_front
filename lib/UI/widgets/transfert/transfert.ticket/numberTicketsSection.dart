@@ -43,6 +43,7 @@ class NumberTicketsSection extends StatelessWidget {
                 controller: controller,
                 keyboardType: TextInputType.number,
                 style: const TextStyle(color: enterTextFieldColor),
+                cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.only(top: 14),

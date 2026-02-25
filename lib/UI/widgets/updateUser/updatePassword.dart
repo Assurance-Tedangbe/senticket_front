@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/updateUser/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -70,7 +70,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                     offset: Offset(0, 2),
                   ),
                 ],
-                border: Border.all(color: kPrimaryColor, width: 3),
+                border: Border.all(color: kPrimaryColor, width: 1),
               ),
               height: 50,
               child: TextFormField(
@@ -99,6 +99,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                     }
                   }
                 },
+                cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.only(top: 11),
                   prefixIcon: const Icon(Icons.password, color: kPrimaryColor),
