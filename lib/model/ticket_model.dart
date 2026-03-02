@@ -301,7 +301,7 @@ class CancelTransferTicketsRequestDTO {
 
 class CancelTransferDTO {
   final int transactionId;
-  final SenderDTO originalSenderDTO;
+  final OriginalSenderDTO originalSenderDTO;
   final RecipientDTO currentOwnerDTO;
 
   CancelTransferDTO({
@@ -315,6 +315,100 @@ class CancelTransferDTO {
       'transactionId': transactionId,
       'originalSenderDTO': originalSenderDTO.toJson(),
       'currentOwnerDTO': currentOwnerDTO.toJson(),
+    };
+  }
+}
+
+class OriginalSenderDTO {
+  final int senderId;
+  final String senderUsername;
+
+  OriginalSenderDTO({required this.senderId, required this.senderUsername});
+
+  factory OriginalSenderDTO.fromJson(Map<String, dynamic> json) {
+    return OriginalSenderDTO(
+      senderId: json['senderId'] as int,
+      senderUsername: json['senderUsername'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'senderId': senderId, 'senderUsername': senderUsername};
+  }
+}
+
+class TransfertHistoryDTO {
+  final int transferHistoryId;
+  final String ticketIdsTransfered;
+  final UserDTO senderDTO;
+  final UserDTO recipientDTO;
+  final DateTime transferDate;
+  final bool canceled;
+
+  TransfertHistoryDTO({
+    required this.transferHistoryId,
+    required this.ticketIdsTransfered,
+    required this.senderDTO,
+    required this.recipientDTO,
+    required this.transferDate,
+    required this.canceled,
+  });
+
+  factory TransfertHistoryDTO.fromJson(Map<String, dynamic> json) {
+    return TransfertHistoryDTO(
+      transferHistoryId: json['transferHistoryId'] as int,
+      ticketIdsTransfered: json['ticketIdsTransfered'] as String,
+      senderDTO: UserDTO.fromJson(json['senderDTO']),
+      recipientDTO: UserDTO.fromJson(json['recipientDTO']),
+      transferDate: DateTime.parse(json['transferDate']),
+      canceled: json['canceled'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'transferHistoryId': transferHistoryId,
+      'ticketIdsTransfered': ticketIdsTransfered,
+      'senderDTO': senderDTO.toJson(),
+      'recipientDTO': recipientDTO.toJson(),
+      'transferDate': transferDate.toIso8601String(),
+      'canceled': canceled,
+    };
+  }
+}
+
+class UserDTO {
+  final int userId;
+  final String username;
+  final String? email;
+  final String? firstName;
+  final String? lastName;
+
+  UserDTO({
+    required this.userId,
+    required this.username,
+    this.email,
+    this.firstName,
+    this.lastName,
+  });
+
+  factory UserDTO.fromJson(Map<String, dynamic> json) {
+    return UserDTO(
+      userId: json['userId'] as int,
+      username: json['username'] as String,
+      email: json['email'] as String?,
+      firstName: json['firstName'] as String?,
+      lastName: json['lastName'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'username': username,
+      'email': email,
+      'firstName': firstName,
+      'lastName': lastName,
     };
   }
 }

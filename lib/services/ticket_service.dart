@@ -13,6 +13,7 @@ import 'package:senticket_front/model/ticket_model.dart';
 */
 class TicketApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/tickets';
+  final transferHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transferHistory';
 
   // Configure HTTP headers for all requests
   static final Map<String, String> headers = {
@@ -25,6 +26,8 @@ class TicketApiService {
   List<Ticket> _cachedTickets = []; // Cache des tickets
   DateTime? _lastFetchTime; // Dernière récupération
   static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
+
+  // ******************** FOR GET ALL TICKETS OPERATION ************************
 
   // READ ALL TICKETS (GET /api/tickets). Using cache
   Future<List<Ticket>> getAllTickets({bool forceRefresh = false}) async {
@@ -79,6 +82,8 @@ class TicketApiService {
       throw Exception('Erreur réseau: $e');
     }
   }
+
+  // ******************** FOR PURCHASE TICKETS OPERATION ************************
 
   // PURCHASE TICKETS (PUT /api/tickets/purchase)
   Future<List<Ticket>> purchaseTickets(
@@ -138,6 +143,8 @@ class TicketApiService {
       throw Exception('Erreur réseau: $e');
     }
   }
+
+  // ******************** FOR DEBITACCOUNT OPERATION ************************
 
   // DEBIT ACCOUNT (PUT /api/tickets/debit)
   // sans cache
@@ -228,34 +235,29 @@ class TicketApiService {
     }
   }
 
-  Future<void> transferTickets(
-    TransfertTicketRequestDTO transfertTicketRequestDTO,
+  // ******************** FOR TRANSFER TICKETS OPERATION ************************
+
+  Future<TransfertHistoryDTO> transferTickets(
+    TransfertTicketRequestDTO request,
   ) async {
     try {
-      print(
-        "Transfert de(s) tickets(s) de: ${transfertTicketRequestDTO.senderDTO.senderUsername} vers toStudentId: ${transfertTicketRequestDTO.recipentDTO.recipientUsername}",
-      );
-      print("Expéditeur ID: ${transfertTicketRequestDTO.senderDTO.senderId}");
-      print(
-        "Destinataire: ${transfertTicketRequestDTO.recipentDTO.recipientUsername}",
-      );
-      print("Type: ${transfertTicketRequestDTO.ticketType}");
-      print(
-        "Nbr tickets: ${transfertTicketRequestDTO.numberOfTicketsToTransfer}",
-      );
+      print("************ TRANSFERT DE TICKETS **************");
+      print("Expéditeur ID: ${request.senderDTO.senderId}");
+      print("Destinataire: ${request.recipentDTO.recipientUsername}");
+      print("Type: ${request.ticketType}");
+      print("Nbr tickets: ${request.numberOfTicketsToTransfer}");
 
       final response = await http.put(
         Uri.parse('$baseUrl/transferTickets'),
         headers: headers,
-        body: json.encode(transfertTicketRequestDTO.toJson()),
+        body: json.encode(request.toJson()),
       );
-
       print("Status code: ${response.statusCode}");
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
-        print("Transfert réussi");
-        return;
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        return TransfertHistoryDTO.fromJson(jsonData);
       } else {
         final errorBody = json.decode(response.body);
         final errorMessage =
@@ -264,71 +266,61 @@ class TicketApiService {
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print("Erreur lors du transfert: $e");
+      print("Erreur lors du transferTickets: $e");
+      rethrow;
+    }
+  }
+  // ******************** FOR GET TRANSFER_HISTORY BY ID OPERATION ************************
+
+  Future<TransfertHistoryDTO> getTransferHistoryById(int transactionId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$transferHistoryBaseUrl/$transactionId'),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        return TransfertHistoryDTO.fromJson(json.decode(response.body));
+      } else {
+        throw Exception(
+          'Erreur récupération historique: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print("Erreur getTransferHistoryById: $e");
+      rethrow;
+    }
+  }
+
+  // ******************** FOR CANCEL TRANSFER TICKETS OPERATION ************************
+
+  // CANCEL TRANSFER TICKETS (PUT /api/tickets/cancelTransferTickets)
+  Future<void> cancelTransfer(CancelTransferTicketsRequestDTO request) async {
+    try {
+      print("************** ANNULATION TRANSFERT **************");
+      print("Transaction ID: ${request.cancelTransferDTO.transactionId}");
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/cancelTransfer'),
+        headers: headers,
+        body: json.encode(request.toJson()),
+      );
+      if (response.statusCode == 200) {
+        print("Annulation du transfert réussie");
+        return;
+      } else {
+        final errorBody = json.decode(response.body);
+        final errorMessage =
+            errorBody['message'] ?? 'Erreur annulation: ${response.statusCode}';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print("Erreur annulation: $e");
       rethrow;
     }
   }
 }
 
 /*
-  // TRANSFER TICKETS (PUT /api/tickets/transferTickets)
-  // sans cache
-  Future<void> transferTickets(
-    TransferTicketsRequestDTO transferTicketsRequestDTO,
-  ) async {
-    try {
-      print(
-        "Transfert de(s) tickets(s) vers toStudentId: ${transferTicketsRequestDTO.toStudentId}",
-      );
-
-      final response = await http.put(
-        Uri.parse('$baseUrl/transferTickets'),
-        headers: headers,
-        body: json.encode(transferTicketsRequestDTO.toJson()),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Erreur transfert tickets: ${response.statusCode}');
-      }
-
-      print(
-        "Tickets transférés de ${transferTicketsRequestDTO.fromStudentId} vers ${transferTicketsRequestDTO.toStudentId}",
-      );
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  // CANCEL TRANSFER TICKETS (PUT /api/tickets/cancelTransferTickets)
-  // sans cache
-  Future<void> cancelTransferTickets(
-    CancelTransferTicketsRequestDTO cancelTransferTicketsRequestDTO,
-  ) async {
-    try {
-      print(
-        "Annuler transfert de(s) tickets(s) pour currentOwnerUserId: ${cancelTransferTicketsRequestDTO.currentOwnerUserId}",
-      );
-
-      final response = await http.put(
-        Uri.parse('$baseUrl/cancelTransferTickets'),
-        headers: headers,
-        body: json.encode(cancelTransferTicketsRequestDTO.toJson()),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Erreur annulation transfert tickets: ${response.statusCode}',
-        );
-      }
-
-      print(
-        "Transfert de tickets annulé entre ${cancelTransferTicketsRequestDTO.currentOwnerUserId} et ${cancelTransferTicketsRequestDTO.originalSenderUserId}",
-      );
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
    // CREATE TICKETS (POST /api/tickets)
   Future<List<Ticket>> createTickets(
     CreationTicketsRequestDTO creationTicketsRequestDTO,

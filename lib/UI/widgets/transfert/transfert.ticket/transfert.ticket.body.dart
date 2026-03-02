@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/cancelTransfertTicket.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
+import 'package:senticket_front/UI/widgets/cancelTrsf/popupCancelTransfer.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
@@ -203,7 +204,45 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       numberOfTicketsToTransfer: number,
     );
 
-    // Effectuer le transfert
+    final history = await ticketProvider.transferTickets(request);
+    if (history != null) {
+      // Afficher le popup d'annulation
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => PopupCancelTransfer(transferHistoryDTO: history),
+        );
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '$number ticket(s) de type ${_selectedTicketType == TicketType.a ? 'A' : 'B'} '
+            'transféré(s) à ${recipient.username}',
+          ),
+          backgroundColor: validateBtnColor,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+
+      // Réinitialiser les champs
+      _recipientController.clear();
+      _numberController.clear();
+      _passwordController.clear();
+      setState(() {
+        _selectedTicketType = null;
+      });
+      userProvider.setTransferRecipientUsername('');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(ticketProvider.error),
+          backgroundColor: redErrorColor,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+    /*  // Effectuer le transfert
     final success = await ticketProvider.transferTickets(request);
 
     if (success) {
@@ -231,7 +270,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
           backgroundColor: redErrorColor,
         ),
       );
-    }
+    } */
   }
 
   @override

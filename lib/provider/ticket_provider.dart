@@ -65,14 +65,19 @@ class TicketProvider with ChangeNotifier {
   List<int> _selectedTicketIdsForDebit = [];
   bool _isLoadingStudentTickets = false;
 
-  // State for transfer operation
+  // State for transferTickets operation
   int _numberOfTicketsToTransfer = 0;
   String? _numberOfTicketsError;
   String?
   _numberOfTicketsIsInvalid; // Stocke les erreurs liées au nombre de tickets à transférer
 
-  // Les getters permettent un accès en lecture seule aux variables privées
+  // State pour cancelTransfer operation
+  TransfertHistoryDTO? _lastTransfer;
+  SenderDTO? _lastSenderDTO; // pour annulation
+  RecipientDTO? _lastRecipientDTO;
+  List<int> _lastTicketIds = [];
 
+  // ******************** GETTERS ********************
   // GETTERS PRINCIPAUX
   List<Ticket> get tickets =>
       _tickets; // Retourne la liste complète des tickets
@@ -108,6 +113,12 @@ class TicketProvider with ChangeNotifier {
   int get numberOfTicketsToTransfer => _numberOfTicketsToTransfer;
   String? get numberOfTicketsError => _numberOfTicketsError;
   String? get numberOfTicketsIsInvalid => _numberOfTicketsIsInvalid;
+
+  // Getters for cancelTransfer operation
+  TransfertHistoryDTO? get lastTransfer => _lastTransfer;
+  SenderDTO? get lastSenderDTO => _lastSenderDTO;
+  RecipientDTO? get lastRecipientDTO => _lastRecipientDTO;
+  List<int> get lastTicketIds => _lastTicketIds;
 
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
@@ -423,27 +434,24 @@ class TicketProvider with ChangeNotifier {
 
   // ******************** FOR TRANSFER TICKETS OPERATION ************************
 
-  // 🔄 TRANSFERT DE TICKETS ENTRE UTILISATEURS
-  // @param request : DTO contenant les infos de transfert
-  Future<bool> transferTickets(TransfertTicketRequestDTO request) async {
+  Future<TransfertHistoryDTO?> transferTickets(
+    TransfertTicketRequestDTO request,
+  ) async {
     _isTransferringTickets = true;
     _isLoading = true;
     _error = '';
     notifyListeners();
 
     try {
-      await _service.transferTickets(
-        request,
-      ); // "demande à l'API de transférer les tickets"
+      final history = await _service.transferTickets(request);
+      _lastTransfer = history;
       _error = '';
-      print(
-        "Transfert de tickets de ${request.senderDTO.senderUsername} vers ${request.recipentDTO.recipientUsername} réussi",
-      );
-      return true;
+      print("Transfert réussi, transaction ID: ${history.transferHistoryId}");
+      return history;
     } catch (e) {
       _error = 'Erreur lors du transfert des tickets: ${e.toString()}';
       print("Erreur transferTickets: $e");
-      return false;
+      return null;
     } finally {
       _isTransferringTickets = false;
       _isLoading = false;
@@ -451,29 +459,45 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  /*
-  /* ↩️ ANNULATION D'UN TRANSFERT DE TICKETS
-   *  @param request : DTO contenant les infos d'annulation */
-  Future<bool> cancelTransferTickets(
-    CancelTransferTicketsRequestDTO cancelTransferTicketsRequestDTO,
-  ) async {
-    _isCancelingTransfer = true;
+  // ******************** FOR GET TRANSFER_HISTORY BY ID OPERATION ************************
+
+  Future<TransfertHistoryDTO?> getTransferHistoryById(int transactionId) async {
     _isLoading = true;
+    _error = '';
     notifyListeners();
 
     try {
-      await _service.cancelTransferTickets(
-        cancelTransferTicketsRequestDTO,
-      ); // demande à l'API d'annuler le transfert de tickets
+      final history = await _service.getTransferHistoryById(transactionId);
+      return history;
+    } catch (e) {
+      _error = 'Erreur lors de la récupération: ${e.toString()}';
+      print("Erreur getTransferHistoryById: $e");
+      return null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
+  // ******************** FOR CANCEL_TRANSFER OPERATION ************************
+
+  // ↩️ ANNULATION D'UN TRANSFERT DE TICKETS
+  Future<bool> cancelTransfer(CancelTransferTicketsRequestDTO request) async {
+    _isCancelingTransfer = true;
+    _isLoading = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      await _service.cancelTransfer(request);
       _error = '';
       print(
-        "Transfert de tickets annulé entre ${cancelTransferTicketsRequestDTO.currentOwnerUserId} et ${cancelTransferTicketsRequestDTO.originalSenderUserId}",
+        "Annulation réussie pour transaction ID: ${request.cancelTransferDTO.transactionId}",
       );
       return true;
     } catch (e) {
-      _error = 'Erreur annulation transfert tickets: ${e.toString()}';
-      print("Erreur cancelTransferTickets: $e");
+      _error = 'Erreur lors de l\'annulation: ${e.toString()}';
+      print("Erreur cancelTransfer: $e");
       return false;
     } finally {
       _isCancelingTransfer = false;
@@ -482,11 +506,19 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-   /*  // Set selected ticket type for debit
+  // Méthode pour effacer le dernier transfert
+  void clearLastTransfer() {
+    _lastTransfer = null;
+    notifyListeners();
+  }
+}
+
+  /*
+    // Set selected ticket type for debit
   void setSelectedTicketTypeForDebit(TicketType? type) {
     _selectedTicketTypeForDebit = type;
     notifyListeners();
-  } */
+  }
 
   /*➕ CREATION DE NOUVEAUX TICKETS */
   Future<bool> createNewTickets(
@@ -940,4 +972,3 @@ class TicketProvider with ChangeNotifier {
       notifyListeners();
     }
   } */
-}
