@@ -534,7 +534,7 @@ class UserProvider with ChangeNotifier {
   }
 
   // for loading User For Consultation
-  Future<void> loadUserForConsultation(int userId) async {
+  /*  Future<void> loadUserForConsultation(int userId) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
@@ -549,7 +549,7 @@ class UserProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
+  } */
 
   // This method returns void because the result is stored in _currentUser
   Future<void> loadUserById(int userId) async {
@@ -743,10 +743,11 @@ class UserProvider with ChangeNotifier {
     _isSearchingUser = true;
     _searchedUser = null;
     _debitUsernameError = null;
+
     // Réinitialiser l'erreur de transfert
-    // _isSearchingRecipient = true;
-    // _searchedRecipient = null;
-    _transferRecipientError = null;
+    /*   _isSearchingRecipient = true;
+     _searchedRecipient = null;
+     _transferRecipientError = null; */
     notifyListeners();
 
     try {
@@ -759,10 +760,11 @@ class UserProvider with ChangeNotifier {
       _searchedUser = user;
       _isSearchingUser = false;
       _debitUsernameError = null;
+
       //for transfer form
-      _searchedRecipient = user;
+      /*  _searchedRecipient = user;
       _isSearchingRecipient = false;
-      // _transferRecipientError = null;
+       _transferRecipientError = null; */
       notifyListeners();
 
       print('Utilisateur trouvé: ${user.username} (Rôle: ${user.role.name})');
@@ -771,38 +773,17 @@ class UserProvider with ChangeNotifier {
       _isSearchingUser = false;
       _searchedUser = null;
       _debitUsernameError = 'Utilisateur non trouvé ';
+
       //for transfer form
-      _transferRecipientError = 'Utilisateur non trouvé';
+      /* _transferRecipientError = 'Utilisateur non trouvé';
       _searchedRecipient = null;
-      _isSearchingRecipient = false;
+      _isSearchingRecipient = false; */
       notifyListeners();
 
       print('Erreur lors de la recherche: $e');
       return false;
     }
   }
-
-  /*  // Search user by username (generic, can be used for both debit and transfer)
-  Future<bool> searchUserByUsername(String username) async {
-    _isSearchingUser = true;
-    _transferRecipientError = null;
-    notifyListeners();
-
-    try {
-      // Assuming you have a method in UserApiService to get user by username
-      final user = await _service.getUserByUsername(username);
-      _searchedRecipient = user;
-      _isSearchingRecipient = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _transferRecipientError = 'Utilisateur non trouvé';
-      _searchedRecipient = null;
-      _isSearchingRecipient = false;
-      notifyListeners();
-      return false;
-    }
-  } */
 
   // Réinitialiser l'état de débit
   void resetDebitState() {

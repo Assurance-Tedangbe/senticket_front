@@ -199,7 +199,7 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
               cursorColor: kPrimaryColor,
               decoration: InputDecoration(
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.only(top: 14),
+                contentPadding: const EdgeInsets.only(top: 14, left: 10),
                 hintText: 'ID transaction',
                 hintStyle: const TextStyle(color: kPrimaryColor, fontSize: 12),
               ),
@@ -208,21 +208,32 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          style: TextButton.styleFrom(backgroundColor: cyanColor),
-          child: const Text('Quitter', style: TextStyle(color: kThirdColor)),
-        ),
-        ElevatedButton(
-          onPressed: _isLoading ? null : _handleValidate,
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          child: _isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('Annuler', style: TextStyle(color: kSecondColor)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(backgroundColor: cyanColor),
+              child: const Text(
+                'Quitter',
+                style: TextStyle(color: kThirdColor),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _handleValidate,
+              style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(
+                      'Annuler',
+                      style: TextStyle(color: kSecondColor),
+                    ),
+            ),
+          ],
         ),
       ],
     );

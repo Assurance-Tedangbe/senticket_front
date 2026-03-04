@@ -63,11 +63,34 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       return;
     }
 
+    // Rechercher le destinataire par son nom d'utilisateur
     final success = await userProvider.searchUserByUsername(
       _recipientController.text.trim(),
     );
 
-    if (!success || userProvider.searchedRecipient == null) {
+    if (success && userProvider.searchedUser != null) {
+      final searchedUser = userProvider.searchedRecipient!;
+
+      // Vérifier que l'utilisateur trouvé est un étudiant
+      if (searchedUser.role.name != 'ETUDIANT') {
+        userProvider.setTransferRecipientError(
+          'Le destinataire doit être un étudiant',
+        );
+        return;
+      }
+    } else {
+      // L'erreur est déjà gérée dans le provider
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            userProvider.transferRecipientError ?? 'Erreur inconnue',
+          ),
+          backgroundColor: redErrorColor,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+    /* if (!success || userProvider.searchedRecipient == null) {
       // L'erreur est déjà définie dans le provider
       return;
     }
@@ -78,7 +101,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         'Le destinataire doit être un étudiant',
       );
       return;
-    }
+    } */
   }
 
   Future<void> _validateSenderPassword(UserProvider userProvider) async {
@@ -116,12 +139,13 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     // Vérifier que l'utilisateur courant est connecté et étudiant
     final currentUser = userProvider.currentUser;
     if (currentUser == null || currentUser.role.name != 'ETUDIANT') {
-      ScaffoldMessenger.of(context).showSnackBar(
+      await _validateRecipientUsername(userProvider);
+      /*ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vous devez être connecté en tant qu\'étudiant'),
           backgroundColor: redErrorColor,
         ),
-      );
+      );*/
       return;
     }
 
@@ -370,8 +394,11 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
             userProvider.currentUser = null;
             userProvider.resetLoginForm();
           },
-          icon: const Icon(Icons.logout),
-          label: const Text('Se déconnecter'),
+          icon: const Icon(Icons.logout, color: kSecondColor),
+          label: const Text(
+            'Se déconnecter',
+            style: TextStyle(color: kSecondColor),
+          ),
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
         ),
       ],
@@ -395,46 +422,51 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
           /* onChanged: (value) { }, */
         ),
         const SizeboxHeightSession(),
-        const Label(text: 'Type de ticket'),
-        const SizedBox(height: 10),
-        DropdownButtonFormField<TicketType>(
-          initialValue: _selectedTicketType,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: kPrimaryColor),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 12,
-            ),
-          ),
-          items: [
-            DropdownMenuItem(
-              value: TicketType.a,
-              child: Text(
-                'Type A',
-                style: TextStyle(
-                  color: _selectedTicketType == TicketType.a
-                      ? kPrimaryColor
-                      : Colors.black,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Label(text: 'Type de ticket'),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<TicketType>(
+              initialValue: _selectedTicketType,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: kPrimaryColor),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
                 ),
               ),
-            ),
-            DropdownMenuItem(
-              value: TicketType.b,
-              child: Text(
-                'Type B',
-                style: TextStyle(
-                  color: _selectedTicketType == TicketType.b
-                      ? kPrimaryColor
-                      : Colors.black,
+              items: [
+                DropdownMenuItem(
+                  value: TicketType.a,
+                  child: Text(
+                    'Type A',
+                    style: TextStyle(
+                      color: _selectedTicketType == TicketType.a
+                          ? kPrimaryColor
+                          : Colors.black,
+                    ),
+                  ),
                 ),
-              ),
+                DropdownMenuItem(
+                  value: TicketType.b,
+                  child: Text(
+                    'Type B',
+                    style: TextStyle(
+                      color: _selectedTicketType == TicketType.b
+                          ? kPrimaryColor
+                          : Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+              onChanged: (value) => setState(() => _selectedTicketType = value),
+              hint: const Text('Sélectionnez un type de ticket'),
             ),
           ],
-          onChanged: (value) => setState(() => _selectedTicketType = value),
-          hint: const Text('Sélectionnez un type de ticket'),
         ),
         const SizeboxHeightSession(),
         NumberTicketsSection(controller: _numberController),

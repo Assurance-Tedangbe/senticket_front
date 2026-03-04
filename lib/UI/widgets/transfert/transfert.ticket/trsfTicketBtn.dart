@@ -15,11 +15,16 @@ class TransfertTicketBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
-      width: 330,
+      width: 340,
       height: 95,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
+          /*  backgroundColor:
+                  userProvider.isConsultFormValid &&
+                      !userProvider.isConsultingUser
+                  ? kPrimaryColor
+                  : greyBorderColor, */
           backgroundColor: isLoading ? greyBorderColor : kPrimaryColor,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),

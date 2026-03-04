@@ -153,7 +153,7 @@ class TicketApiService {
   ) async {
     try {
       print(
-        "Debiter le compte de l'utilisateur: ${debitAccountRequestDTO.debitStudentDTO.username}",
+        "Debiter le compte de l'utilisateur ID: ${debitAccountRequestDTO.debitStudentDTO.debitStudentId}",
       );
 
       final response = await http.put(
