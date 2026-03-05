@@ -11,6 +11,7 @@ import 'package:senticket_front/UI/widgets/login/login.username.dart';
 import 'package:senticket_front/UI/widgets/login/login.passwordsection.dart';
 import 'package:senticket_front/UI/widgets/login/rememberme.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
+import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -37,12 +38,6 @@ class _LoginBodyState extends State<LoginBody> {
     super.dispose();
   }
 
-  /* void _onLoginSuccess() {
-    // Navigation vers la page d'accueil
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const Home()),
-    );
-  } */
   void _onLoginSuccess() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.currentUser;
@@ -56,14 +51,7 @@ class _LoginBodyState extends State<LoginBody> {
       } else if (roleName == 'PORTIER') {
         destination = const PorterInterface();
       } else {
-        /* // Rôle non autorisé (ne devrait pas arriver car la validation a déjà eu lieu)
-        // On affiche une erreur et on retourne à la page de connexion
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Rôle inconnu'),
-            backgroundColor: redErrorColor,
-          ),
-        ); */
+        // Rôle non autorisé (ne devrait pas arriver car la validation a déjà eu lieu)
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
@@ -72,12 +60,20 @@ class _LoginBodyState extends State<LoginBody> {
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (context) => destination));
-    } /*  else {
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Erreur lors de la récupération des informations utilisateur',
+          ),
+          backgroundColor: redErrorColor,
+        ),
+      );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
       return;
-    } */
+    }
   }
 
   void _toggleRememberMe(bool? value) {
