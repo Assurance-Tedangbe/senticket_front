@@ -463,6 +463,17 @@ class UserProvider with ChangeNotifier {
       // Appel au service de connexion
       final user = await _service.login(_loginUsername, _loginPassword);
 
+      // Vérification du rôle
+      final roleName = user.role.name.toUpperCase();
+      if (roleName != 'ETUDIANT' &&
+          roleName != 'ADMIN' &&
+          roleName != 'PORTIER') {
+        _isLoggingIn = false;
+        _error = 'Non autorisé.';
+        notifyListeners();
+        return false;
+      }
+
       _currentUser = user;
       _isLoggingIn = false;
       _error = '';

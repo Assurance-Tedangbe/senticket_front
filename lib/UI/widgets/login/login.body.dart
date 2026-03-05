@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/pages/home.dart';
+import 'package:senticket_front/UI/pages/adminInterface.dart';
+import 'package:senticket_front/UI/pages/login.dart';
+import 'package:senticket_front/UI/pages/porterInterface.dart';
+import 'package:senticket_front/UI/pages/studentInterface.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/login/checksignup.btn.dart';
 import 'package:senticket_front/UI/widgets/login/forgotPwdBtn.dart';
@@ -34,11 +37,47 @@ class _LoginBodyState extends State<LoginBody> {
     super.dispose();
   }
 
-  void _onLoginSuccess() {
+  /* void _onLoginSuccess() {
     // Navigation vers la page d'accueil
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const Home()),
     );
+  } */
+  void _onLoginSuccess() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.currentUser;
+    if (user != null) {
+      final roleName = user.role.name.toUpperCase();
+      Widget destination;
+      if (roleName == 'ETUDIANT') {
+        destination = const StudentInterface();
+      } else if (roleName == 'ADMIN') {
+        destination = const AdminInterface();
+      } else if (roleName == 'PORTIER') {
+        destination = const PorterInterface();
+      } else {
+        /* // Rôle non autorisé (ne devrait pas arriver car la validation a déjà eu lieu)
+        // On affiche une erreur et on retourne à la page de connexion
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Rôle inconnu'),
+            backgroundColor: redErrorColor,
+          ),
+        ); */
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+        return;
+      }
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => destination));
+    } /*  else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+      return;
+    } */
   }
 
   void _toggleRememberMe(bool? value) {
