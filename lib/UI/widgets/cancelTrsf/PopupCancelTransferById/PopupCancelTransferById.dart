@@ -69,7 +69,7 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
     // Vérifier que l'utilisateur connecté est le sender du transfert
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.currentUser;
-    if (currentUser == null || currentUser.userId != history.senderDTO.userId) {
+    if (currentUser == null || currentUser.userId != history.senderDTO.id) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -116,11 +116,11 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
                   cancelTransferDTO: CancelTransferDTO(
                     transactionId: history.transferHistoryId,
                     originalSenderDTO: OriginalSenderDTO(
-                      senderId: history.senderDTO.userId,
+                      senderId: history.senderDTO.id,
                       senderUsername: history.senderDTO.username,
                     ),
                     currentOwnerDTO: RecipientDTO(
-                      recipientId: history.recipientDTO.userId,
+                      recipientId: history.recipientDTO.id,
                       recipientUsername: history.recipientDTO.username,
                     ),
                   ),

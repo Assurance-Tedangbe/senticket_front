@@ -453,6 +453,25 @@ class UserApiService {
       throw Exception('Email invalide');
     }
   }
+
+  /* Future<void> logout() async {
+    final url = Uri.parse('$authUrl/logout');
+    final token =
+        await _getToken(); // récupérez le token depuis SharedPreferences
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode != 200) {
+      // Vous pouvez logger l'erreur mais ne pas échouer la déconnexion locale
+      print(
+        'Erreur lors de la déconnexion côté serveur : ${response.statusCode}',
+      );
+    }
+  } */
 }
   //********** Suppl services not used ************
   /*
@@ -551,21 +570,4 @@ class UserApiService {
       throw Exception('Erreur réseau: $e');
     }
   }
-
-  // REMOVE ROLE FROM USER (DELETE /api/users/{userId}/roles/{roleId})
-  Future<void> removeRoleFromUser(int userId, int roleId) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/$userId/roles/$roleId'),
-        headers: headers,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Erreur retrait rôle: ${response.statusCode}');
-      }
-
-      print("✅ Rôle $roleId retiré de l'utilisateur $userId");
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  } */
+ */

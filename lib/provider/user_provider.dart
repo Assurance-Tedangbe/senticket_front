@@ -845,6 +845,31 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /*   Future<void> logout() async {
+    // 1. Appeler l'API de déconnexion (optionnel)
+    try {
+      await _service.logout();
+    } catch (e) {
+      print('Erreur logout API: $e');
+    }
+
+    // 2. Nettoyer les données locales
+    _currentUser = null;
+    _authToken = null;
+    // Supprimer le token des SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+
+    notifyListeners();
+
+    // 3. Rediriger vers la page de connexion
+    // (La navigation doit être gérée dans le widget, pas ici.
+    // On peut utiliser un événement ou un callback, mais une bonne pratique
+    // est de laisser le widget réagir au changement de _currentUser.
+    // Par exemple, dans votre MaterialApp, utilisez un Router qui redirige
+    // vers LoginPage si _currentUser == null.)
+  } */
 }
   /*   
   //********** Suppl methods not used ************

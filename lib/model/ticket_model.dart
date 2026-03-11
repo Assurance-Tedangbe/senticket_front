@@ -4,29 +4,22 @@ import 'package:senticket_front/enums/ticket_type.dart';
 /*  ticket_model.dart: role(Conversion données), utilise forApi, fromApi, toBackend, fromBackend  */
 
 class Ticket {
-  final int? ticketId;
-  final TicketType ticketType;
-  final double ticketPrice;
-  final String paymentCode;
+  final int? id;
+  final TicketType type;
+  final double price;
   final bool booked;
-  final TicketStatus ticketStatus;
-  final DateTime ticketCreationDate;
-  final DateTime? ticketPurchaseDate;
-  final String ticketDescription;
+  final TicketStatus status;
+  final DateTime creationDate;
   final PurchaseUserDTO purchaseUserDTO;
   final bool isSelected;
 
-  // Constructeur principal
   Ticket({
-    this.ticketId,
-    required this.ticketType,
-    required this.ticketPrice,
-    required this.paymentCode,
+    this.id,
+    required this.type,
+    required this.price,
     required this.booked,
-    required this.ticketStatus,
-    required this.ticketCreationDate,
-    this.ticketPurchaseDate,
-    required this.ticketDescription,
+    required this.status,
+    required this.creationDate,
     required this.purchaseUserDTO,
     this.isSelected = false,
   });
@@ -34,37 +27,26 @@ class Ticket {
   /// Factory constructor pour créer un Ticket à partir d'un JSON
   factory Ticket.fromJson(Map<String, dynamic> json) {
     return Ticket(
-      ticketId: json['ticketId'],
-      ticketPrice: (json['ticketPrice'] as num?)?.toDouble() ?? 0.0,
-      paymentCode: json['paymentCode'] ?? '',
+      id: json['id'],
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       booked: json['booked'] ?? false,
-      ticketType: TicketTypeExtension.fromBackend(json['ticketType']), // ← ICI
-      ticketStatus: TicketStatusExtension.fromApi(
-        json['ticketStatus'],
-      ), // ← ICI
-      ticketCreationDate: DateTime.parse(json['ticketCreationDate']),
-      ticketPurchaseDate: json['ticketPurchaseDate'] != null
-          ? DateTime.parse(json['ticketPurchaseDate'])
-          : null,
-      ticketDescription: json['ticketDescription'] ?? '',
+      type: TicketTypeExtension.fromBackend(json['type']), // ← ICI
+      status: TicketStatusExtension.fromApi(json['status']), // ← ICI
+      creationDate: DateTime.parse(json['creationDate']),
       purchaseUserDTO: PurchaseUserDTO.fromJson(json['userDTO']),
-      isSelected: false, // Par défaut non sélectionné
+      isSelected: false,
     );
   }
 
   /// Convertit l'objet Ticket en Map JSON
   Map<String, dynamic> toJson() {
     return {
-      'ticketId': ticketId,
-      'ticketType': ticketType.toBackend, // ← ICI: "A", "B"
-      'ticketPrice': ticketPrice,
-      'paymentCode': paymentCode,
+      'id': id,
+      'type': type.toBackend, // ← ICI: "A", "B"
+      'price': price,
       'booked': booked,
-      'ticketStatus':
-          ticketStatus.forApi, // ← ICI:  "AVAILABLE", "BOOKED", "USED"
-      'ticketCreationDate': ticketCreationDate.toIso8601String().split('T')[0],
-      'ticketPurchaseDate': ticketPurchaseDate?.toIso8601String().split('T')[0],
-      'ticketDescription': ticketDescription,
+      'status': status.forApi, // ← ICI:  "AVAILABLE", "BOOKED", "USED"
+      'creationDate': creationDate.toIso8601String().split('T')[0],
       'purchaseUserDTO': purchaseUserDTO.toJson(),
       'isSelected': isSelected,
     };
@@ -73,28 +55,22 @@ class Ticket {
   // Crée une copie de l'objet Ticket avec des valeurs optionnelles modifiées:
   // utilisé ds TicketApiService
   Ticket copyWith({
-    int? ticketId,
-    TicketType? ticketType,
-    double? ticketPrice,
-    String? paymentCode,
+    int? id,
+    TicketType? type,
+    double? price,
     bool? booked,
-    TicketStatus? ticketStatus,
-    DateTime? ticketCreationDate,
-    DateTime? ticketPurchaseDate,
-    String? ticketDescription,
+    TicketStatus? status,
+    DateTime? creationDate,
     PurchaseUserDTO? purchaseUserDTO,
     bool? isSelected,
   }) {
     return Ticket(
-      ticketId: ticketId ?? this.ticketId,
-      ticketType: ticketType ?? this.ticketType,
-      ticketPrice: ticketPrice ?? this.ticketPrice,
-      paymentCode: paymentCode ?? this.paymentCode,
+      id: id ?? this.id,
+      type: type ?? this.type,
+      price: price ?? this.price,
       booked: booked ?? this.booked,
-      ticketStatus: ticketStatus ?? this.ticketStatus,
-      ticketCreationDate: ticketCreationDate ?? this.ticketCreationDate,
-      ticketPurchaseDate: ticketPurchaseDate ?? this.ticketPurchaseDate,
-      ticketDescription: ticketDescription ?? this.ticketDescription,
+      status: status ?? this.status,
+      creationDate: creationDate ?? this.creationDate,
       purchaseUserDTO: purchaseUserDTO ?? this.purchaseUserDTO,
       isSelected: isSelected ?? this.isSelected,
     );
@@ -102,14 +78,14 @@ class Ticket {
 }
 
 class PurchaseUserDTO {
-  final int userId; // Ne doit pas être nullable - le backend le requiert
-  final String username; // Ne doit pas être nullable - le backend le requiert
+  final int? userId;
+  final String username;
 
   PurchaseUserDTO({required this.userId, required this.username});
 
   factory PurchaseUserDTO.fromJson(Map<String, dynamic> json) {
     return PurchaseUserDTO(
-      userId: json['userId'] as int,
+      userId: json['userId'], //as int,
       username: json['username'] as String,
     );
   }
@@ -238,18 +214,18 @@ class TransfertTicketRequestDTO {
 }
 
 class SenderDTO {
-  final int senderId;
+  final int? senderId;
   final String senderUsername;
   final String senderPassword;
 
   SenderDTO({
-    required this.senderId,
+    this.senderId,
     required this.senderUsername,
     required this.senderPassword,
   });
   factory SenderDTO.fromJson(Map<String, dynamic> json) {
     return SenderDTO(
-      senderId: json['senderId'] as int,
+      senderId: json['senderId'] as int?,
       senderUsername: json['senderUsername'] as String,
       senderPassword: json['senderPassword'] as String,
     );
@@ -265,14 +241,14 @@ class SenderDTO {
 }
 
 class RecipientDTO {
-  final int recipientId;
+  final int? recipientId;
   final String recipientUsername;
 
-  RecipientDTO({required this.recipientId, required this.recipientUsername});
+  RecipientDTO({ this.recipientId, required this.recipientUsername});
 
   factory RecipientDTO.fromJson(Map<String, dynamic> json) {
     return RecipientDTO(
-      recipientId: json['recipientId'] as int,
+      recipientId: json['recipientId'] as int?,
       recipientUsername: json['recipientUsername'] as String,
     );
   }
@@ -300,7 +276,7 @@ class CancelTransferTicketsRequestDTO {
 }
 
 class CancelTransferDTO {
-  final int transactionId;
+  final int? transactionId;
   final OriginalSenderDTO originalSenderDTO;
   final RecipientDTO currentOwnerDTO;
 
@@ -320,14 +296,14 @@ class CancelTransferDTO {
 }
 
 class OriginalSenderDTO {
-  final int senderId;
+  final int? senderId;
   final String senderUsername;
 
-  OriginalSenderDTO({required this.senderId, required this.senderUsername});
+  OriginalSenderDTO({this.senderId, required this.senderUsername});
 
   factory OriginalSenderDTO.fromJson(Map<String, dynamic> json) {
     return OriginalSenderDTO(
-      senderId: json['senderId'] as int,
+      senderId: json['senderId'] as int?,
       senderUsername: json['senderUsername'] as String,
     );
   }
@@ -338,7 +314,7 @@ class OriginalSenderDTO {
 }
 
 class TransfertHistoryDTO {
-  final int transferHistoryId;
+  final int? transferHistoryId;
   final String ticketIdsTransfered;
   final UserDTO senderDTO;
   final UserDTO recipientDTO;
@@ -346,7 +322,7 @@ class TransfertHistoryDTO {
   final bool canceled;
 
   TransfertHistoryDTO({
-    required this.transferHistoryId,
+     this.transferHistoryId,
     required this.ticketIdsTransfered,
     required this.senderDTO,
     required this.recipientDTO,
@@ -356,7 +332,7 @@ class TransfertHistoryDTO {
 
   factory TransfertHistoryDTO.fromJson(Map<String, dynamic> json) {
     return TransfertHistoryDTO(
-      transferHistoryId: json['transferHistoryId'] as int,
+      transferHistoryId: json['transferHistoryId'] as int?,
       ticketIdsTransfered: json['ticketIdsTransfered'] as String,
       senderDTO: UserDTO.fromJson(json['senderDTO']),
       recipientDTO: UserDTO.fromJson(json['recipientDTO']),
@@ -378,14 +354,14 @@ class TransfertHistoryDTO {
 }
 
 class UserDTO {
-  final int userId;
+  final int? id;
   final String username;
   final String? email;
   final String? firstName;
   final String? lastName;
 
   UserDTO({
-    required this.userId,
+     this.id,
     required this.username,
     this.email,
     this.firstName,
@@ -394,7 +370,7 @@ class UserDTO {
 
   factory UserDTO.fromJson(Map<String, dynamic> json) {
     return UserDTO(
-      userId: json['userId'] as int,
+      id: json['id'] as int?,
       username: json['username'] as String,
       email: json['email'] as String?,
       firstName: json['firstName'] as String?,
@@ -404,7 +380,7 @@ class UserDTO {
 
   Map<String, dynamic> toJson() {
     return {
-      'userId': userId,
+      'id': id,
       'username': username,
       'email': email,
       'firstName': firstName,

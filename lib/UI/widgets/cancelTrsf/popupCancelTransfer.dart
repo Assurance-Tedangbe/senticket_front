@@ -43,7 +43,7 @@ class PopupCancelTransfer extends StatelessWidget {
           onPressed: () async {
             // Vérifier que l'utilisateur est bien l'expéditeur original
             if (currentUser == null ||
-                currentUser.userId != transferHistoryDTO.senderDTO.userId) {
+                currentUser.userId != transferHistoryDTO.senderDTO.id) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Non autorisé'),
@@ -60,11 +60,11 @@ class PopupCancelTransfer extends StatelessWidget {
               cancelTransferDTO: CancelTransferDTO(
                 transactionId: transferHistoryDTO.transferHistoryId,
                 originalSenderDTO: OriginalSenderDTO(
-                  senderId: transferHistoryDTO.senderDTO.userId,
+                  senderId: transferHistoryDTO.senderDTO.id,
                   senderUsername: transferHistoryDTO.senderDTO.username,
                 ),
                 currentOwnerDTO: RecipientDTO(
-                  recipientId: transferHistoryDTO.recipientDTO.userId,
+                  recipientId: transferHistoryDTO.recipientDTO.id,
                   recipientUsername: transferHistoryDTO.recipientDTO.username,
                 ),
               ),

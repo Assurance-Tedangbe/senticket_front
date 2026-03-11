@@ -22,7 +22,7 @@ class User {
   // JSON -> User
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      userId: json['userId'],
+      userId: json['id'],
       username: json['username'],
       password: json['password'] ?? '', // Default value if null
       email: json['email'],
@@ -35,7 +35,7 @@ class User {
   // User -> JSON
   Map<String, dynamic> toJson() {
     return {
-      'userId': userId,
+      'id': userId,
       'username': username,
       'password': password,
       'email': email,

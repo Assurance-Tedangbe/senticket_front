@@ -52,6 +52,7 @@ class TicketApiService {
 
       if (response.statusCode == 200) {
         // "Convertit la réponse JSON → liste d'objets Ticket"
+        print("JSON reçu : ${response.body}"); // <- Ajoutez ceci
 
         final List<dynamic> jsonList = json.decode(
           response.body,
@@ -187,7 +188,6 @@ class TicketApiService {
     }
   }
 
-  // Get purchased tickets by user (GET /api/tickets/user)
   Future<List<Ticket>> getPurchasedTicketsByUser({
     required int userId,
     bool? booked,
@@ -207,7 +207,7 @@ class TicketApiService {
       }
 
       if (ticketStatus != null) {
-        params['ticketStatus'] = ticketStatus;
+        params['status'] = ticketStatus;
       }
 
       if (ticketType != null) {

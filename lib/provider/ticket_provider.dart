@@ -122,16 +122,14 @@ class TicketProvider with ChangeNotifier {
 
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
-      .where((ticket) => ticket.ticketStatus == TicketStatus.available)
+      .where((ticket) => ticket.status == TicketStatus.available)
       .toList();
 
-  List<Ticket> get ticketsA => availableTickets
-      .where((ticket) => ticket.ticketType == TicketType.a)
-      .toList();
+  List<Ticket> get ticketsA =>
+      availableTickets.where((ticket) => ticket.type == TicketType.a).toList();
 
-  List<Ticket> get ticketsB => availableTickets
-      .where((ticket) => ticket.ticketType == TicketType.b)
-      .toList();
+  List<Ticket> get ticketsB =>
+      availableTickets.where((ticket) => ticket.type == TicketType.b).toList();
 
   List<Ticket> get selectedTickets =>
       _tickets.where((ticket) => ticket.isSelected).toList();
@@ -184,7 +182,7 @@ class TicketProvider with ChangeNotifier {
 
   // Pour gérer la sélection/désélection
   void toggleTicketSelection(int ticketId) {
-    final index = _tickets.indexWhere((t) => t.ticketId == ticketId);
+    final index = _tickets.indexWhere((t) => t.id == ticketId);
     if (index != -1) {
       _tickets[index] = _tickets[index].copyWith(
         isSelected: !(_tickets[index].isSelected),
@@ -195,9 +193,9 @@ class TicketProvider with ChangeNotifier {
 
   void selectAllTicketsA() {
     for (var ticket in _tickets) {
-      if (ticket.ticketType == TicketType.a &&
-          ticket.ticketStatus == TicketStatus.available) {
-        final index = _tickets.indexWhere((t) => t.ticketId == ticket.ticketId);
+      if (ticket.type == TicketType.a &&
+          ticket.status == TicketStatus.available) {
+        final index = _tickets.indexWhere((t) => t.id == ticket.id);
         if (index != -1) {
           _tickets[index] = _tickets[index].copyWith(isSelected: true);
         }
@@ -208,9 +206,9 @@ class TicketProvider with ChangeNotifier {
 
   void selectAllTicketsB() {
     for (var ticket in _tickets) {
-      if (ticket.ticketType == TicketType.b &&
-          ticket.ticketStatus == TicketStatus.available) {
-        final index = _tickets.indexWhere((t) => t.ticketId == ticket.ticketId);
+      if (ticket.type == TicketType.b &&
+          ticket.status == TicketStatus.available) {
+        final index = _tickets.indexWhere((t) => t.id == ticket.id);
         if (index != -1) {
           _tickets[index] = _tickets[index].copyWith(isSelected: true);
         }
@@ -266,7 +264,7 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final ticketIds = selected.map((t) => t.ticketId!).toList();
+      final ticketIds = selected.map((t) => t.id!).toList();
 
       // Créer le PurchaseUserDTO avec l'utilisateur connecté
       final purchaseUserDTO = PurchaseUserDTO(
@@ -310,12 +308,12 @@ class TicketProvider with ChangeNotifier {
   // Fetch student's purchased tickets by user
   Future<void> getPurchasedTicketsByUser({
     required int studentId,
-    TicketType? ticketType,
+    TicketType? type,
   }) async {
     _isLoading = true;
     _isLoadingStudentTickets = true;
     _error = '';
-    _selectedTicketTypeForDebit = ticketType;
+    _selectedTicketTypeForDebit = type;
     notifyListeners();
 
     try {
@@ -323,14 +321,13 @@ class TicketProvider with ChangeNotifier {
         userId: studentId,
         booked: true,
         ticketStatus: 'BOOKED',
-        ticketType: ticketType?.toBackend,
+        ticketType: type?.toBackend,
       );
 
       // Filter only booked and BOOKED status tickets
       _studentTicketsForDebit = _studentTicketsForDebit
           .where(
-            (ticket) =>
-                ticket.booked && ticket.ticketStatus == TicketStatus.booked,
+            (ticket) => ticket.booked && ticket.status == TicketStatus.booked,
           )
           .toList();
 
@@ -354,9 +351,7 @@ class TicketProvider with ChangeNotifier {
 
   // Toggle ticket selection for debit
   void toggleTicketSelectionForDebit(int ticketId) {
-    final index = _studentTicketsForDebit.indexWhere(
-      (t) => t.ticketId == ticketId,
-    );
+    final index = _studentTicketsForDebit.indexWhere((t) => t.id == ticketId);
     if (index != -1) {
       final ticket = _studentTicketsForDebit[index];
       final updatedTicket = ticket.copyWith(isSelected: !ticket.isSelected);
@@ -377,7 +372,7 @@ class TicketProvider with ChangeNotifier {
       _studentTicketsForDebit[i] = _studentTicketsForDebit[i].copyWith(
         isSelected: true,
       );
-      _selectedTicketIdsForDebit.add(_studentTicketsForDebit[i].ticketId!);
+      _selectedTicketIdsForDebit.add(_studentTicketsForDebit[i].id!);
     }
     notifyListeners();
   }

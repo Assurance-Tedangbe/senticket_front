@@ -12,7 +12,7 @@ class TicketABloc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAvailable = ticket.ticketStatus == TicketStatus.available;
+    final isAvailable = ticket.status == TicketStatus.available;
     final isSelected = ticket.isSelected;
 
     return Padding(
@@ -38,11 +38,11 @@ class TicketABloc extends StatelessWidget {
                     context,
                     listen: false,
                   );
-                  provider.toggleTicketSelection(ticket.ticketId!);
+                  provider.toggleTicketSelection(ticket.id!);
                 }
               : null,
           child: Text(
-            ticket.ticketId?.toString() ?? 'N/A',
+            ticket.id?.toString() ?? 'N/A',
             style: TextStyle(
               color: isSelected ? kSecondColor : kThirdColor,
               fontSize: 12,

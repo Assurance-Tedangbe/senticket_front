@@ -57,7 +57,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {
-      userProvider.setTransferRecipientError(
+      userProvider.setDebitUsernameError(
         'Veuillez entrer le nom du destinataire',
       );
       return;
@@ -69,7 +69,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     );
 
     if (success && userProvider.searchedUser != null) {
-      final searchedUser = userProvider.searchedRecipient!;
+      final searchedUser = userProvider.searchedUser!;
 
       // Vérifier que l'utilisateur trouvé est un étudiant
       if (searchedUser.role.name != 'ETUDIANT') {
@@ -211,7 +211,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         return;
       }
     }
-    final recipient = userProvider.searchedRecipient!;
+    final recipient = userProvider.searchedUser!;
 
     // Construire la requête
     final request = TransfertTicketRequestDTO(

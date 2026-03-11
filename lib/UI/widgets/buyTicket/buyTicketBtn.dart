@@ -31,7 +31,7 @@ class BuyTicketBtn extends StatelessWidget {
 
             double totalPrice = 0;
             for (var ticket in selectedTickets) {
-              totalPrice += ticket.ticketPrice;
+              totalPrice += ticket.price;
             }
 
             return Column(

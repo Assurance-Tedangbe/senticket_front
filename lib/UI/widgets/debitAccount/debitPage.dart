@@ -44,7 +44,7 @@ class _DebitPageState extends State<DebitPage> {
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     await ticketProvider.getPurchasedTicketsByUser(
       studentId: widget.studentId,
-      ticketType: value,
+      type: value,
     );
   }
 
@@ -108,7 +108,7 @@ class _DebitPageState extends State<DebitPage> {
       if (_selectedTicketType != null) {
         await ticketProvider.getPurchasedTicketsByUser(
           studentId: widget.studentId,
-          ticketType: _selectedTicketType,
+          type: _selectedTicketType,
         );
       }
     } else {
@@ -427,20 +427,18 @@ class _DebitPageState extends State<DebitPage> {
               leading: Checkbox(
                 value: ticket.isSelected,
                 onChanged: (value) {
-                  provider.toggleTicketSelectionForDebit(ticket.ticketId!);
+                  provider.toggleTicketSelectionForDebit(ticket.id!);
                 },
                 checkColor: kSecondColor,
                 activeColor: kPrimaryColor,
               ),
-              title: Text('Ticket ${ticket.ticketId}'),
+              title: Text('Ticket ${ticket.id}'),
               /*  subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                   Text('Type: ${ticket.ticketType.toString().split('.').last}'),
                   Text('Prix: ${ticket.ticketPrice} FCFA'),
                   Text('Statut: ${ticket.ticketStatus.toString().split('.').last}'),
-                  if (ticket.paymentCode.isNotEmpty)
-                     Text('Code: ${ticket.paymentCode}'),
                   if (ticket.ticketCreationDate != null)
                      Text('Créé: ${_formatDate(ticket.ticketCreationDate!)}'),
                   ],
@@ -452,7 +450,7 @@ class _DebitPageState extends State<DebitPage> {
                         color: ticket.isSelected ? kPrimaryColor : Colors.grey,
               ), */
               onTap: () {
-                provider.toggleTicketSelectionForDebit(ticket.ticketId!);
+                provider.toggleTicketSelectionForDebit(ticket.id!);
               },
             ),
           ),
