@@ -59,9 +59,9 @@ class UserProvider with ChangeNotifier {
 
   // TRANSFER FORM STATE: pour la recherche du destinataire
   String _transferRecipientUsername = '';
-  bool _isSearchingRecipient = false;
+  /* bool _isSearchingRecipient = false;
   User? _searchedRecipient;
-  String? _transferRecipientError;
+  String? _transferRecipientError;*/
 
   String _senderPassword = '';
   String? _senderPasswordError;
@@ -126,10 +126,8 @@ class UserProvider with ChangeNotifier {
   bool get isDebitFormValid => _debitUsername.isNotEmpty;
 
   // Getters for transfer form
-  String get transferRecipientUsername => _transferRecipientUsername;
-  User? get searchedRecipient => _searchedRecipient;
-  String? get transferRecipientError => _transferRecipientError;
-  bool get isSearchingRecipient => _isSearchingRecipient;
+ //  String get transferRecipientUsername => _transferRecipientUsername;
+ // bool get isSearchingRecipient => _isSearchingRecipient;
   bool get isTransferFormValid =>
       _transferRecipientUsername.isNotEmpty; //&& _searchedRecipient != null;
   String get senderPassword => _senderPassword;
@@ -256,15 +254,15 @@ class UserProvider with ChangeNotifier {
   // ************** Setters pour transfer form ***************
   void setTransferRecipientUsername(String value) {
     _transferRecipientUsername = value;
-    _transferRecipientError = null;
+    _debitUsernameError = null;
     notifyListeners();
   }
 
   // Définir l'erreur de nom d'utilisateur pour transfert
-  void setTransferRecipientError(String error) {
+ /* void setTransferRecipientError(String error) {
     _transferRecipientError = error;
     notifyListeners();
-  }
+  }*/
 
   // Définir l'erreur de nom d'utilisateur pour transfert
   void setSenderPassword(String value) {
@@ -811,9 +809,9 @@ class UserProvider with ChangeNotifier {
   void resetTransferState() {
     _transferRecipientUsername = '';
     _senderPassword = '';
-    _isSearchingRecipient = false;
-    _searchedRecipient = null;
-    _transferRecipientError = null;
+    _isSearchingUser = false;
+    _searchedUser =null;
+    _debitUsernameError = null;
     _senderPasswordError = null;
     notifyListeners();
   }

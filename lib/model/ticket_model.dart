@@ -1,8 +1,7 @@
 import 'package:senticket_front/enums/ticket_status.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
 
-/*  ticket_model.dart: role(Conversion données), utilise forApi, fromApi, toBackend, fromBackend  */
-
+/* role(Conversion données), utilise forApi, fromApi, toBackend, fromBackend  */
 class Ticket {
   final int? id;
   final TicketType type;
@@ -30,8 +29,8 @@ class Ticket {
       id: json['id'],
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       booked: json['booked'] ?? false,
-      type: TicketTypeExtension.fromBackend(json['type']), // ← ICI
-      status: TicketStatusExtension.fromApi(json['status']), // ← ICI
+      type: TicketTypeExtension.fromBackend(json['type']),
+      status: TicketStatusExtension.fromApi(json['status']),
       creationDate: DateTime.parse(json['creationDate']),
       purchaseUserDTO: PurchaseUserDTO.fromJson(json['userDTO']),
       isSelected: false,
@@ -42,10 +41,10 @@ class Ticket {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'type': type.toBackend, // ← ICI: "A", "B"
+      'type': type.toBackend, // "A", "B"
       'price': price,
       'booked': booked,
-      'status': status.forApi, // ← ICI:  "AVAILABLE", "BOOKED", "USED"
+      'status': status.forApi, // "AVAILABLE", "BOOKED", "USED"
       'creationDate': creationDate.toIso8601String().split('T')[0],
       'purchaseUserDTO': purchaseUserDTO.toJson(),
       'isSelected': isSelected,
@@ -85,8 +84,8 @@ class PurchaseUserDTO {
 
   factory PurchaseUserDTO.fromJson(Map<String, dynamic> json) {
     return PurchaseUserDTO(
-      userId: json['userId'], //as int,
-      username: json['username'] as String,
+      userId: json['userId'],
+      username: json['username']
     );
   }
 
@@ -162,8 +161,8 @@ class DebitPorterDTO {
 
   factory DebitPorterDTO.fromJson(Map<String, dynamic> json) {
     return DebitPorterDTO(
-      porterId: json['porterId'] as int,
-      porterUsername: json['porterUsername'] as String,
+      porterId: json['porterId'],
+      porterUsername: json['porterUsername']
     );
   }
 
@@ -180,8 +179,8 @@ class DebitStudentDTO {
 
   factory DebitStudentDTO.fromJson(Map<String, dynamic> json) {
     return DebitStudentDTO(
-      debitStudentId: json['debitStudentId'] as int,
-      username: json['username'] as String,
+      debitStudentId: json['debitStudentId'],
+      username: json['username']
     );
   }
 
@@ -214,20 +213,20 @@ class TransfertTicketRequestDTO {
 }
 
 class SenderDTO {
-  final int? senderId;
+  final int senderId;
   final String senderUsername;
   final String senderPassword;
 
   SenderDTO({
-    this.senderId,
+    required this.senderId,
     required this.senderUsername,
     required this.senderPassword,
   });
   factory SenderDTO.fromJson(Map<String, dynamic> json) {
     return SenderDTO(
-      senderId: json['senderId'] as int?,
-      senderUsername: json['senderUsername'] as String,
-      senderPassword: json['senderPassword'] as String,
+      senderId: json['senderId'],
+      senderUsername: json['senderUsername'],
+      senderPassword: json['senderPassword']
     );
   }
 
@@ -241,15 +240,15 @@ class SenderDTO {
 }
 
 class RecipientDTO {
-  final int? recipientId;
+  final int recipientId;
   final String recipientUsername;
 
-  RecipientDTO({ this.recipientId, required this.recipientUsername});
+  RecipientDTO({required this.recipientId, required this.recipientUsername});
 
   factory RecipientDTO.fromJson(Map<String, dynamic> json) {
     return RecipientDTO(
-      recipientId: json['recipientId'] as int?,
-      recipientUsername: json['recipientUsername'] as String,
+      recipientId: json['recipientId'],
+      recipientUsername: json['recipientUsername']
     );
   }
 
@@ -276,7 +275,7 @@ class CancelTransferTicketsRequestDTO {
 }
 
 class CancelTransferDTO {
-  final int? transactionId;
+  final int transactionId;
   final OriginalSenderDTO originalSenderDTO;
   final RecipientDTO currentOwnerDTO;
 
@@ -296,15 +295,15 @@ class CancelTransferDTO {
 }
 
 class OriginalSenderDTO {
-  final int? senderId;
+  final int senderId;
   final String senderUsername;
 
-  OriginalSenderDTO({this.senderId, required this.senderUsername});
+  OriginalSenderDTO({required this.senderId, required this.senderUsername});
 
   factory OriginalSenderDTO.fromJson(Map<String, dynamic> json) {
     return OriginalSenderDTO(
-      senderId: json['senderId'] as int?,
-      senderUsername: json['senderUsername'] as String,
+      senderId: json['senderId'],
+      senderUsername: json['senderUsername']
     );
   }
 
@@ -314,7 +313,7 @@ class OriginalSenderDTO {
 }
 
 class TransfertHistoryDTO {
-  final int? transferHistoryId;
+  final int id;
   final String ticketIdsTransfered;
   final UserDTO senderDTO;
   final UserDTO recipientDTO;
@@ -322,7 +321,7 @@ class TransfertHistoryDTO {
   final bool canceled;
 
   TransfertHistoryDTO({
-     this.transferHistoryId,
+    required this.id,
     required this.ticketIdsTransfered,
     required this.senderDTO,
     required this.recipientDTO,
@@ -332,8 +331,8 @@ class TransfertHistoryDTO {
 
   factory TransfertHistoryDTO.fromJson(Map<String, dynamic> json) {
     return TransfertHistoryDTO(
-      transferHistoryId: json['transferHistoryId'] as int?,
-      ticketIdsTransfered: json['ticketIdsTransfered'] as String,
+      id: json['id'],
+      ticketIdsTransfered: json['ticketIdsTransfered'],
       senderDTO: UserDTO.fromJson(json['senderDTO']),
       recipientDTO: UserDTO.fromJson(json['recipientDTO']),
       transferDate: DateTime.parse(json['transferDate']),
@@ -343,7 +342,7 @@ class TransfertHistoryDTO {
 
   Map<String, dynamic> toJson() {
     return {
-      'transferHistoryId': transferHistoryId,
+      'id': id,
       'ticketIdsTransfered': ticketIdsTransfered,
       'senderDTO': senderDTO.toJson(),
       'recipientDTO': recipientDTO.toJson(),
@@ -354,14 +353,14 @@ class TransfertHistoryDTO {
 }
 
 class UserDTO {
-  final int? id;
+  final int id;
   final String username;
   final String? email;
   final String? firstName;
   final String? lastName;
 
   UserDTO({
-     this.id,
+    required this.id,
     required this.username,
     this.email,
     this.firstName,
@@ -370,11 +369,11 @@ class UserDTO {
 
   factory UserDTO.fromJson(Map<String, dynamic> json) {
     return UserDTO(
-      id: json['id'] as int?,
-      username: json['username'] as String,
-      email: json['email'] as String?,
-      firstName: json['firstName'] as String?,
-      lastName: json['lastName'] as String?,
+      id: json['id'],
+      username: json['username'],
+      email: json['email'],
+      firstName: json['firstName'],
+      lastName: json['lastName']
     );
   }
 

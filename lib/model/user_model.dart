@@ -44,25 +44,4 @@ class User {
       'roleDTO': role.toJson(),
     };
   }
-
-  // Creates a copy of the user with some modified values: useful for edit forms
-  /*   User copyWith({
-    int? userId,
-    String? username,
-    String? password,
-    String? email,
-    String? firstName,
-    String? lastName,
-    Role? role,
-  }) {
-    return User(
-      userId: userId ?? this.userId,
-      username: username ?? this.username,
-      password: password ?? this.password,
-      email: email ?? this.email,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      role: role ?? this.role,
-    );
-  } */
 }

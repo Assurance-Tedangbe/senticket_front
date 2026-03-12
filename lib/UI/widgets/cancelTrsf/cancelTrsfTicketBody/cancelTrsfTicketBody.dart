@@ -17,20 +17,7 @@ class CancelTrsfTicketBody extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            /*   ReferenceNumberCancelTrsfTicketSection(),
-            SizeboxHeightSession(), 
-            // RecipientNumberTrsfTicket(),
-            //SizeboxHeightSession(), */
-
-            //  NumberTicketsSection(),
             SizeboxHeightSession(),
-            /* Padding(
-              padding: EdgeInsets.fromLTRB(25.0, 0.0, 8.0, 0.0),
-              child: TicketTypeSection(),
-            ),
-            SizeboxHeightSession(), */
-
-            // SenderPasswordTrsfTicket(),
             SizeboxHeightSession(),
             CancelTrsfTicketBtn(),
           ],

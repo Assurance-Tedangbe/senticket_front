@@ -441,7 +441,7 @@ class TicketProvider with ChangeNotifier {
       final history = await _service.transferTickets(request);
       _lastTransfer = history;
       _error = '';
-      print("Transfert réussi, transaction ID: ${history.transferHistoryId}");
+      print("Transfert réussi, transaction ID: ${history.id}");
       return history;
     } catch (e) {
       _error = 'Erreur lors du transfert des tickets: ${e.toString()}';

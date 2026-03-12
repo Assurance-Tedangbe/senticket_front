@@ -1,7 +1,8 @@
+/*
 import 'package:senticket_front/model/user_model.dart';
 
 class TransfertHistory {
-  final int transferHistoryId;
+  final int id;
   final String ticketIdsTransfered;
   final User senderDTO;
   final User recipientDTO;
@@ -9,7 +10,7 @@ class TransfertHistory {
   final bool canceled;
 
   TransfertHistory({
-    required this.transferHistoryId,
+    required this.id,
     required this.ticketIdsTransfered,
     required this.senderDTO,
     required this.recipientDTO,
@@ -19,8 +20,8 @@ class TransfertHistory {
 
   factory TransfertHistory.fromJson(Map<String, dynamic> json) {
     return TransfertHistory(
-      transferHistoryId: json['transferHistoryId'] as int,
-      ticketIdsTransfered: json['ticketIdsTransfered'] as String,
+      id: json['id'],
+      ticketIdsTransfered: json['ticketIdsTransfered'],
       senderDTO: User.fromJson(json['senderDTO']),
       recipientDTO: User.fromJson(json['recipientDTO']),
       transferDate: DateTime.parse(json['transferDate']),
@@ -30,7 +31,7 @@ class TransfertHistory {
 
   Map<String, dynamic> toJson() {
     return {
-      'transferHistoryId': transferHistoryId,
+      'id': id,
       'ticketIdsTransfered': ticketIdsTransfered,
       'senderDTO': senderDTO.toJson(),
       'recipientDTO': recipientDTO.toJson(),
@@ -48,3 +49,4 @@ class TransfertHistory {
     return cleaned.split(',').map((s) => int.parse(s.trim())).toList();
   }
 }
+*/

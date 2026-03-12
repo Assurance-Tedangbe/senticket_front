@@ -6,12 +6,10 @@ import 'package:senticket_front/provider/ticket_provider.dart';
 
 class NumberTicketsSection extends StatelessWidget {
   final TextEditingController controller;
-  // final ValueChanged<String>? onChanged;
 
   const NumberTicketsSection({
     super.key,
     required this.controller,
-    // this.onChanged,
   });
 
   @override
