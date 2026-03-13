@@ -5,7 +5,6 @@ import 'package:senticket_front/services/user_service.dart';
 
 class UserProvider with ChangeNotifier {
   //Creates a class that can notify its listeners of changes
-  // _ means these variables are private
 
   final UserApiService _service;
 

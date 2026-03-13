@@ -25,13 +25,27 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
     super.dispose();
   }
 
-  Future<void> _handleValidate() async {
+  Future<void> _validateTransactionID(TicketProvider ticketProvider) async {
     final idText = _transactionIdController.text.trim();
     if (idText.isEmpty) {
+      ticketProvider.setTransactionIdError(
+        'Veuillez entrer l\'ID de la transaction',
+      );
+      return;
+    }
+  }
+
+  Future<void> _handleValidate() async {
+    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+
+    final idText = _transactionIdController.text.trim();
+    if (idText.isEmpty) {
+     // await _validateTransactionID(ticketProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Veuillez entrer un ID de transaction'),
-          // backgroundColor: redErrorColor,
+           backgroundColor: redErrorColor,
+           duration: Duration(seconds: 3),
         ),
       );
       return;
@@ -40,30 +54,47 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
     if (transactionId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('ID invalide'),
+          content: Text('ID null'),
         ),
       );
+      Navigator.pop(context);
       return;
     }
 
     setState(() => _isLoading = true);
 
-    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+   // final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     final history = await ticketProvider.getTransferHistoryById(transactionId);
 
     setState(() => _isLoading = false);
 
     if (history == null) {
+      // cas IDTransaction non existant
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(ticketProvider.error),
+            content: Text('transaction non valide'),
             backgroundColor: redErrorColor,
           ),
         );
+        Navigator.pop(context);
       }
       return;
     }
+
+    if(history.canceled){
+     // if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('This transaction is already canceled'),
+            backgroundColor: redErrorColor,
+          ),
+        );
+        Navigator.pop(context);
+    //  }
+      return;
+    }
+
 
     // Vérifier que l'utilisateur connecté est le sender du transfert
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -76,7 +107,10 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
             backgroundColor: redErrorColor,
           ),
         );
+        Navigator.pop(context);
       }
+      // Réinitialiser le champ
+      _transactionIdController.clear();
       return;
     }
 
@@ -146,6 +180,7 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
                       duration: Duration(seconds: 5),
                     ),
                   );
+                  Navigator.pop(context);
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),

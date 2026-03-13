@@ -77,6 +77,8 @@ class TicketProvider with ChangeNotifier {
   RecipientDTO? _lastRecipientDTO;
   List<int> _lastTicketIds = [];
 
+  String? _transactionIdError;
+
   // ******************** GETTERS ********************
   // GETTERS PRINCIPAUX
   List<Ticket> get tickets =>
@@ -120,6 +122,8 @@ class TicketProvider with ChangeNotifier {
   RecipientDTO? get lastRecipientDTO => _lastRecipientDTO;
   List<int> get lastTicketIds => _lastTicketIds;
 
+  String? get transactionIdError => _transactionIdError;
+
   // GETTERS POUR LES TICKETS FILTRÉS
   List<Ticket> get availableTickets => _tickets
       .where((ticket) => ticket.status == TicketStatus.available)
@@ -149,6 +153,11 @@ class TicketProvider with ChangeNotifier {
 
   void setNumberOfTicketsIsInvalid(String error) {
     _numberOfTicketsIsInvalid = error;
+    notifyListeners();
+  }
+
+  void setTransactionIdError(String error) {
+    _transactionIdError = error;
     notifyListeners();
   }
 

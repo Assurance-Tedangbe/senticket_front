@@ -36,13 +36,6 @@ class Services extends StatelessWidget {
               servicename: "Acheter ticket",
               imagepath: "images/ticket.JPG",
             ),
-            /*    ContainerTemplate(
-            press: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const CreditAccount()));
-            },
-            servicename: "Créditer compte",
-            imagepath: "images/crediter.JPG"), */
             ContainerTemplate(
               press: () {
                 Navigator.of(context).push(
@@ -85,11 +78,6 @@ class Services extends StatelessWidget {
                   context: context,
                   builder: (_) => const PopupCancelTransferById(),
                 );
-                /* Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const PopupCancelTransferById(),
-                  ),
-                ); */
               },
               servicename: "Annuler transfert",
               imagepath: "images/annuler_transaction.JPG",
