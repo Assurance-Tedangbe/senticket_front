@@ -66,7 +66,6 @@ class TicketProvider with ChangeNotifier {
   bool _isLoadingStudentTickets = false;
 
   // State for transferTickets operation
-  int _numberOfTicketsToTransfer = 0;
   String? _numberOfTicketsError;
   String?
   _numberOfTicketsIsInvalid; // Stocke les erreurs liées au nombre de tickets à transférer
@@ -112,7 +111,6 @@ class TicketProvider with ChangeNotifier {
   bool get isLoadingStudentTickets => _isLoadingStudentTickets;
 
   // Getters for transfer operation
-  int get numberOfTicketsToTransfer => _numberOfTicketsToTransfer;
   String? get numberOfTicketsError => _numberOfTicketsError;
   String? get numberOfTicketsIsInvalid => _numberOfTicketsIsInvalid;
 
@@ -139,13 +137,6 @@ class TicketProvider with ChangeNotifier {
       _tickets.where((ticket) => ticket.isSelected).toList();
 
   // Setters for transfer operation
-
-  void setNumberOfTicketsToTransfer(int value) {
-    _numberOfTicketsToTransfer = value;
-    _numberOfTicketsError = null;
-    notifyListeners();
-  }
-
   void setNumberOfTicketsError(String error) {
     _numberOfTicketsError = error;
     notifyListeners();

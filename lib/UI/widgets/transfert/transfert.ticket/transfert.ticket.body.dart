@@ -50,7 +50,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {
-      userProvider.setDebitUsernameError(
+      userProvider.setUsernameError(
         'Veuillez entrer le nom du destinataire',
       );
       return;
@@ -66,7 +66,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
       // Vérifier que l'utilisateur trouvé est un étudiant
       if (searchedUser.role.name != 'ETUDIANT') {
-        userProvider.setDebitUsernameError(
+        userProvider.setUsernameError(
           'Le destinataire doit être un étudiant',
         );
         return;
@@ -423,7 +423,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => StudentInterface()
-                  //const PopupCancelTransfer(transferHistoryDTO: transferHistoryDTO),
+                  //PopupCancelTransfer(transferHistoryDTO: transferHistoryDTO);
                 ),
               ),
             ),

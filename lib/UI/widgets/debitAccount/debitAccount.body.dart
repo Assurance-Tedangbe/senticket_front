@@ -40,7 +40,7 @@ class _DebitBodyState extends State<DebitBody> {
 
   Future<void> _validateStudent(UserProvider userProvider) async {
     if (_usernameController.text.isEmpty) {
-      userProvider.setDebitUsernameError(
+      userProvider.setUsernameError(
         'Veuillez entrer un nom d\'utilisateur',
       );
       return;

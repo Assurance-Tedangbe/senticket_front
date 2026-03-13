@@ -58,18 +58,13 @@ class UserProvider with ChangeNotifier {
 
   // TRANSFER FORM STATE: pour la recherche du destinataire
   String _transferRecipientUsername = '';
-  /* bool _isSearchingRecipient = false;
-  User? _searchedRecipient;
-  String? _transferRecipientError;*/
-
   String _senderPassword = '';
+  String  _numberOfTicketsToTransfer = '';
   String? _senderPasswordError;
-  //String? _recipientError;
 
   UserProvider(this._service);
 
-  // GETTERS - Accès contrôlé à l'état ===
-
+  // GETTERS
   // Main Getters
   List<User> get users =>
       _users; // Allows other classes to read `_users` but not modify it.
@@ -125,11 +120,9 @@ class UserProvider with ChangeNotifier {
   bool get isDebitFormValid => _debitUsername.isNotEmpty;
 
   // Getters for transfer form
- //  String get transferRecipientUsername => _transferRecipientUsername;
- // bool get isSearchingRecipient => _isSearchingRecipient;
-  bool get isTransferFormValid =>
-      _transferRecipientUsername.isNotEmpty; //&& _searchedRecipient != null;
-  String get senderPassword => _senderPassword;
+  String get transferRecipientUsername => _transferRecipientUsername;
+      String get senderPassword => _senderPassword;
+  String get numberOfTicketsToTransfer => _numberOfTicketsToTransfer;
   String? get senderPasswordError => _senderPasswordError;
 
   // **************** setters for signup form ***************
@@ -244,8 +237,8 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Définir l'erreur de nom d'utilisateur pour débit
-  void setDebitUsernameError(String error) {
+  // Définir l'erreur de nom d'utilisateur
+  void setUsernameError(String error) {
     _debitUsernameError = error;
     notifyListeners();
   }
@@ -256,12 +249,6 @@ class UserProvider with ChangeNotifier {
     _debitUsernameError = null;
     notifyListeners();
   }
-
-  // Définir l'erreur de nom d'utilisateur pour transfert
- /* void setTransferRecipientError(String error) {
-    _transferRecipientError = error;
-    notifyListeners();
-  }*/
 
   // Définir l'erreur de nom d'utilisateur pour transfert
   void setSenderPassword(String value) {
@@ -278,7 +265,6 @@ class UserProvider with ChangeNotifier {
 
   // *************** Load all users from the service ****************
   Future<void> loadAllUsers({bool forceRefresh = false}) async {
-    //load the users, this will take some time (async)
 
     _isLoading = true; // activate the loading
     _error = ''; // clear previous errors
@@ -332,7 +318,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  // Validation
+  // Validation for signup
   bool get isFormValid =>
       _firstName.isNotEmpty &&
       _lastName.isNotEmpty &&
@@ -415,9 +401,7 @@ class UserProvider with ChangeNotifier {
 
   // Validation pour la connexion
   bool get isLoginFormValid =>
-      _loginUsername.isNotEmpty && _loginPassword.isNotEmpty; /* &&
-      loginUsernameError == null &&
-      loginPasswordError == null; */
+      _loginUsername.isNotEmpty && _loginPassword.isNotEmpty;
 
   String? get loginUsernameError {
     if (_loginUsername.isEmpty) {
@@ -540,24 +524,6 @@ class UserProvider with ChangeNotifier {
       return user.role.name.toUpperCase() == roleName.toUpperCase();
     }).toList();
   }
-
-  // for loading User For Consultation
-  /*  Future<void> loadUserForConsultation(int userId) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      await _service.getUserById(userId);
-      _error = '';
-    } catch (e) {
-      _error = 'Erreur lors du chargement: ${e.toString()}';
-      print("Error loadUserForConsultation: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  } */
 
   // This method returns void because the result is stored in _currentUser
   Future<void> loadUserById(int userId) async {
@@ -751,16 +717,11 @@ class UserProvider with ChangeNotifier {
     _isSearchingUser = true;
     _searchedUser = null;
     _debitUsernameError = null;
-
-    // Réinitialiser l'erreur de transfert
-    /*   _isSearchingRecipient = true;
-     _searchedRecipient = null;
-     _transferRecipientError = null; */
     notifyListeners();
 
     try {
       print(
-        '🔍 Recherche de l\'utilisateur pour débiter son compte: $username',
+        '🔍 Recherche de l\'utilisateur : $username',
       );
 
       final user = await _service.getUserByUsername(username);
@@ -768,11 +729,6 @@ class UserProvider with ChangeNotifier {
       _searchedUser = user;
       _isSearchingUser = false;
       _debitUsernameError = null;
-
-      //for transfer form
-      /*  _searchedRecipient = user;
-      _isSearchingRecipient = false;
-       _transferRecipientError = null; */
       notifyListeners();
 
       print('Utilisateur trouvé: ${user.username} (Rôle: ${user.role.name})');
@@ -781,13 +737,7 @@ class UserProvider with ChangeNotifier {
       _isSearchingUser = false;
       _searchedUser = null;
       _debitUsernameError = 'Utilisateur non trouvé ';
-
-      //for transfer form
-      /* _transferRecipientError = 'Utilisateur non trouvé';
-      _searchedRecipient = null;
-      _isSearchingRecipient = false; */
       notifyListeners();
-
       print('Erreur lors de la recherche: $e');
       return false;
     }
@@ -814,6 +764,10 @@ class UserProvider with ChangeNotifier {
     _senderPasswordError = null;
     notifyListeners();
   }
+
+  bool get isTransferUserFormValid =>
+      _transferRecipientUsername.isNotEmpty &&
+      _senderPassword.isNotEmpty; //&& _numberOfTicketsToTransfer.isNotEmpty ;
 
   // *********************** for deleting user ***********************
   Future<bool> deleteExistingUser(int userId) async {
