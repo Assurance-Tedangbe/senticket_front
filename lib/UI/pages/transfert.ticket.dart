@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/transfert.ticket.body.dart';
+import 'package:senticket_front/UI/widgets/transfert/ticket/transfert.ticket.body.dart';
 import 'package:senticket_front/constants.dart';
 
 class TransfertTicket extends StatelessWidget {

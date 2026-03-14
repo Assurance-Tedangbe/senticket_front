@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
+import 'package:senticket_front/UI/widgets/cancelTrsf/cancelButtonWithBadge.dart';
 import 'package:senticket_front/UI/widgets/cancelTrsf/popupCancelTransfer.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/numberTicketsSection.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/senderPasswordTrsfTicket.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/recipientUsernameTrsfTicket.dart';
-import 'package:senticket_front/UI/widgets/transfert/transfert.ticket/trsfTicketBtn.dart';
+import 'package:senticket_front/UI/widgets/transfert/ticket/recipientUsernameTrsfTicket.dart';
+import 'package:senticket_front/UI/widgets/transfert/ticket/trsfTicketBtn.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+
+import 'numberTicketsSection.dart';
+import 'senderPasswordTrsfTicket.dart';
 
 class TrsfTicketBody extends StatefulWidget {
   const TrsfTicketBody({super.key});
@@ -238,7 +240,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Aucun transfert à annuler'),
-          backgroundColor: cyanColor,
+          backgroundColor: kPrimaryColor,
           duration: Duration(seconds: 3),
         ),
       );
@@ -449,7 +451,12 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            // Afficher le badge du nombre de transferts à annuler si disponible
+            CancelButtonWithBadge(
+              onPressed: _onCancelTransferPressed,
+              hasTransferToCancel: _lastTransferHistory != null,
+            ),
+
+          /*  // Afficher le badge du nombre de transferts à annuler si disponible
             if (_lastTransferHistory != null)
               Container(
                 margin: const EdgeInsets.only(right: 8),
@@ -472,16 +479,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
               icon: const Icon(Icons.cancel, color: kPrimaryColor),
               tooltip: 'Annuler le dernier transfert',
               onPressed: _onCancelTransferPressed,
-            ),
-
-            /*IconButton(
-              iconSize: 60,
-              icon: const Icon(Icons.cancel, color: kPrimaryColor),
-              tooltip: 'Annuler transfert ticket',
-              onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => //const PopupCancelTransfer(transferHistoryDTO: transferHistoryDTO),
-            ),),*/
+            ),*/
           ],
         ),
       ],

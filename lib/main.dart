@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:senticket_front/UI/pages/adminInterface.dart';
 import 'package:senticket_front/UI/pages/buyTicket.dart';
-import 'package:senticket_front/UI/pages/cancelTransfertTicket.dart';
 import 'package:senticket_front/UI/pages/consultAccount.dart';
 import 'package:senticket_front/UI/pages/debitAccount.dart';
 import 'package:senticket_front/UI/pages/coverPage.dart';
@@ -82,12 +81,10 @@ class RootView extends StatelessWidget {
         "/student": (context) => const StudentInterface(),
         "/ticket": (context) => const BuyTicket(),
         "/transfert-ticket": (context) => const TransfertTicket(),
-        "/cancel-transfert-ticket": (context) => const CancelTrsfTicket(),
         "/consult-account": (context) => const ConsultAccount(),
         "/update-profile": (context) => const UpdateProfile(),
         "/porter": (context) => const PorterInterface(),
         "/debit-account": (context) => const DebitAccount(),
-        // "/agent": (context) => const AgentInterface(),
         "/settings": (context) => const SettingsPage(),
         "/log-out": (context) => const LogOut(),
       },
