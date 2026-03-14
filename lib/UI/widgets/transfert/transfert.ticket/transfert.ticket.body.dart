@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/login.dart';
-import 'package:senticket_front/UI/pages/studentInterface.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/cancelTrsf/popupCancelTransfer.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
@@ -29,6 +28,9 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
   final TextEditingController _numberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   TicketType? _selectedTicketType;
+
+  // Stocker l'historique du dernier transfert pour pouvoir l'annuler
+  TransfertHistoryDTO? _lastTransferHistory;
 
   @override
   void initState() {
@@ -187,18 +189,22 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
     final history = await ticketProvider.transferTickets(request);
     if (history != null) {
-      // Afficher le popup d'annulation
+      // Stocker l'historique pour pouvoir l'annuler plus tard
+      setState(() {
+        _lastTransferHistory = history;
+      });
+      /*// Afficher le popup d'annulation
       if (context.mounted) {
         showDialog(
           context: context,
           builder: (_) => PopupCancelTransfer(transferHistoryDTO: history),
         );
-      }
+      }*/
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '$number ticket(s) transferé(s) avec succès'
+            '$number ticket(s) transferé(s)'
            /* '$number ticket(s) de type ${_selectedTicketType == TicketType.a ? 'A' : 'B'} '
             'transféré(s) à ${recipient.username}',*/
           ),
@@ -224,6 +230,34 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         ),
       );
     }
+  }
+
+  // méthode pour annuler le dernier transfert
+  Future<void> _onCancelTransferPressed() async {
+    if (_lastTransferHistory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aucun transfert à annuler'),
+          backgroundColor: cyanColor,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // Afficher le popup d'annulation avec l'historique du dernier transfert
+    showDialog(
+      context: context,
+      builder: (_) => PopupCancelTransfer(
+        transferHistoryDTO: _lastTransferHistory!,
+        onCancelSuccess: () {
+          // Réinitialiser l'historique après annulation réussie
+          setState(() {
+            _lastTransferHistory = null;
+          });
+        },
+      ),
+    );
   }
 
   @override
@@ -288,7 +322,6 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
             backgroundColor: kPrimaryColor,
             foregroundColor: kSecondColor,
           ),
-          /* style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor), */
         ),
       ],
     );
@@ -416,17 +449,39 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
+            // Afficher le badge du nombre de transferts à annuler si disponible
+            if (_lastTransferHistory != null)
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: kPrimaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '1',
+                  style: const TextStyle(
+                    color: kSecondColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             IconButton(
               iconSize: 60,
               icon: const Icon(Icons.cancel, color: kPrimaryColor),
-              tooltip: 'Annuler transfert ticket',
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => StudentInterface()
-                  //PopupCancelTransfer(transferHistoryDTO: transferHistoryDTO);
-                ),
-              ),
+              tooltip: 'Annuler le dernier transfert',
+              onPressed: _onCancelTransferPressed,
             ),
+
+            /*IconButton(
+              iconSize: 60,
+              icon: const Icon(Icons.cancel, color: kPrimaryColor),
+              tooltip: 'Annuler transfert ticket',
+              onPressed: () => showDialog(
+                    context: context,
+                    builder: (_) => //const PopupCancelTransfer(transferHistoryDTO: transferHistoryDTO),
+            ),),*/
           ],
         ),
       ],

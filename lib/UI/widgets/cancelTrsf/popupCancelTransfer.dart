@@ -7,8 +7,11 @@ import 'package:senticket_front/provider/user_provider.dart';
 
 class PopupCancelTransfer extends StatelessWidget {
   final TransfertHistoryDTO transferHistoryDTO;
+  final VoidCallback? onCancelSuccess;
 
-  const PopupCancelTransfer({super.key, required this.transferHistoryDTO});
+  const PopupCancelTransfer({super.key,
+    required this.transferHistoryDTO,
+    this.onCancelSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +78,7 @@ class PopupCancelTransfer extends StatelessWidget {
 
             if (success && context.mounted) {
               Navigator.pop(context);
+              onCancelSuccess?.call(); // Appeler le callback de succès
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Transfert annulé'),
