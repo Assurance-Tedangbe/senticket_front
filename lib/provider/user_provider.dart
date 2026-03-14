@@ -20,8 +20,7 @@ class UserProvider with ChangeNotifier {
   bool _isDeletingUser = false;
   bool _isLoggingIn = false;
   /*   bool _isUpdatingPassword = false;
-  bool _isAddRoleToUser = false;
-  bool _isRemoveRoleFromUser = false; */
+  bool _isAddRoleToUser = false; */
 
   // State for signup form
   String _firstName = '';
@@ -53,13 +52,12 @@ class UserProvider with ChangeNotifier {
   // DEBIT FORM STATE
   String _debitUsername = '';
   bool _isSearchingUser = false;
-  User? _searchedUser; // Utilisateur recherché
+  User? _searchedUser;
   String? _debitUsernameError;
 
-  // TRANSFER FORM STATE: pour la recherche du destinataire
+  // TRANSFER FORM STATE
   String _transferRecipientUsername = '';
   String _senderPassword = '';
-  String  _numberOfTicketsToTransfer = '';
   String? _senderPasswordError;
 
   UserProvider(this._service);
@@ -122,7 +120,6 @@ class UserProvider with ChangeNotifier {
   // Getters for transfer form
   String get transferRecipientUsername => _transferRecipientUsername;
       String get senderPassword => _senderPassword;
-  String get numberOfTicketsToTransfer => _numberOfTicketsToTransfer;
   String? get senderPasswordError => _senderPasswordError;
 
   // **************** setters for signup form ***************
@@ -765,10 +762,6 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get isTransferUserFormValid =>
-      _transferRecipientUsername.isNotEmpty &&
-      _senderPassword.isNotEmpty; //&& _numberOfTicketsToTransfer.isNotEmpty ;
-
   // *********************** for deleting user ***********************
   Future<bool> deleteExistingUser(int userId) async {
     _isDeletingUser = true;
@@ -842,27 +835,6 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-    // Load a specific user by its username
-    Future<void> loadUserByUsername(String username) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      _currentUser = await _service.getUserByUsername(
-        username,
-      ); //I request a specific user by its username from the API and store it in _currentUser"
-      _error = '';
-      print(" User loaded with username: $username");
-    } catch (e) {
-      _error = 'Error loading user with username: ${e.toString()}';
-      print(" Error loadUserByUsername: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  } 
-
   // ******************* Update password *****************
   Future<bool> updateUserPassword(int userId, String newPassword) async {
     _isUpdatingPassword = true;
@@ -873,7 +845,7 @@ class UserProvider with ChangeNotifier {
       await _service.updatePassword(
         userId,
         newPassword,
-      ); // asking the API to change the password for this user
+      );
 
       _error = '';
       print(" User password updated successfully: $newPassword");
@@ -888,28 +860,7 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // Force data refresh
-  Future<void> refreshData() async {
-    await loadAllUsers(forceRefresh: true);
-  }
-
-  // Clear the error message and notify the UI
-  void clearError() {
-    _error = '';
-    notifyListeners();
-  }
-
-   // Validation du formulaire de débit
-  String? getDebitUsernameError() {
-    if (_debitUsername.isEmpty) {
-      return 'Le nom d\'utilisateur est requis';
-    }
-    return null;
-  } */  
-
-
-  // Add role to an existing user
+  */
   Future<bool> addRoleToExistingUser(int userId, int roleId) async {
     _isAddRoleToUser = true;
     _isLoading = true;
@@ -933,11 +884,6 @@ class UserProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  // Searching for users (uses the service's local cache)
-  List<User> searchUsers(String query) {
-    return _service.searchUsers(query);
   }
  */
 

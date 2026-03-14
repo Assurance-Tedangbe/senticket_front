@@ -67,8 +67,8 @@ class TicketProvider with ChangeNotifier {
 
   // State for transferTickets operation
   String? _numberOfTicketsError;
-  String?
-  _numberOfTicketsIsInvalid; // Stocke les erreurs liées au nombre de tickets à transférer
+  /*String?
+  _numberOfTicketsIsInvalid; */// Stocke les erreurs liées au nombre de tickets à transférer
 
   // State pour cancelTransfer operation
   TransfertHistoryDTO? _lastTransfer;
@@ -112,7 +112,7 @@ class TicketProvider with ChangeNotifier {
 
   // Getters for transfer operation
   String? get numberOfTicketsError => _numberOfTicketsError;
-  String? get numberOfTicketsIsInvalid => _numberOfTicketsIsInvalid;
+  //String? get numberOfTicketsIsInvalid => _numberOfTicketsIsInvalid;
 
   // Getters for cancelTransfer operation
   TransfertHistoryDTO? get lastTransfer => _lastTransfer;
@@ -142,13 +142,23 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setNumberOfTicketsIsInvalid(String error) {
+  /*void setNumberOfTicketsIsInvalid(String error) {
     _numberOfTicketsIsInvalid = error;
     notifyListeners();
-  }
+  }*/
 
   void setTransactionIdError(String error) {
     _transactionIdError = error;
+    notifyListeners();
+  }
+
+  void setNumberOfTicketsIsInvalid(String error) {
+    _numberOfTicketsError = error;
+    notifyListeners();
+  }
+
+  void clearNumberOfTicketsError() {
+    _numberOfTicketsError = '';
     notifyListeners();
   }
 

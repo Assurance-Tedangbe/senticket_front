@@ -6,16 +6,24 @@ import 'package:senticket_front/provider/ticket_provider.dart';
 
 class NumberTicketsSection extends StatelessWidget {
   final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
 
   const NumberTicketsSection({
     super.key,
     required this.controller,
+    this.onChanged,
+
   });
 
   @override
   Widget build(BuildContext context) {
     return Consumer<TicketProvider>(
       builder: (context, ticketProvider, child) {
+
+        String? getErrorText(BuildContext context) {
+          return ticketProvider.numberOfTicketsError;
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -37,11 +45,20 @@ class NumberTicketsSection extends StatelessWidget {
                 ],
                 border: Border.all(color: kPrimaryColor, width: 1),
               ),
-              child: TextField(
+              child: TextFormField(
                 controller: controller,
                 keyboardType: TextInputType.number,
                 style: const TextStyle(color: enterTextFieldColor),
                 cursorColor: kPrimaryColor,
+                onChanged: (value) {
+                  // Valider que c'est un nombre positif
+                  final number = int.tryParse(value);
+                  if (number != null && number > 0) {
+                    // Effacer l'erreur si elle existe
+                    ticketProvider.clearNumberOfTicketsError();
+                  }
+                  onChanged?.call(value);
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.only(top: 14),
@@ -54,7 +71,8 @@ class NumberTicketsSection extends StatelessWidget {
                     color: kPrimaryColor,
                     fontSize: 12,
                   ),
-                  errorText: ticketProvider.numberOfTicketsError,
+                  errorText: getErrorText(context),
+                 // errorText: ticketProvider.numberOfTicketsError,
                 ),
               ),
             ),

@@ -52,6 +52,27 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     super.dispose();
   }
 
+  bool _isFormValid() {
+    // Vérifier que tous les champs sont remplis
+    final recipientNotEmpty = _recipientController.text.isNotEmpty;
+    final typeSelected = _selectedTicketType != null;
+    final numberNotEmpty = _numberController.text.isNotEmpty;
+    final passwordNotEmpty = _passwordController.text.isNotEmpty;
+
+    // Vérifier que le nombre est valide (si présent)
+    bool isNumberValid = true;
+    if (numberNotEmpty) {
+      final number = int.tryParse(_numberController.text.trim());
+      isNumberValid = number != null && number > 0;
+    }
+
+    return recipientNotEmpty &&
+        typeSelected &&
+        numberNotEmpty &&
+        isNumberValid &&
+        passwordNotEmpty;
+  }
+
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {
       userProvider.setUsernameError(
@@ -128,6 +149,17 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       return;
     }
 
+    // Double vérification de la validité du formulaire
+    if (!_isFormValid()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez remplir tous les champs correctement'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+      return;
+    }
+
     // Valider le type sélectionné
     if (_selectedTicketType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -173,6 +205,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       }
     }
     final recipient = userProvider.searchedUser!;
+   // final number = int.parse(_numberController.text.trim());
 
     // Construire la requête
     final request = TransfertTicketRequestDTO(
@@ -195,13 +228,6 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       setState(() {
         _lastTransferHistory = history;
       });
-      /*// Afficher le popup d'annulation
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (_) => PopupCancelTransfer(transferHistoryDTO: history),
-        );
-      }*/
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -223,6 +249,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         _selectedTicketType = null;
       });
       userProvider.setTransferRecipientUsername('');
+      ticketProvider.clearNumberOfTicketsError();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -382,6 +409,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
           controller: _recipientController,
           onChanged: (value) {
             userProvider.setDebitUsername(value);
+            setState(() {}); // Rebuild pour mettre à jour l'état du bouton
           },
         ),
         const SizeboxHeightSession(),
@@ -435,18 +463,23 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
           ],
         ),
         const SizeboxHeightSession(),
-        NumberTicketsSection(controller: _numberController),
+        NumberTicketsSection(controller: _numberController,
+          onChanged: (value) {
+          setState(() {});
+        },),
         const SizeboxHeightSession(),
         SenderPasswordTrsfTicket(
           controller: _passwordController,
           onChanged: (value) {
             userProvider.setSenderPassword(value);
+            setState(() {});
           },
         ),
         const SizeboxHeightSession(),
         TransfertTicketBtn(
           onPressed: _onTransferPressed,
           isLoading: ticketProvider.isTransferringTickets,
+          isFormValid: _isFormValid(),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
