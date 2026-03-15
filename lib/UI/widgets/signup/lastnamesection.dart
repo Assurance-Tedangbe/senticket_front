@@ -4,16 +4,14 @@ import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.da
 import 'package:senticket_front/constants.dart';
 
 class LastNameSection extends StatelessWidget {
-  final TextEditingController controller; // ← ICI
-  final ValueChanged<String>? onChanged; // ⭐ NOUVEAU
+  final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
 
   const LastNameSection({
     super.key,
     required this.controller,
-    this.onChanged, // ← ICI
+    this.onChanged,
   });
-
-  /* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +19,7 @@ class LastNameSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Label(text: 'Nom'),
-
-        // Espacement entre le label et le champ
         const SizeBoxBtwLabelField(),
-
         // Container stylisé pour le champ de saisie
         Container(
           alignment: Alignment.centerLeft,

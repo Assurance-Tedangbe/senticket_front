@@ -322,12 +322,15 @@ class UserProvider with ChangeNotifier {
       _username.isNotEmpty &&
       _email.isNotEmpty &&
       _password.isNotEmpty &&
+      _confirmPassword.isNotEmpty &&
       _password == _confirmPassword &&
-      _password.length >= 6;
+      _password.length >= 6 &&
+      _role != null;
+
 
   String? get passwordError {
     if (_password.isNotEmpty && _password.length < 6) {
-      return 'Le mot de passe doit contenir au moins 6 caractères';
+      return 'Il doit contenir au moins 6 caractères';
     }
     if (_confirmPassword.isNotEmpty && _password != _confirmPassword) {
       return 'Les mots de passe ne correspondent pas';
@@ -340,6 +343,12 @@ class UserProvider with ChangeNotifier {
       return 'Email invalide';
     }
     return null;
+  }
+
+  String? get usernameError{
+    if(_username.isNotEmpty && _username.length < 3) {
+      return 'Il doit contenir au moins 3 caractères';
+    }
   }
 
   Future<bool> submitSignup() async {

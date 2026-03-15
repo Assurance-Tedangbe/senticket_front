@@ -10,24 +10,22 @@ import 'package:senticket_front/constants.dart';
   Valide que les deux mots de passe correspondent.
 */
 class ConfirmPwdSection extends StatelessWidget {
-  final TextEditingController controller; // ← ICI
-  final ValueChanged<String>? onChanged; // ⭐ NOUVEAU
+  final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
 
   const ConfirmPwdSection({
     super.key,
-    required this.controller, // ← ICI
-    this.onChanged, // ← ICI
+    required this.controller,
+    this.onChanged,
   });
 
-  /* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
-     ce widgets a besoin d'accéder à des données dynamiques du Provider :
+  /* Besoin du Consumer:
      userProvider.isPasswordVisible → Changement d'état booléen
      userProvider.passwordError → Messages d'erreur dynamiques */
 
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
-      // Consumer permet de réagir aux changements du Provider  // ← ICI
       builder: (context, userProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,9 +48,9 @@ class ConfirmPwdSection extends StatelessWidget {
               ),
               height: 50,
               child: TextField(
-                controller: controller, // ← ICI
+                controller: controller,
                 keyboardType: TextInputType.visiblePassword,
-                obscureText: !userProvider.isPasswordVisible, // ← ICI
+                obscureText: !userProvider.isPasswordVisible,
                 style: const TextStyle(color: enterTextFieldColor),
                 onChanged: onChanged,
                 cursorColor: kPrimaryColor,
@@ -70,19 +68,18 @@ class ConfirmPwdSection extends StatelessWidget {
                     icon: Icon(
                       // Change l'icône selon l'état de visibilité
                       userProvider
-                              .isPasswordVisible // ← ICI
+                              .isPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
                       color: kPrimaryColor,
                     ),
                     onPressed: () {
                       // Bascule l'état de visibilité via le Provider
-                      userProvider.togglePasswordVisibility(); // ← ICI
+                      userProvider.togglePasswordVisibility();
                     },
                   ),
                   border: InputBorder.none,
-                  // Affichage des erreurs de correspondance
-                  errorText: userProvider.passwordError, // ← ICI
+                  errorText: userProvider.passwordError,
                 ),
               ),
             ),

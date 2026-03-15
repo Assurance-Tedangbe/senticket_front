@@ -10,24 +10,21 @@ import 'package:senticket_front/constants.dart';
   Gère dynamiquement l'affichage/masquage du mot de passe.
 */
 class PasswordSection extends StatelessWidget {
-  final TextEditingController controller; // ← ICI
-  final ValueChanged<String>? onChanged; // ⭐ NOUVEAU
+  final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
 
   const PasswordSection({
     super.key,
     required this.controller,
-    this.onChanged, // ← ICI
+    this.onChanged,
   });
 
-  /* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
-     ce widgets a besoin d'accéder à des données dynamiques du Provider :
+  /* Besoin du Consumer:
      userProvider.isPasswordVisible → Changement d'état booléen
      userProvider.passwordError → Messages d'erreur dynamiques */
-
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
-      // Consumer permet de réagir aux changements du Provider // ← ICI
       builder: (context, userProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,10 +55,6 @@ class PasswordSection extends StatelessWidget {
                 style: const TextStyle(color: enterTextFieldColor),
                 onChanged: onChanged,
                 cursorColor: kPrimaryColor,
-                /* (value) {
-                  // Met à jour le mot de passe dans le Provider
-                  userProvider.motdepasse(value); 
-                }, */
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.only(top: 11),
                   prefixIcon: const Icon(Icons.password, color: kPrimaryColor),
@@ -83,12 +76,11 @@ class PasswordSection extends StatelessWidget {
                     ),
                     onPressed: () {
                       // Bascule l'état de visibilité via le Provider
-                      userProvider.togglePasswordVisibility(); // ← ICI
+                      userProvider.togglePasswordVisibility();
                     },
                   ),
                   border: InputBorder.none,
-                  // Affichage des erreurs de validation
-                  errorText: userProvider.passwordError, // ← ICI
+                  errorText: userProvider.passwordError,
                 ),
               ),
             ),

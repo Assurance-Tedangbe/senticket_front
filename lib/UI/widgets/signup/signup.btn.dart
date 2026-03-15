@@ -9,36 +9,27 @@ import 'package:senticket_front/constants.dart';
   Dynamiquement activé/désactivé selon la validation du formulaire.
 */
 class SignupBtn extends StatelessWidget {
-  final VoidCallback onSignupSuccess; // ← ICI
+  final VoidCallback onSignupSuccess;
 
   const SignupBtn({
     super.key,
-    required this.onSignupSuccess, // ← ICI
+    required this.onSignupSuccess,
   });
-
-  /* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
-     Ces widget a besoin d'accéder à des données dynamiques du Provider  */
 
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
-      // ← ICI
       builder: (context, userProvider, child) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 25),
           width: double.infinity,
           height: 90,
           child: ElevatedButton(
-            /* Le bouton est désactivé si :
-                1. Une création est déjà en cours
-                2. Le formulaire n'est pas valide  */
-            // ← ICI
             onPressed: userProvider.isCreatingUser || !userProvider.isFormValid
                 ? null
                 : () async {
-                    final success = await userProvider.submitSignup(); // ← ICI
+                    final success = await userProvider.submitSignup();
                     if (success) {
-                      // Afficher un message de succès
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Compte créé avec succès !'),
@@ -46,13 +37,11 @@ class SignupBtn extends StatelessWidget {
                         ),
                       );
 
-                      // Réinitialiser le formulaire
-                      userProvider.resetForm(); // ← ICI
+                      userProvider.resetForm();
 
                       // Navigation ou callback
-                      onSignupSuccess(); // ← ICI
+                      onSignupSuccess();
                     } else {
-                      // Afficher l'erreur
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(userProvider.error),
@@ -62,8 +51,7 @@ class SignupBtn extends StatelessWidget {
                     }
                   },
             style: ElevatedButton.styleFrom(
-              // Change la couleur selon l'état de validation
-              backgroundColor: // ← ICI
+              backgroundColor:
               userProvider.isFormValid && !userProvider.isCreatingUser
                   ? kPrimaryColor
                   : greyBorderColor,
@@ -78,10 +66,10 @@ class SignupBtn extends StatelessWidget {
             ),
             child:
                 userProvider
-                    .isCreatingUser // ← ICI
+                    .isCreatingUser
                 ? // Affiche un indicateur de chargement pendant la création
                   const CustomCircularProgressIndicator()
-                : const Text('Créer un compte'),
+                : const Text('Créer un compte', style: TextStyle(color: kSecondColor)),
           ),
         );
       },

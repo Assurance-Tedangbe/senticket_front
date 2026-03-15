@@ -19,14 +19,12 @@ class EmailSection extends StatelessWidget {
     this.onChanged, // ← ICI
   });
 
-  /* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
-   ce widget a besoin d'accéder à des données dynamiques du Provider :
+  /* Besoin du Consumer:
    userProvider.emailError → Validation en temps réel */
-
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
-      // Consumer permet de réagir aux changements du Provider  // ← ICI
+      // Consumer permet de réagir aux changements du Provider
       builder: (context, userProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,8 +63,7 @@ class EmailSection extends StatelessWidget {
                     fontSize: 12,
                   ),
 
-                  // Affichage conditionnel des erreurs de validation
-                  errorText: userProvider.emailError, // ← ICI
+                  errorText: userProvider.emailError,
                 ),
               ),
             ),

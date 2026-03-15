@@ -13,23 +13,19 @@ import 'package:senticket_front/model/role_model.dart';
 */
 class RoleSection extends StatelessWidget {
   // ⭐ CHANGEMENT : Accepte un objet Role, pas un String
-  final ValueChanged<Role?> onRoleChanged; // ← ICI
-  final Role? selectedRole; // ⭐ NOUVEAU : Pour garder la sélection
+  final ValueChanged<Role?> onRoleChanged;
+  final Role? selectedRole; //Pour garder la sélection
 
   const RoleSection({
     super.key,
-    required this.onRoleChanged, // ← ICI
-    this.selectedRole, // ⭐ NOUVEAU
+    required this.onRoleChanged,
+    this.selectedRole,
   });
 
-  /* Consumer est utilisé QUAND ON A BESOIN DE "LIRE" DES DONNÉES DYNAMIQUES
-     Ce widget a besoin d'accéder à des données dynamiques du Provider :
-     roleProvider.roles  */
-
+  /* Besoin du Consumer: roleProvider.roles  */
   @override
   Widget build(BuildContext context) {
     return Consumer<RoleProvider>(
-      // Consumer permet de réagir aux changements du Provider  // ← ICI
       builder: (context, roleProvider, child) {
         // Vérifie si les rôles sont chargés, sinon les charge
         if (roleProvider.roles.isEmpty && !roleProvider.isLoading) {
@@ -37,7 +33,6 @@ class RoleSection extends StatelessWidget {
             Provider.of<RoleProvider>(context, listen: false).loadAllRoles();
           });
         }
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -72,7 +67,7 @@ class RoleSection extends StatelessWidget {
                       )
                     : // Affiche la liste déroulante une fois les données chargées
                       DropdownButtonFormField<Role>(
-                        // ⭐ Utilise la valeur sélectionnée
+                        // Utilise la valeur sélectionnée
                         initialValue: roleProvider.roles.isNotEmpty
                             ? roleProvider.roles.first
                             : null,

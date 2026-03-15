@@ -3,27 +3,17 @@ import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
 import 'package:senticket_front/constants.dart';
 
-/*
-  Widget pour le champ "Prénom" transformé en StatelessWidget.
-  L'état est maintenant géré par le UserProvider, ce qui permet :
-  - Une meilleure séparation des responsabilités
-  - Une gestion d'état centralisée
-  - Une meilleure testabilité
-*/
-
 // L'ENFANT utilise seulement
 class FirstNameSection extends StatelessWidget {
   final TextEditingController
-  controller; // ← ICI : UTILISATION SEULEMENT(REÇU EN PARAMÈTRE)
-  final ValueChanged<String>? onChanged; // ⭐ NOUVEAU
+  controller; // ← UTILISATION SEULEMENT(REÇU EN PARAMÈTRE)
+  final ValueChanged<String>? onChanged;
 
   const FirstNameSection({
     super.key,
-    required this.controller, // ← ICI :  ← NE LE CRÉE PAS, LE REÇOIT
-    this.onChanged, // ⭐ NOUVEAU
+    required this.controller, // ← NE LE CRÉE PAS, LE REÇOIT
+    this.onChanged,
   });
-
-  /* Consumer n'est pas utilisé QUAND ON A BESOIN SEULEMENT D'ÉCRIRE DANS LE PROVIDER */
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +21,7 @@ class FirstNameSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Label(text: 'Prénom'),
-
-        // Espacement entre le label et le champ
         const SizeBoxBtwLabelField(),
-
         // Container qui englobe le TextField pour le style
         Container(
           alignment: Alignment.centerLeft,
@@ -54,15 +41,9 @@ class FirstNameSection extends StatelessWidget {
           height: 50,
           child: TextFormField(
             controller: controller, // Lier le contrôleur au TextField
-            keyboardType: TextInputType.text, // Type de clavier texte
+            keyboardType: TextInputType.text,
             style: const TextStyle(color: enterTextFieldColor),
             onChanged: onChanged,
-            /* (value) {
-              // Appel au Provider pour mettre à jour l'état
-              // ↓ Seulement un appel pour écrire dans le Provider
-              Provider.of<UserProvider>(context, listen: false)
-                  .firstname(value); 
-            }, */
             cursorColor: kPrimaryColor,
             decoration: const InputDecoration(
               border: InputBorder.none, // Pas de bordure interne

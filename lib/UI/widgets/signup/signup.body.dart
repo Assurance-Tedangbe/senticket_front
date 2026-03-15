@@ -43,16 +43,13 @@ class _SignupBodyState extends State<SignupBody> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  // ⭐ CHANGEMENT : Stockez l'objet Role complet, pas juste le nom
+  // CHANGEMENT : Stockez l'objet Role complet, pas juste le nom
   Role? _selectedRole;
-
-  // État local pour le rôle sélectionné
-  // String? _selectedRole;
 
   @override
   void dispose() {
     // Nettoyage obligatoire pour éviter les memory leaks
-    // 2. Libérer le contrôleur lorsque le widget est détruit
+    // Libérer le contrôleur lorsque le widget est détruit
     _firstNameController.dispose();
     _lastNameController.dispose();
     _usernameController.dispose();
