@@ -318,6 +318,40 @@ class TicketApiService {
       rethrow;
     }
   }
+
+// ******************** 📊 FOR STATISTICS OPERATION ************************
+
+  /// Récupère les statistiques des tickets
+  /// @param userId (optionnel) - ID de l'utilisateur pour les stats spécifiques
+  Future<TicketStatisticsDTO> getTicketStatistics({int? userId}) async {
+    try {
+      print("************** RÉCUPÉRATION STATISTIQUES **************");
+      print("User ID: $userId");
+
+      // Construire l'URL avec paramètre optionnel
+      final uri = userId != null
+          ? Uri.parse('$baseUrl/statistics?userId=$userId')
+          : Uri.parse('$baseUrl/statistics');
+
+      final response = await http.get(uri, headers: headers);
+
+      print("Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        return TicketStatisticsDTO.fromJson(jsonData);
+      } else {
+        final errorBody = json.decode(response.body);
+        final errorMessage =
+            errorBody['message'] ?? 'Erreur récupération statistiques: ${response.statusCode}';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      print("Erreur getTicketStatistics: $e");
+      rethrow;
+    }
+  }
 }
 
 /*
@@ -547,34 +581,6 @@ class TicketApiService {
     }
   }
 
-  // UNBOOK TICKET (PUT /api/tickets/unbook/{ticketId})
-  Future<void> unbookTicket(int ticketId) async {
-    try {
-      print("Annuler réservation du ticket avec ID: $ticketId");
-
-      final response = await http.put(
-        Uri.parse('$baseUrl/unbook/$ticketId'),
-        headers: headers,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Erreur annulation réservation ticket: ${response.statusCode}',
-        );
-      }
-
-      print("Réservation ticket $ticketId annulée");
-
-      // "Met à jour le cache local"
-      final index = _cachedTickets.indexWhere((t) => t.ticketId == ticketId);
-      if (index != -1) {
-        _cachedTickets[index] = _cachedTickets[index].copyWith(booked: false);
-      }
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
   // READ TICKETS BY STATUS (GET /api/tickets/ticketStatus/{ticketStatus})
   Future<List<Ticket>> getTicketsByStatus(TicketStatus ticketStatus) async {
     try {
@@ -793,7 +799,7 @@ class TicketApiService {
       'booked': 5,
       'available': 8,
       'used': 2,
-      'AVAILABLE': 8,    // ← Clé cohérente avec le backend
+      'AVAILABLE': 8,
       'BOOKED': 5,      
       'USED': 2,        
       'A': 10,          
@@ -803,70 +809,3 @@ class TicketApiService {
   }
   */
 
-/*
-    // READ TICKETS BY ACCOUNT ID (GET /api/tickets/accountId/{accountId})
-  Future<List<Ticket>> getTicketsByAccountId(int accountId) async {
-    try {
-      print("Récupération des tickets par accountId: $accountId");
-
-      final response = await http.get(
-        Uri.parse('$baseUrl/accountId/$accountId'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-
-        return jsonList.map((json) => Ticket.fromJson(json)).toList();
-      } else {
-        throw Exception(
-            'Erreur récupération tickets par compte: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  } 
-
-  // READ TICKETS BY MENU ID AND USER ID (GET /api/tickets/menuId/{menuId}/userId/{userId})
-  Future<List<Ticket>> getTicketsByMenuIdAndUserId(
-      int menuId, String userId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/menuId/$menuId/userId/$userId'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((json) => Ticket.fromJson(json)).toList();
-      } else {
-        throw Exception(
-            'Erreur récupération tickets par menu et utilisateur: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  // READ TICKETS BY MENU ID, USER ID AND STATUS (GET /api/tickets/menuId/{menuId}/userId/{userId}/status/{ticketStatus})
-  Future<List<Ticket>> getTicketsByMenuIdAndUserIdAndStatus(
-      String menuId, String userId, String ticketStatus) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-            '$baseUrl/menuId/$menuId/userId/$userId/status/$ticketStatus'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        return jsonList.map((json) => Ticket.fromJson(json)).toList();
-      } else {
-        throw Exception(
-            'Erreur récupération tickets par menu, utilisateur et statut: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-  */

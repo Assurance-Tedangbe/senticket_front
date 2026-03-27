@@ -283,7 +283,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  // ***************** FOR SIGN UP ****************
+  // ***************** 👤FOR SIGN UP ****************
 
   Future<bool> createNewUser(User user) async {
     //I'm going to create a user and I'll tell you if it worked (bool)"
@@ -380,7 +380,7 @@ class UserProvider with ChangeNotifier {
         role: _role!,
       );
 
-      print('🔄 Création de l\'utilisateur avec rôle: ${_role!.name}');
+      print(' 👤 Création de l\'utilisateur avec rôle: ${_role!.name}');
 
       return await createNewUser(user);
     } catch (e) {

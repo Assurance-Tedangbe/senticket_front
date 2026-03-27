@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
 import 'package:senticket_front/UI/widgets/home/imageasset.template.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/home/stat.label.dart';
 import 'package:senticket_front/constants.dart';
+
+import '../../../provider/ticket_provider.dart' show TicketProvider;
 
 class Statistics extends StatefulWidget {
   const Statistics({super.key});
@@ -14,21 +17,47 @@ class Statistics extends StatefulWidget {
 
 class _StatisticsState extends State<Statistics> {
   @override
+  void initState() {
+    super.initState();
+    _loadStatistics();
+  }
+  Future<void> _loadStatistics() async {
+    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    // Charger les statistiques globales sans userId
+    await ticketProvider.loadTicketStatistics();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final ticketProvider = Provider.of<TicketProvider>(context);
+    final globalStats = ticketProvider.globalStats;
+    final availableStats = ticketProvider.availableStats;
+    final isLoading = ticketProvider.isLoadingStatistics;
     Size size = MediaQuery.of(context).size;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: [BlocTitle(text: "Statistiques")],
+          children: [BlocTitle(text: "Statistiques globales des tickets")],
         ),
         const SizeboxHeightSession(),
+        if (isLoading)
+          const Center(child: CircularProgressIndicator())
+        else if (globalStats == null)
+          const Center(
+            child: Text(
+              "Aucune statistique disponible",
+              style: TextStyle(color: greyBorderColor),
+            ),
+          )
+        else
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Stack(
               children: [
+                /// Total global achetés et débités
                 Container(
                   width: size.width / 1.7,
                   height: size.height / 13.0,
@@ -49,8 +78,11 @@ class _StatisticsState extends State<Statistics> {
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      /// Total global achetés
                       Column(
+                        // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,7 +91,7 @@ class _StatisticsState extends State<Statistics> {
                                 width: size.width / 20.0,
                                 height: size.height / 50.0,
                                 child: const ImageAsset(
-                                  iconpath: "images/increase.JPG",
+                                  iconpath: "images/ticket_icon.JPG",
                                 ),
                               ),
                               const Padding(
@@ -69,14 +101,15 @@ class _StatisticsState extends State<Statistics> {
                                   0.0,
                                   0.0,
                                 ),
-                                child: StatisticsLabel(label: "Total tickets"),
+                                child: StatisticsLabel(label: "Total achetés"),
                               ),
                             ],
                           ),
-                          const Padding(
+                          // const SizedBox(height: 4),
+                           Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              "20",
+                              globalStats.totalPurchasedTickets.toString(),
                               style: TextStyle(
                                 color: kThirdColor,
                                 fontSize: 12.0,
@@ -86,6 +119,57 @@ class _StatisticsState extends State<Statistics> {
                           ),
                         ],
                       ),
+                      // Séparateur vertical
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: kPrimaryColor,
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      // just added
+                      /// Total global débités
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(3.0, 0.0, 0.0, 0.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                /*Icon(Icons.food_bank),
+                                StatisticsLabel(label: "Total debités"),*/
+                                SizedBox(
+                                  width: size.width / 20.0,
+                                  height: size.height / 50.0,
+                                  child: const ImageAsset(
+                                    iconpath: "images/ticket_icon.JPG",
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.fromLTRB(
+                                    6.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                  ),
+                                  child: StatisticsLabel(label: "Total debités"),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                globalStats.totalDebitedTickets.toString(),
+                                style: TextStyle(
+                                  color: kThirdColor,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -94,6 +178,8 @@ class _StatisticsState extends State<Statistics> {
             const SizeboxHeightSession(),
             Stack(
               children: [
+                /// Tickets disponibles (Type A et Type B)
+                if (availableStats != null)
                 Container(
                   width: size.width / 1.7,
                   height: size.height / 13.0,
@@ -109,12 +195,15 @@ class _StatisticsState extends State<Statistics> {
                     ],
                     border: Border.all(color: kPrimaryColor, width: 0.5),
                   ),
-                ),
+                child:
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      /// Type A disponibles
                       Column(
+                        // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Row(
                             children: [
@@ -132,14 +221,14 @@ class _StatisticsState extends State<Statistics> {
                                   0.0,
                                   0.0,
                                 ),
-                                child: StatisticsLabel(label: "Tickets A"),
+                                child: StatisticsLabel(label: "A dispo."),
                               ),
                             ],
                           ),
-                          const Padding(
+                           Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              "10",
+                              availableStats.typeATicketsAvailable.toString(),
                               style: TextStyle(
                                 color: kThirdColor,
                                 fontSize: 12.0,
@@ -149,22 +238,32 @@ class _StatisticsState extends State<Statistics> {
                           ),
                         ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(3.0, 0.0, 0.0, 0.0),
+                      // Séparateur vertical
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: kPrimaryColor,
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                      ),
+
+                      /// Type B disponibles
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(3.0, 0.0, 0.0, 0.0),
                         child: Column(
                           children: [
-                            Row(
+                            const Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Icon(Icons.food_bank),
-                                StatisticsLabel(label: "Tickets B"),
+                                StatisticsLabel(label: "B dispo."),
                               ],
                             ),
+                            //const SizedBox(height: 4),
                             Padding(
-                              padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                              padding: const EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                "10",
-                                style: TextStyle(
+                                availableStats.typeBTicketsAvailable.toString(),
+                                style: const TextStyle(
                                   color: kThirdColor,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w700,
@@ -176,6 +275,7 @@ class _StatisticsState extends State<Statistics> {
                       ),
                     ],
                   ),
+                ),
                 ),
               ],
             ),

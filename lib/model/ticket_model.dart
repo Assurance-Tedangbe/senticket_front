@@ -83,10 +83,7 @@ class PurchaseUserDTO {
   PurchaseUserDTO({required this.userId, required this.username});
 
   factory PurchaseUserDTO.fromJson(Map<String, dynamic> json) {
-    return PurchaseUserDTO(
-      userId: json['userId'],
-      username: json['username']
-    );
+    return PurchaseUserDTO(userId: json['userId'], username: json['username']);
   }
 
   Map<String, dynamic> toJson() {
@@ -162,7 +159,7 @@ class DebitPorterDTO {
   factory DebitPorterDTO.fromJson(Map<String, dynamic> json) {
     return DebitPorterDTO(
       porterId: json['porterId'],
-      porterUsername: json['porterUsername']
+      porterUsername: json['porterUsername'],
     );
   }
 
@@ -180,7 +177,7 @@ class DebitStudentDTO {
   factory DebitStudentDTO.fromJson(Map<String, dynamic> json) {
     return DebitStudentDTO(
       debitStudentId: json['debitStudentId'],
-      username: json['username']
+      username: json['username'],
     );
   }
 
@@ -226,7 +223,7 @@ class SenderDTO {
     return SenderDTO(
       senderId: json['senderId'],
       senderUsername: json['senderUsername'],
-      senderPassword: json['senderPassword']
+      senderPassword: json['senderPassword'],
     );
   }
 
@@ -248,7 +245,7 @@ class RecipientDTO {
   factory RecipientDTO.fromJson(Map<String, dynamic> json) {
     return RecipientDTO(
       recipientId: json['recipientId'],
-      recipientUsername: json['recipientUsername']
+      recipientUsername: json['recipientUsername'],
     );
   }
 
@@ -303,7 +300,7 @@ class OriginalSenderDTO {
   factory OriginalSenderDTO.fromJson(Map<String, dynamic> json) {
     return OriginalSenderDTO(
       senderId: json['senderId'],
-      senderUsername: json['senderUsername']
+      senderUsername: json['senderUsername'],
     );
   }
 
@@ -373,7 +370,7 @@ class UserDTO {
       username: json['username'],
       email: json['email'],
       firstName: json['firstName'],
-      lastName: json['lastName']
+      lastName: json['lastName'],
     );
   }
 
@@ -384,6 +381,154 @@ class UserDTO {
       'email': email,
       'firstName': firstName,
       'lastName': lastName,
+    };
+  }
+}
+
+// ==================== STATISTICS DTO ====================
+/// DTO pour les statistiques des tickets
+class TicketStatisticsDTO {
+  final Map<String, UserTicketStats> userStats;
+  final GlobalTicketStats globalStats;
+  final AvailableTicketsStats availableStats;
+
+  TicketStatisticsDTO({
+    required this.userStats,
+    required this.globalStats,
+    required this.availableStats,
+  });
+
+  factory TicketStatisticsDTO.fromJson(Map<String, dynamic> json) {
+    // Convertir userStats (Map<String, dynamic> -> Map<String, UserTicketStats>)
+    final Map<String, UserTicketStats> userStatsMap = {};
+    if (json['userStats'] != null) {
+      (json['userStats'] as Map<String, dynamic>).forEach((key, value) {
+        userStatsMap[key] = UserTicketStats.fromJson(value);
+      });
+    }
+
+    return TicketStatisticsDTO(
+      userStats: userStatsMap,
+      globalStats: GlobalTicketStats.fromJson(json['globalStats'] ?? {}),
+      availableStats: AvailableTicketsStats.fromJson(
+        json['availableStats'] ?? {},
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> userStatsMap = {};
+    userStats.forEach((key, value) {
+      userStatsMap[key] = value.toJson();
+    });
+
+    return {
+      'userStats': userStatsMap,
+      'globalStats': globalStats.toJson(),
+      'availableStats': availableStats.toJson(),
+    };
+  }
+}
+
+/// Statistiques individuelles d'un utilisateur (étudiant)
+class UserTicketStats {
+  final int userId;
+  final String username;
+  final String firstName;
+  final String lastName;
+  final int purchasedTicketsCount; // Nombre de tickets achetés
+  final int debitedTicketsCount; // Nombre de tickets débités
+  final int totalTicketsCount; // Total (achetés + débités)
+
+  UserTicketStats({
+    required this.userId,
+    required this.username,
+    required this.firstName,
+    required this.lastName,
+    required this.purchasedTicketsCount,
+    required this.debitedTicketsCount,
+    required this.totalTicketsCount,
+  });
+
+  factory UserTicketStats.fromJson(Map<String, dynamic> json) {
+    return UserTicketStats(
+      userId: json['userId'] ?? 0,
+      username: json['username'] ?? '',
+      firstName: json['firstName'] ?? '',
+      lastName: json['lastName'] ?? '',
+      purchasedTicketsCount: json['purchasedTicketsCount'] ?? 0,
+      debitedTicketsCount: json['debitedTicketsCount'] ?? 0,
+      totalTicketsCount: json['totalTicketsCount'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'username': username,
+      'firstName': firstName,
+      'lastName': lastName,
+      'purchasedTicketsCount': purchasedTicketsCount,
+      'debitedTicketsCount': debitedTicketsCount,
+      'totalTicketsCount': totalTicketsCount,
+    };
+  }
+}
+
+/// Statistiques globales des tickets
+class GlobalTicketStats {
+  final int totalPurchasedTickets; // Total tickets achetés (tous utilisateurs)
+  final int totalDebitedTickets; // Total tickets débités (tous comptes)
+  final int totalTicketsProcessed; // Total tickets achetés + débités
+
+  GlobalTicketStats({
+    required this.totalPurchasedTickets,
+    required this.totalDebitedTickets,
+    required this.totalTicketsProcessed,
+  });
+
+  factory GlobalTicketStats.fromJson(Map<String, dynamic> json) {
+    return GlobalTicketStats(
+      totalPurchasedTickets: json['totalPurchasedTickets'] ?? 0,
+      totalDebitedTickets: json['totalDebitedTickets'] ?? 0,
+      totalTicketsProcessed: json['totalTicketsProcessed'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'totalPurchasedTickets': totalPurchasedTickets,
+      'totalDebitedTickets': totalDebitedTickets,
+      'totalTicketsProcessed': totalTicketsProcessed,
+    };
+  }
+}
+
+/// Statistiques des tickets disponibles (status = AVAILABLE)
+class AvailableTicketsStats {
+  final int typeATicketsAvailable; // Tickets Type A disponibles
+  final int typeBTicketsAvailable; // Tickets Type B disponibles
+  final int totalTicketsAvailable; // Total tickets disponibles (A + B)
+
+  AvailableTicketsStats({
+    required this.typeATicketsAvailable,
+    required this.typeBTicketsAvailable,
+    required this.totalTicketsAvailable,
+  });
+
+  factory AvailableTicketsStats.fromJson(Map<String, dynamic> json) {
+    return AvailableTicketsStats(
+      typeATicketsAvailable: json['typeATicketsAvailable'] ?? 0,
+      typeBTicketsAvailable: json['typeBTicketsAvailable'] ?? 0,
+      totalTicketsAvailable: json['totalTicketsAvailable'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'typeATicketsAvailable': typeATicketsAvailable,
+      'typeBTicketsAvailable': typeBTicketsAvailable,
+      'totalTicketsAvailable': totalTicketsAvailable,
     };
   }
 }

@@ -18,7 +18,6 @@ class StudentBody extends StatelessWidget {
           width: size.width,
           child: const Column(
             children: [
-              // SoldeSection(),
               StudentServices(),
               SizeboxHeightSession(),
               SizeboxHeightSession(),
