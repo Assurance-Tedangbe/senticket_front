@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
 import 'package:senticket_front/UI/widgets/home/imageasset.template.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
@@ -9,6 +10,8 @@ import 'package:senticket_front/constants.dart';
 import '../../../provider/ticket_provider.dart';
 import '../../../provider/user_provider.dart' show UserProvider;
 
+/// Widget affichant les statistiques pour un utilisateur ETUDIANT
+/// Affiche uniquement si l'utilisateur est connecté et a le rôle ETUDIANT
 class StatisticsStudent extends StatefulWidget {
   const StatisticsStudent({super.key});
 
@@ -23,16 +26,21 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
     super.initState();
     _loadStatistics();
   }
+
+  /// Charge les statistiques pour l'utilisateur connecté
   Future<void> _loadStatistics() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
 
     final currentUser = userProvider.currentUser;
-    if (currentUser != null) {
+
+    // Vérifier que l'utilisateur est connecté ET a le rôle ETUDIANT
+    if (currentUser != null && currentUser.role.name.toUpperCase() == 'ETUDIANT') {
       // load statistics for connected user
       await ticketProvider.loadTicketStatistics(userId: currentUser.userId);
     } else {
-      // Si pas d'utilisateur connecté, charger les stats globales
+      // Si l'utilisateur n'est pas connecté ou n'est pas étudiant, charger quand même
+      // pour avoir des stats à 0 (mais sans userId)
       await ticketProvider.loadTicketStatistics();
     }
   }
@@ -40,9 +48,28 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
   @override
   Widget build(BuildContext context) {
     final ticketProvider = Provider.of<TicketProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    final currentUser = userProvider.currentUser;
     final userStats = ticketProvider.currentUserStats;
     final isLoading = ticketProvider.isLoadingStatistics;
     Size size = MediaQuery.of(context).size;
+
+    // Vérifier si l'utilisateur est connecté ET a le rôle ETUDIANT
+    final isAuthenticatedStudent = currentUser != null &&
+        currentUser.role.name.toUpperCase() == 'ETUDIANT';
+
+    // Déterminer les valeurs à afficher
+    // Si l'utilisateur est authentifié étudiant, utiliser les vraies stats
+    // Sinon, afficher 0 pour toutes les valeurs
+    final purchasedCount = (isAuthenticatedStudent && userStats != null)
+        ? userStats.purchasedTicketsCount
+        : 0;
+    final debitedCount = (isAuthenticatedStudent && userStats != null)
+        ? userStats.debitedTicketsCount
+        : 0;
+    final totalCount = (isAuthenticatedStudent && userStats != null)
+        ? userStats.totalTicketsCount
+        : 0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,15 +80,16 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
         ),
         const SizeboxHeightSession(),
 
+        // Afficher un indicateur de chargement si les stats sont en cours de chargement
         if (isLoading)
-          const Center(child: CircularProgressIndicator())
-        else if (userStats == null)
+          const Center(child: CustomCircularProgressIndicator())
+        /*else if (userStats == null)
           const Center(
             child: Text(
               "Aucune statistique disponible",
               style: TextStyle(color: greyBorderColor),
             ),
-          )
+          )*/
         else
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -113,14 +141,14 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
                               ),
                             ],
                           ),
-                          //const SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              userStats.totalTicketsCount.toString(),
+                              totalCount.toString(),
                               style: TextStyle(
                                 color: kThirdColor,
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -154,15 +182,13 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       /// Tickets achetés par l'utilisateur connecté
                       Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            // mainAxisAlignment: MainAxisAlignment.center,
+                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(
                                 width: size.width / 25.0,
@@ -186,25 +212,26 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
                            Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              userStats.purchasedTicketsCount.toString(),
+                              purchasedCount.toString(),
                               style: TextStyle(
                                 color: kThirdColor,
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
                         ],
                       ),
+                      SizedBox(width: 7),
                       // Séparateur vertical
                       Container(
                         width: 1,
-                        height: 40,
+                        height: 50,
                         color: kPrimaryColor,
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
+                        padding: const EdgeInsets.fromLTRB(12.0, 0.0, 0.0, 0.0),
                         child: Column(
                           children: [
                             Row(
@@ -232,10 +259,10 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
                             Padding(
                               padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                userStats.debitedTicketsCount.toString(),
+                                debitedCount.toString(),
                                 style: TextStyle(
                                   color: kThirdColor,
-                                  fontSize: 12.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

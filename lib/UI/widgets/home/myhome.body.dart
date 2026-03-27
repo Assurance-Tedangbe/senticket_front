@@ -6,6 +6,8 @@ import 'package:senticket_front/UI/widgets/home/statistics.dart';
 import '../../../provider/user_provider.dart';
 import '../customWidgets/sizeboxHeightSession.dart';
 
+/// Widget principal de la page d'accueil
+/// Affiche les services et les statistiques globales selon le rôle de l'utilisateur
 class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
 
@@ -13,10 +15,15 @@ class HomeBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final currentUser = userProvider.currentUser;
+
+    // Récupérer le rôle de l'utilisateur (converti en majuscules pour éviter les erreurs de casse)
     final userRole = currentUser?.role.name.toUpperCase() ?? '';
 
-    // Déterminer si l'utilisateur a accès aux statistiques globales
-    final showGlobalStats = userRole == 'ADMIN' || userRole == 'PORTIER';
+    // Seul ADMIN a accès aux statistiques globales
+    final showGlobalStats = userRole == 'ADMIN';
+
+    // Vérifier si l'utilisateur est authentifié
+    final isAuthenticated = currentUser != null;
 
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
@@ -29,8 +36,8 @@ class HomeBody extends StatelessWidget {
           child:  Column(
             children: [
               Services(),
-            // Afficher les statistiques globales seulement pour ADMIN ou PORTIER
-            if (showGlobalStats) ...[
+            // Afficher les statistiques globales seulement pour ADMIN
+            if (showGlobalStats && isAuthenticated) ...[
                 const SizeboxHeightSession(),
                 const SizeboxHeightSession(),
                 const Statistics(),

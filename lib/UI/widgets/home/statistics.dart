@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
 import 'package:senticket_front/UI/widgets/home/imageasset.template.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/UI/widgets/home/stat.label.dart';
 import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/provider/user_provider.dart';
 
 import '../../../provider/ticket_provider.dart' show TicketProvider;
 
@@ -30,10 +32,33 @@ class _StatisticsState extends State<Statistics> {
   @override
   Widget build(BuildContext context) {
     final ticketProvider = Provider.of<TicketProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    final currentUser = userProvider.currentUser;
     final globalStats = ticketProvider.globalStats;
     final availableStats = ticketProvider.availableStats;
     final isLoading = ticketProvider.isLoadingStatistics;
     Size size = MediaQuery.of(context).size;
+
+    // Vérifier si l'utilisateur est connecté et a le rôle ADMIN
+    final isAuthenticatedAdmin = currentUser != null &&
+        currentUser.role.name.toUpperCase() == 'ADMIN';
+
+    // Déterminer les valeurs à afficher
+    // Si l'utilisateur est authentifié admin, utiliser les vraies stats
+    // Sinon, afficher 0 pour toutes les valeurs
+    final totalPurchased = (isAuthenticatedAdmin && globalStats != null)
+        ? globalStats.totalPurchasedTickets
+        : 0;
+    final totalDebited = (isAuthenticatedAdmin && globalStats != null)
+        ? globalStats.totalDebitedTickets
+        : 0;
+    final typeAAvailable = (isAuthenticatedAdmin && availableStats != null)
+        ? availableStats.typeATicketsAvailable
+        : 0;
+    final typeBAvailable = (isAuthenticatedAdmin && availableStats != null)
+        ? availableStats.typeBTicketsAvailable
+        : 0;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -43,14 +68,14 @@ class _StatisticsState extends State<Statistics> {
         ),
         const SizeboxHeightSession(),
         if (isLoading)
-          const Center(child: CircularProgressIndicator())
-        else if (globalStats == null)
+          const Center(child: CustomCircularProgressIndicator())
+        /*else if (globalStats == null)
           const Center(
             child: Text(
               "Aucune statistique disponible",
               style: TextStyle(color: greyBorderColor),
             ),
-          )
+          )*/
         else
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,7 +84,7 @@ class _StatisticsState extends State<Statistics> {
               children: [
                 /// Total global achetés et débités
                 Container(
-                  width: size.width / 1.7,
+                  width: size.width / 1.5,
                   height: size.height / 13.0,
                   decoration: BoxDecoration(
                     color: ticketSectionColor,
@@ -77,12 +102,11 @@ class _StatisticsState extends State<Statistics> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       /// Total global achetés
                       Column(
-                        // mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,14 +129,14 @@ class _StatisticsState extends State<Statistics> {
                               ),
                             ],
                           ),
-                          // const SizedBox(height: 4),
+                          const SizedBox(height: 4),
                            Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              globalStats.totalPurchasedTickets.toString(),
+                              totalPurchased.toString(),
                               style: TextStyle(
                                 color: kThirdColor,
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -122,7 +146,7 @@ class _StatisticsState extends State<Statistics> {
                       // Séparateur vertical
                       Container(
                         width: 1,
-                        height: 40,
+                        height: 50,
                         color: kPrimaryColor,
                         margin: const EdgeInsets.symmetric(horizontal: 12),
                       ),
@@ -135,8 +159,6 @@ class _StatisticsState extends State<Statistics> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                /*Icon(Icons.food_bank),
-                                StatisticsLabel(label: "Total debités"),*/
                                 SizedBox(
                                   width: size.width / 20.0,
                                   height: size.height / 50.0,
@@ -159,10 +181,10 @@ class _StatisticsState extends State<Statistics> {
                             Padding(
                               padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                globalStats.totalDebitedTickets.toString(),
+                                totalDebited.toString(),
                                 style: TextStyle(
                                   color: kThirdColor,
-                                  fontSize: 12.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -175,14 +197,14 @@ class _StatisticsState extends State<Statistics> {
                 ),
               ],
             ),
-            const SizeboxHeightSession(),
+            //const SizeboxHeightSession(),
             Stack(
               children: [
                 /// Tickets disponibles (Type A et Type B)
                 if (availableStats != null)
                 Container(
-                  width: size.width / 1.7,
-                  height: size.height / 13.0,
+                  width: size.width / 1.5,
+                  height: size.height / 12.0,
                   decoration: BoxDecoration(
                     color: ticketSectionColor,
                     borderRadius: const BorderRadius.all(Radius.circular(17.0)),
@@ -199,11 +221,11 @@ class _StatisticsState extends State<Statistics> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       /// Type A disponibles
                       Column(
-                        // mainAxisAlignment: MainAxisAlignment.center,
+                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Row(
                             children: [
@@ -228,10 +250,10 @@ class _StatisticsState extends State<Statistics> {
                            Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              availableStats.typeATicketsAvailable.toString(),
+                              typeAAvailable.toString(),
                               style: TextStyle(
                                 color: kThirdColor,
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -241,7 +263,7 @@ class _StatisticsState extends State<Statistics> {
                       // Séparateur vertical
                       Container(
                         width: 1,
-                        height: 40,
+                        height: 50,
                         color: kPrimaryColor,
                         margin: const EdgeInsets.symmetric(horizontal: 12),
                       ),
@@ -262,10 +284,10 @@ class _StatisticsState extends State<Statistics> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                availableStats.typeBTicketsAvailable.toString(),
+                                typeBAvailable.toString(),
                                 style: const TextStyle(
                                   color: kThirdColor,
-                                  fontSize: 12.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

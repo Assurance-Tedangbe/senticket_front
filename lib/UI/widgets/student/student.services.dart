@@ -93,22 +93,6 @@ class StudentServices extends StatelessWidget {
               servicename: "Historique",
               imagepath: "images/historic.JPG",
             ),
-
-            /*  ContainerTemplate(
-            press: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const CreditAccount()));
-            },
-            servicename: "Créditer compte",
-            imagepath: "images/crediter.JPG"),
-
-            ContainerTemplate(
-            press: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const TransfertCredit()));
-            },
-            servicename: "Transfert crédit",
-            imagepath: "images/transfert.JPG") */
           ],
         ),
       ],

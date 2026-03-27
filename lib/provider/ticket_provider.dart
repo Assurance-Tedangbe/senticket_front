@@ -544,8 +544,6 @@ class TicketProvider with ChangeNotifier {
         _ticketStatistics!.userStats.forEach((username, stats) {
           print("Utilisateur: $username");
           print("  - User ID: ${stats.userId}");
-          print("  - Prénom: ${stats.firstName}");
-          print("  - Nom: ${stats.lastName}");
           print("  - Tickets achetés: ${stats.purchasedTicketsCount}");
           print("  - Tickets débités: ${stats.debitedTicketsCount}");
           print("  - Total tickets: ${stats.totalTicketsCount}");
@@ -585,104 +583,8 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+
   /*
-  /* ➕ CREATION DE NOUVEAUX TICKETS */
-  Future<bool> createNewTickets(
-    CreationTicketsRequestDTO creationTicketsRequestDTO,
-  ) async {
-    _isCreatingTickets = true;
-    _isLoading = true;
-    notifyListeners();
-    try {
-      final newTickets = await _service.createTickets(
-        creationTicketsRequestDTO,
-      );
-      // Ajout des nouveaux tickets à la liste locale
-      _tickets.addAll(
-        newTickets,
-      ); // "Si ça fonctionne, ajoute les nouveaux tickets à ma liste locale"
-      _error = ''; // "Efface les erreurs"
-      print("Tickets créés avec succès: ${newTickets.length} tickets");
-      return true; // "Succès"
-    } catch (e) {
-      _error = 'Erreur création tickets: ${e.toString()}';
-      print("Erreur createNewTickets: $e");
-      return false; // "Échec"
-    } finally {
-      // Nettoyage final
-      _isCreatingTickets = false;
-      _isLoading = false;
-      notifyListeners(); // Notifie la fin de l'opération
-    }
-  }
-
-  /* ✏️ MISE A JOUR D'UN TICKET EXISTANT */
-  Future<bool> updateExistingTicket(Ticket ticket) async {
-    _isUpdatingTicket = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // Validation des données avant envoi
-      _service.validateTicketData(ticket);
-
-      // Appel API pour mettre à jour le ticket
-      final updatedTicket = await _service.updateTicket(ticket);
-
-      // Recherche de l'index du ticket dans la liste locale
-      final index = _tickets.indexWhere(
-        (t) => t.ticketId == ticket.ticketId,
-      ); // "cherche la position de ce ticket dans ma liste"
-
-      // Mise à jour dans la liste locale si trouvé
-      if (index != -1) {
-        _tickets[index] =
-            updatedTicket; // "Si j'ai trouvé le ticket (index != -1), je remplace l'ancienne version par la nouvelle"
-      }
-
-      _error = '';
-      print("Ticket mis à jour avec succès: ${updatedTicket.ticketId}");
-      return true;
-    } catch (e) {
-      _error = 'Erreur mise à jour ticket: ${e.toString()}';
-      print("Erreur updateExistingTicket: $e");
-      return false;
-    } finally {
-      _isUpdatingTicket = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // 🗑️ SUPPRESSION D'UN TICKET
-  Future<bool> deleteExistingTicket(int ticketId) async {
-    _isDeletingTicket = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // Appel API pour supprimer le ticket
-      await _service.deleteTicket(
-        ticketId,
-      ); // "demande à l'API de supprimer le ticket avec cet ID"
-
-      // "supprime le ticket de la liste locale"
-      _tickets.removeWhere((ticket) => ticket.ticketId == ticketId);
-
-      _error = '';
-      print("Ticket avec cet ID supprimé: $ticketId");
-      return true;
-    } catch (e) {
-      _error = 'Erreur suppression: ${e.toString()}';
-      print("Erreur deleteExistingTicket: $e");
-      return false;
-    } finally {
-      _isDeletingTicket = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
   // retourne void car le résultat est stocké dans _currentTicket
   Future<void> loadTicketById(int ticketId) async {
     _isLoading = true;
@@ -704,118 +606,10 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  void clearCurrentTicket() {
-    _currentTicket = null;
-    notifyListeners();
-  }
-
-  // 🔄 FORCE LE RAFRAICHISSEMENT DES DONNEES depuis l'API
-  Future<void> refreshData() async {
-    await loadAllTickets(forceRefresh: true);
-  }
-
-  // 📊 OBTENTION DES STATISTIQUES DES TICKETS
-  Map<String, int> getTicketStatistics() {
-    return _service.getTicketStatistics(_tickets);
-  }
-
-  // OBTENTION DES STATISTIQUES FORMATÉES POUR L'UI
-  Map<String, int> getFrenchStatistics() {
-    final stats = getTicketStatistics();
-    return {
-      'Total': stats['total'] ?? 0,
-      'Réservés': stats['booked'] ?? 0,
-      'Disponibles': stats['available'] ?? 0,
-      'Utilisés': stats['used'] ?? 0,
-      'Type A': stats['A'] ?? 0,
-      'Type B': stats['B'] ?? 0,
-    };
-    /*
-      Exple de résultat attendu:
-      {
-        'Total': 150,
-        'Réservés': 80,
-        'Disponibles': 70,
-        'Utilisés': 45,
-        'Type A': 90,
-        'Type B': 60
-      }
-    */
-  }
-
-  /*
-   * 🔄 MISE A JOUR DU STATUT D'UN TICKET
-   * @param ticketStatus : le nouveau statut à appliquer
-   *  Le provider utilise les enums DIRECTEMENT
-   */
-  Future<bool> updateTicketStatus(
-    int ticketId,
-    TicketStatus ticketStatus,
-  ) async {
-    _isUpdatingTicketStatus = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // Appel API pour changer le statut
-      // Il passe l'enum Dart au service, qui se charge de la conversion
-      await _service.updateTicketStatus(
-        ticketId,
-        ticketStatus,
-      ); // "demande à l'API de mettre à jour le statut du ticket"
-
-      _error = '';
-      print("Statut du ticket $ticketId mis à jour: $ticketStatus");
-      return true;
-    } catch (e) {
-      _error = 'Erreur mise à jour statut ticket: ${e.toString()}';
-      print("Erreur updateTicketStatus: $e");
-      return false;
-    } finally {
-      _isUpdatingTicketStatus = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /*
-   * 📅 RESERVATION D'UN TICKET
-   * @param ticketId : l'identifiant du ticket à réserver
-   * @return Future<bool> : true si succès, false si échec
-   */
-  Future<bool> bookTicket(int ticketId) async {
-    _isBookingTicket = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.bookTicket(
-        ticketId,
-      ); // "demande à l'API de réserver le ticket"
-
-      _error = '';
-      print("Ticket $ticketId réservé");
-      return true;
-    } catch (e) {
-      _error = 'Erreur réservation ticket: ${e.toString()}';
-      print("Erreur bookTicket: $e");
-      return false;
-    } finally {
-      _isBookingTicket = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // === MÉTHODES DE RECHERCHE ET FILTRAGE ===
-  /* CHARGEMENT DES TICKETS PAR STATUT
-   * @param ticketStatus : le statut des tickets à charger
-   */
   Future<void> loadTicketsByStatus(TicketStatus ticketStatus) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
-
     try {
       _tickets = await _service.getTicketsByStatus(ticketStatus);
       _error = '';
@@ -831,127 +625,25 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  /*
-   * 👥 CHARGEMENT DES TICKETS PAR UTILISATEUR
-   * @param userId : l'identifiant de l'utilisateur
-   */
-  Future<void> loadTicketsByUserId(int userId) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      _tickets = await _service.getTicketsByUserId(userId);
-      _error = '';
-      print(
-        "Tickets chargés par utilisateur $userId: ${_tickets.length} tickets",
-      );
-    } catch (e) {
-      _error = 'Erreur chargement tickets par utilisateur: ${e.toString()}';
-      print("Erreur loadTicketsByUserId: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  //🔍 RECHERCHE DE TICKETS DANS LE CACHE LOCAL
-  List<Ticket> searchTickets(String query) {
-    return _service.searchTickets(query);
-  }
-
   // FILTRAGE DES TICKETS PAR STATUT
   List<Ticket> filterTicketsByStatus(TicketStatus status) {
     return _service.filterTicketsByStatus(status);
   }
 
-  // FILTRAGE DES TICKETS PAR TYPE
-  List<Ticket> filterTicketsByType(TicketType type) {
-    return _service.filterTicketsByType(type);
-  }
-
-  // Filtre les tickets réservés/non réservés
-  List<Ticket> filterTicketsByBookedStatus(bool booked) {
-    return _service.filterTicketsByBookedStatus(booked);
-  }
-
-  /*
-   * 💰 TRI DES TICKETS PAR PRIX
-   * @param ascending : true pour croissant, false pour décroissant
-   */
-  List<Ticket> sortTicketsByPrice(bool ascending) {
-    return _service.sortTicketsByPrice(ascending);
-  }
-
-  /*
-   * 📅 TRI DES TICKETS PAR DATE DE CREATION
-   * @param ascending : true pour plus récents d'abord, false pour plus anciens
-   */
-  List<Ticket> sortTicketsByCreationDate(bool ascending) {
-    return _service.sortTicketsByCreationDate(ascending);
-  }
-
-  /*
-   * OBTENTION DE TOUS LES STATUTS de tickets UNIQUES
-   * @return List<TicketStatus> : liste des statuts existants
-   */
-  List<TicketStatus> getUniqueTicketStatuses() {
-    final statuses = _tickets
-        .map((ticket) => ticket.ticketStatus)
-        .toSet()
-        .toList();
-    statuses.sort();
-    return statuses;
-  }
-
-  // "Obtient tous les types de tickets uniques"
-  /* OBTENTION DE TOUS LES TYPES UNIQUES (POUR FILTRES UI)
-   * @return List<String> : liste des types de tickets existants
-   */
-  List<TicketType> getUniqueTicketTypes() {
-    final types = _tickets.map((ticket) => ticket.ticketType).toSet().toList();
-    types.sort();
-    return types;
-  }
-
-  /*
-   * 💰 CALCUL DU REVENU TOTAL
-   * @return double : somme des prix de tous les tickets
-   */
+   // 💰 CALCUL DU REVENU TOTAL
   double getTotalRevenue() {
     return _tickets.fold(0.0, (sum, ticket) => sum + ticket.ticketPrice);
   }
-
-  // VERIFICATION DE DISPONIBILITE D'UN TICKET POUR ACHAT
-  bool isTicketAvailableForPurchase(Ticket ticket) {
-    // CORRECTION : Utiliser l'enum directement au lieu de String
-    return !ticket.booked && ticket.ticketStatus == TicketStatus.available;
-    // return !ticket.booked && ticket.ticketStatus == 'AVAILABLE';
-  }
-
-  // 🛒 OBTENTION DES TICKETS DISPONIBLES POUR ACHAT
-  List<Ticket> getAvailableTicketsForPurchase() {
-    return _tickets.where(isTicketAvailableForPurchase).toList();
-  }
-
   // OBTENTION DE LA COULEUR D'UN STATUT
   Color getStatusColor(TicketStatus status) {
     return status.displayColor;
   }
-
   // OBTENTION DE LA COULEUR D'UN TYPE
   Color getTypeColor(TicketType type) {
     return type.displayColor;
   }
-
   // OBTENTION DU LIBELLÉ FRANÇAIS D'UN STATUT
   String getStatusDisplayName(TicketStatus status) {
     return status.frenchLabel; // "Disponible", "Réservé", "Utilisé"
   }
-
-  // OBTENTION DU NOM D'AFFICHAGE D'UN TYPE
-  String getTypeDisplayName(TicketType type) {
-    return type.displayName; // "a", "b"
-  }
-  */
-
+*/

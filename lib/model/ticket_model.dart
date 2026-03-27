@@ -388,8 +388,11 @@ class UserDTO {
 // ==================== STATISTICS DTO ====================
 /// DTO pour les statistiques des tickets
 class TicketStatisticsDTO {
+  // Map contenant les statistiques par utilisateur (clé = nom d'utilisateur)
   final Map<String, UserTicketStats> userStats;
+  // Statistiques globales (tous utilisateurs confondus)
   final GlobalTicketStats globalStats;
+  // Statistiques des tickets disponibles (status = AVAILABLE)
   final AvailableTicketsStats availableStats;
 
   TicketStatisticsDTO({
@@ -398,6 +401,7 @@ class TicketStatisticsDTO {
     required this.availableStats,
   });
 
+  /// Convertit un JSON en objet TicketStatisticsDTO
   factory TicketStatisticsDTO.fromJson(Map<String, dynamic> json) {
     // Convertir userStats (Map<String, dynamic> -> Map<String, UserTicketStats>)
     final Map<String, UserTicketStats> userStatsMap = {};
@@ -416,6 +420,7 @@ class TicketStatisticsDTO {
     );
   }
 
+  /// Convertit l'objet en JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> userStatsMap = {};
     userStats.forEach((key, value) {
@@ -450,6 +455,7 @@ class UserTicketStats {
     required this.totalTicketsCount,
   });
 
+  /// Convertit un JSON en objet UserTicketStats
   factory UserTicketStats.fromJson(Map<String, dynamic> json) {
     return UserTicketStats(
       userId: json['userId'] ?? 0,
@@ -462,6 +468,7 @@ class UserTicketStats {
     );
   }
 
+  /// Convertit l'objet en JSON
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
@@ -475,7 +482,7 @@ class UserTicketStats {
   }
 }
 
-/// Statistiques globales des tickets
+/// Statistiques globales des tickets (tous utilisateurs confondus)
 class GlobalTicketStats {
   final int totalPurchasedTickets; // Total tickets achetés (tous utilisateurs)
   final int totalDebitedTickets; // Total tickets débités (tous comptes)
@@ -487,6 +494,7 @@ class GlobalTicketStats {
     required this.totalTicketsProcessed,
   });
 
+  /// Convertit un JSON en objet GlobalTicketStats
   factory GlobalTicketStats.fromJson(Map<String, dynamic> json) {
     return GlobalTicketStats(
       totalPurchasedTickets: json['totalPurchasedTickets'] ?? 0,
@@ -495,6 +503,7 @@ class GlobalTicketStats {
     );
   }
 
+  /// Convertit l'objet en JSON
   Map<String, dynamic> toJson() {
     return {
       'totalPurchasedTickets': totalPurchasedTickets,
@@ -506,8 +515,8 @@ class GlobalTicketStats {
 
 /// Statistiques des tickets disponibles (status = AVAILABLE)
 class AvailableTicketsStats {
-  final int typeATicketsAvailable; // Tickets Type A disponibles
-  final int typeBTicketsAvailable; // Tickets Type B disponibles
+  final int typeATicketsAvailable; // Tickets Type A disponibles (non achetés, non débités)
+  final int typeBTicketsAvailable; // Tickets Type B disponibles (non achetés, non débités)
   final int totalTicketsAvailable; // Total tickets disponibles (A + B)
 
   AvailableTicketsStats({
@@ -516,6 +525,7 @@ class AvailableTicketsStats {
     required this.totalTicketsAvailable,
   });
 
+  /// Convertit un JSON en objet AvailableTicketsStats
   factory AvailableTicketsStats.fromJson(Map<String, dynamic> json) {
     return AvailableTicketsStats(
       typeATicketsAvailable: json['typeATicketsAvailable'] ?? 0,
@@ -524,6 +534,7 @@ class AvailableTicketsStats {
     );
   }
 
+  /// Convertit l'objet en JSON
   Map<String, dynamic> toJson() {
     return {
       'typeATicketsAvailable': typeATicketsAvailable,

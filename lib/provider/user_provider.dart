@@ -780,8 +780,7 @@ class UserProvider with ChangeNotifier {
     try {
       await _service.deleteUser(
         userId,
-      ); //asking the API to delete the user with this ID
-
+      );
       // remove the user from the local list
       _users.removeWhere((user) => user.userId == userId);
 
@@ -813,22 +812,11 @@ class UserProvider with ChangeNotifier {
     // Supprimer le token des SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-
     notifyListeners();
-
-    // 3. Rediriger vers la page de connexion
-    // (La navigation doit être gérée dans le widget, pas ici.
-    // On peut utiliser un événement ou un callback, mais une bonne pratique
-    // est de laisser le widget réagir au changement de _currentUser.
-    // Par exemple, dans votre MaterialApp, utilisez un Router qui redirige
-    // vers LoginPage si _currentUser == null.)
   } */
 }
-  /*   
-  //********** Suppl methods not used ************
- 
-  // *********************** for loging out ***********************
-  Future<void> logout() async {
+
+/*  Future<void> logout() async {
     try {
       // Optionnel: Appeler l'API pour invalider le token
       // await _service.logout();
@@ -839,8 +827,6 @@ class UserProvider with ChangeNotifier {
       _authToken = null;
       resetLoginForm();
       notifyListeners();
-
-      print('Déconnexion réussie');
     }
   }
 
@@ -849,13 +835,11 @@ class UserProvider with ChangeNotifier {
     _isUpdatingPassword = true;
     _isLoading = true;
     notifyListeners();
-
     try {
       await _service.updatePassword(
         userId,
         newPassword,
       );
-
       _error = '';
       print(" User password updated successfully: $newPassword");
       return true;
@@ -870,30 +854,3 @@ class UserProvider with ChangeNotifier {
     }
   }
   */
-  Future<bool> addRoleToExistingUser(int userId, int roleId) async {
-    _isAddRoleToUser = true;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _service.addRoleToUser(
-        userId,
-        roleId,
-      ); //“adding a role to a user via the API”
-
-      _error = '';
-      print("Role $roleId added to user $userId");
-      return true;
-    } catch (e) {
-      _error = 'Error adding role: ${e.toString()}';
-      print(" Error addRoleToUser: $e");
-      return false;
-    } finally {
-      _isAddRoleToUser = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
- */
-
-
