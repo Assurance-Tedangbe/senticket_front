@@ -38,12 +38,12 @@ class HomeDrawer extends StatelessWidget {
         "leadingIcon": Icons.person_4,
         "trailingIcon": Icons.arrow_forward
       },
-      {
+     /* {
         "title": "Interface Agent",
         "route": "/agent",
         "leadingIcon": Icons.person_3_outlined,
         "trailingIcon": Icons.arrow_forward
-      },
+      },*/
       {
         "title": "Portail Admin",
         "route": "/admin",

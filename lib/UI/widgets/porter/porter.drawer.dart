@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/home/home.drawer.header.dart';
 import 'package:senticket_front/UI/widgets/porter/porterdrawer.item.dart';
 
 class PortierDrawer extends StatelessWidget {
@@ -30,6 +31,7 @@ class PortierDrawer extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
+          const HomeDrawerHeader(),
           Expanded(
             child: ListView.separated(
                 itemBuilder: (context, index) {

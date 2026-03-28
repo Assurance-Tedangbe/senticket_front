@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senticket_front/UI/widgets/home/home.drawer.header.dart';
 import 'package:senticket_front/UI/widgets/student/studentdrawer.item.dart';
 
 class StudentDrawer extends StatelessWidget {
@@ -66,6 +67,7 @@ class StudentDrawer extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
+          const HomeDrawerHeader(),
           Expanded(
             child: ListView.separated(
               itemBuilder: (context, index) {

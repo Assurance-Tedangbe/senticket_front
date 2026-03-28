@@ -30,19 +30,24 @@ class ContainerTemplate extends StatelessWidget {
         border: Border.all(color: kPrimaryColor, width: 0.5),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-              elevation: 0.0,
+              backgroundColor: blueOfImages,
+              elevation: 1.0,
             ),
             onPressed: press,
-            child: Image.asset(imagepath, width: 55.0, height: 55.0),
+            child: SizedBox(
+              height: size.height * 0.08,
+              width: size.width * 0.3,
+              child: Image.asset(imagepath, width: 55.0, height: 65.0),
+            ),
           ),
+
           const SizeboxTemplate(),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+            padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
             child: Text(
               servicename,
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),

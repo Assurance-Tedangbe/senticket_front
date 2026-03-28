@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/admin/admindrawer.item.dart';
+import 'package:senticket_front/UI/widgets/home/home.drawer.header.dart';
 
 class AdminDrawer extends StatelessWidget {
   const AdminDrawer({super.key});
@@ -36,6 +37,7 @@ class AdminDrawer extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
+          const HomeDrawerHeader(),
           Expanded(
             child: ListView.separated(
               itemBuilder: (context, index) {
