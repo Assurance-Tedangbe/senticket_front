@@ -1,4 +1,538 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/enums/transaction_type.dart';
+import 'package:senticket_front/model/transaction_history_model.dart';
+import 'package:senticket_front/provider/transaction_history_provider.dart';
+import 'package:senticket_front/provider/user_provider.dart';
+
+/// Widget principal de la page d'historique
+class HistoricBody extends StatefulWidget {
+  const HistoricBody({super.key});
+
+  @override
+  State<HistoricBody> createState() => _HistoricBodyState();
+}
+
+class _HistoricBodyState extends State<HistoricBody> {
+  // Contrôleurs pour les dates
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
+
+  // Type de transaction sélectionné
+  String _selectedTransactionType = 'ALL';
+
+  // Options pour le dropdown selon le rôle de l'utilisateur
+  List<Map<String, String>> _filterOptions = [];
+
+  // Scroll controller pour le chargement infini
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _setupFilterOptions();
+    _setupScrollListener();
+    _loadInitialTransactions();
+  }
+
+  /// Configure les options de filtre selon le rôle de l'utilisateur
+  void _setupFilterOptions() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+
+    // Options par défaut (pour tous)
+    _filterOptions = [
+      {'value': 'ALL', 'label': 'Toutes les transactions'},
+    ];
+
+    // Ajouter les options selon le rôle
+    if (userRole == 'ETUDIANT') {
+      // Étudiant: ne voit que ses achats et ses débits
+      _filterOptions.addAll([
+        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
+      ]);
+    } else if (userRole == 'PORTIER') {
+      // Portier: ne voit que les débits qu'il a effectués
+      _filterOptions.addAll([
+        {'value': 'DEBIT', 'label': 'Débits effectués'},
+      ]);
+    } else if (userRole == 'ADMIN') {
+      // Admin: voit tout
+      _filterOptions.addAll([
+        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
+        {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
+      ]);
+    }
+  }
+
+  /// Configure l'écouteur de scroll pour le chargement infini
+  void _setupScrollListener() {
+    _scrollController.addListener(() {
+      final provider = Provider.of<TransactionHistoryProvider>(
+        context,
+        listen: false,
+      );
+
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        if (!provider.isLoading && provider.hasMore) {
+          _loadMoreTransactions();
+        }
+      }
+    });
+  }
+
+  /// Charge les transactions initiales
+  Future<void> _loadInitialTransactions() async {
+    final provider = Provider.of<TransactionHistoryProvider>(
+      context,
+      listen: false,
+    );
+
+    await provider.loadTransactions(
+      transactionType: _selectedTransactionType,
+      startDate: _getStartDate(),
+      endDate: _getEndDate(),
+      reset: true,
+    );
+  }
+
+  /// Charge plus de transactions (scroll infini)
+  Future<void> _loadMoreTransactions() async {
+    final provider = Provider.of<TransactionHistoryProvider>(
+      context,
+      listen: false,
+    );
+
+    await provider.loadTransactions(
+      transactionType: _selectedTransactionType,
+      startDate: _getStartDate(),
+      endDate: _getEndDate(),
+      reset: false,
+    );
+  }
+
+  /// Récupère la date de début
+  DateTime? _getStartDate() {
+    if (_startDateController.text.isNotEmpty) {
+      return DateTime.parse(_startDateController.text);
+    }
+    return null;
+  }
+
+  /// Récupère la date de fin
+  DateTime? _getEndDate() {
+    if (_endDateController.text.isNotEmpty) {
+      return DateTime.parse(_endDateController.text);
+    }
+    return null;
+  }
+
+  /// Applique les filtres et recharge les transactions
+  Future<void> _applyFilters() async {
+    final provider = Provider.of<TransactionHistoryProvider>(
+      context,
+      listen: false,
+    );
+
+    await provider.loadTransactions(
+      transactionType: _selectedTransactionType,
+      startDate: _getStartDate(),
+      endDate: _getEndDate(),
+      reset: true,
+    );
+  }
+
+  /// Affiche le sélecteur de date
+  Future<void> _selectDate(TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        controller.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+      _applyFilters();
+    }
+  }
+
+  @override
+  void dispose() {
+    _startDateController.dispose();
+    _endDateController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<TransactionHistoryProvider>(context);
+    final transactions = provider.transactions;
+    final isLoading = provider.isLoading;
+    final error = provider.error;
+
+    return Column(
+      children: [
+        // ========== FILTRES ==========
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 10.0),
+          child: DropdownButtonFormField<String>(
+            value: _selectedTransactionType,
+            decoration: const InputDecoration(
+              labelText: 'Type de transaction',
+              border: OutlineInputBorder(),
+            ),
+            items: _filterOptions.map((option) {
+              return DropdownMenuItem<String>(
+                value: option['value'],
+                child: Text(option['label']!),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  _selectedTransactionType = newValue;
+                });
+                _applyFilters();
+              }
+            },
+          ),
+        ),
+
+        // ========== SÉLECTEURS DE DATES ==========
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20.0, 4.0, 20.0, 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Date de début
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _selectDate(_startDateController),
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: kSecondColor,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: greyBorderColor, width: 1),
+                    ),
+                    child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(
+                            Icons.calendar_month,
+                            color: dateColor,
+                            size: 18,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            _startDateController.text.isEmpty
+                                ? 'Date de début'
+                                : _startDateController.text,
+                            style: TextStyle(
+                              color: _startDateController.text.isEmpty
+                                  ? dateColor
+                                  : kThirdColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // Date de fin
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _selectDate(_endDateController),
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: kSecondColor,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: greyBorderColor, width: 1),
+                    ),
+                    child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(
+                            Icons.calendar_month,
+                            color: dateColor,
+                            size: 18,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            _endDateController.text.isEmpty
+                                ? 'Date de fin'
+                                : _endDateController.text,
+                            style: TextStyle(
+                              color: _endDateController.text.isEmpty
+                                  ? dateColor
+                                  : kThirdColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ========== LISTE DES TRANSACTIONS ==========
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _applyFilters,
+            child: error.isNotEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          error,
+                          style: const TextStyle(color: redErrorColor),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: _applyFilters,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor,
+                          ),
+                          child: const Text('Réessayer'),
+                        ),
+                      ],
+                    ),
+                  )
+                : transactions.isEmpty && !isLoading
+                ? const Center(
+                    child: Text(
+                      'Aucune transaction trouvée',
+                      style: TextStyle(color: greyBorderColor),
+                    ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemCount: transactions.length + (isLoading ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == transactions.length) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      return _buildTransactionCard(transactions[index]);
+                    },
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Construit la carte d'une transaction
+  Widget _buildTransactionCard(TransactionHistoryDTO transaction) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () {
+          // Optionnel: afficher les détails dans un dialogue
+          _showTransactionDetails(transaction);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // En-tête avec type et date
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getTransactionColor(transaction.transactionType),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      transaction.getTransactionLabel(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    DateFormat('dd/MM/yyyy HH:mm').format(transaction.date),
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Détails de la transaction
+              Text(
+                transaction.getTransactionDetails(),
+                style: const TextStyle(fontSize: 13, color: kThirdColor),
+              ),
+              const SizedBox(height: 4),
+
+              // Informations sur les tickets
+              Row(
+                children: [
+                  const Icon(
+                    Icons.confirmation_number,
+                    size: 14,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${transaction.ticketsCount} ticket(s)',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.label, size: 14, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  Text(
+                    transaction.ticketTypes.join(', '),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+
+              // Indicateur d'annulation pour les transferts
+              if (transaction.transactionType == TransactionType.transfer &&
+                  transaction.transferCanceled == true)
+                const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    '⚠️ Transfert annulé',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: kPrimaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Affiche les détails d'une transaction dans une boîte de dialogue
+  void _showTransactionDetails(TransactionHistoryDTO transaction) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(transaction.getTransactionLabel()),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDetailRow('ID', transaction.id.toString()),
+              _buildDetailRow(
+                'Date',
+                DateFormat('dd/MM/yyyy HH:mm:ss').format(transaction.date),
+              ),
+              _buildDetailRow(
+                'Nombre de tickets',
+                transaction.ticketsCount.toString(),
+              ),
+              _buildDetailRow(
+                'IDs des tickets',
+                transaction.ticketIds.join(', '),
+              ),
+              _buildDetailRow(
+                'Types des tickets',
+                transaction.ticketTypes.join(', '),
+              ),
+              const Divider(),
+              _buildDetailRow('Détails', transaction.getTransactionDetails()),
+
+              if (transaction.transactionType == TransactionType.transfer)
+                _buildDetailRow(
+                  'Statut',
+                  transaction.transferCanceled == true ? 'Annulé' : 'Confirmé',
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Construit une ligne de détail
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 13))),
+        ],
+      ),
+    );
+  }
+
+  /// Retourne la couleur associée au type de transaction
+  Color _getTransactionColor(TransactionType type) {
+    switch (type) {
+      case TransactionType.purchase:
+        return blueOfImages;
+      case TransactionType.debit:
+        return cyanColor;
+      case TransactionType.transfer:
+        return Colors.blue;
+    }
+  }
+}
+
+/* import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:senticket_front/UI/widgets/research.dart/research.listview.dart';
 import 'package:senticket_front/bloc/historic.bloc.dart';
@@ -22,8 +556,6 @@ class _HistoricBodyState extends State<HistoricBody> {
     'Achat ticket',
     'Transfert ticket',
     'Débiter compte',
-    //'Créditer compte',
-    //'Transfert crédit',
   ];
   @override
   Widget build(BuildContext context) {
@@ -191,3 +723,4 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 }
+ */
