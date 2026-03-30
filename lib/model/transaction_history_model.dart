@@ -74,11 +74,11 @@ class TransactionHistoryDTO {
   String getTransactionDetails() {
     switch (transactionType) {
       case TransactionType.purchase:
-        return 'Acheté par: ${purchaserDTO?.username ?? 'Inconnu'}';
+        return 'Par ${purchaserDTO?.username ?? 'Inconnu'}';
       case TransactionType.debit:
-        return 'Débité par: ${porterDTO?.username ?? 'Inconnu'} sur ${studentDTO?.username ?? 'Inconnu'}';
+        return 'Par ${porterDTO?.username ?? 'Inconnu'} sur ${studentDTO?.username ?? 'Inconnu'}';
       case TransactionType.transfer:
-        return 'Transféré de ${senderDTO?.username ?? 'Inconnu'} à ${recipientDTO?.username ?? 'Inconnu'}'
+        return 'De ${senderDTO?.username ?? 'Inconnu'} à ${recipientDTO?.username ?? 'Inconnu'}'
             '${transferCanceled == true ? ' (Annulé)' : ''}';
     }
   }

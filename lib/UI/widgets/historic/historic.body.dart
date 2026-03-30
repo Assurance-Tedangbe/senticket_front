@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/transaction_type.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
@@ -29,6 +30,9 @@ class _HistoricBodyState extends State<HistoricBody> {
   // Scroll controller pour le chargement infini
   final ScrollController _scrollController = ScrollController();
 
+  // Stocker l'ID de l'utilisateur connecté pour les filtres backend
+  int? _currentUserId;
+
   @override
   void initState() {
     super.initState();
@@ -40,9 +44,44 @@ class _HistoricBodyState extends State<HistoricBody> {
   /// Configure les options de filtre selon le rôle de l'utilisateur
   void _setupFilterOptions() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.currentUser;
     final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
 
-    // Options par défaut (pour tous)
+    // Stocker l'ID de l'utilisateur connecté
+    _currentUserId = currentUser?.userId;
+
+    // Réinitialiser les options
+    _filterOptions = [];
+
+    // Configurer les options selon le rôle
+    if (userRole == 'ETUDIANT') {
+      // Étudiant: voit toutes les options (Toutes, Achats, Débits, Transferts)
+      // Les transactions sont filtrées automatiquement par le backend avec userId
+      _filterOptions = [
+        {'value': 'ALL', 'label': 'Toutes les transactions'},
+        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
+        {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
+      ];
+    } else if (userRole == 'PORTIER') {
+      // Portier: voit uniquement l'option "Débits de compte"
+      // Les transactions sont filtrées par le backend avec l'ID du portier
+      _filterOptions = [
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
+      ];
+      // Pour le portier, on force le type à DEBIT
+      _selectedTransactionType = 'DEBIT';
+    } else if (userRole == 'ADMIN') {
+      // Admin: voit toutes les options (Toutes, Achats, Débits, Transferts)
+      _filterOptions = [
+        {'value': 'ALL', 'label': 'Toutes les transactions'},
+        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
+        {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
+      ];
+    }
+
+    /*     // Options par défaut (pour tous)
     _filterOptions = [
       {'value': 'ALL', 'label': 'Toutes les transactions'},
     ];
@@ -57,7 +96,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     } else if (userRole == 'PORTIER') {
       // Portier: ne voit que les débits qu'il a effectués
       _filterOptions.addAll([
-        {'value': 'DEBIT', 'label': 'Débits effectués'},
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
       ]);
     } else if (userRole == 'ADMIN') {
       // Admin: voit tout
@@ -66,7 +105,7 @@ class _HistoricBodyState extends State<HistoricBody> {
         {'value': 'DEBIT', 'label': 'Débits de compte'},
         {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
       ]);
-    }
+    } */
   }
 
   /// Configure l'écouteur de scroll pour le chargement infini
@@ -92,6 +131,36 @@ class _HistoricBodyState extends State<HistoricBody> {
       context,
       listen: false,
     );
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+
+    // Pour le portier, on passe l'ID du portier comme paramètre pour filtrer
+    // ses propres débits
+    if (userRole == 'PORTIER') {
+      await provider.loadTransactionsForUser(
+        transactionType: _selectedTransactionType,
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        userId: _currentUserId, // Filtrer par l'ID du portier
+        reset: true,
+      );
+    } else {
+      // Pour les autres rôles, on charge normalement
+      await provider.loadTransactions(
+        transactionType: _selectedTransactionType,
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        reset: true,
+      );
+    }
+  }
+
+  /* /// Charge les transactions initiales
+  Future<void> _loadInitialTransactions() async {
+    final provider = Provider.of<TransactionHistoryProvider>(
+      context,
+      listen: false,
+    );
 
     await provider.loadTransactions(
       transactionType: _selectedTransactionType,
@@ -99,9 +168,35 @@ class _HistoricBodyState extends State<HistoricBody> {
       endDate: _getEndDate(),
       reset: true,
     );
-  }
+  } */
 
   /// Charge plus de transactions (scroll infini)
+  Future<void> _loadMoreTransactions() async {
+    final provider = Provider.of<TransactionHistoryProvider>(
+      context,
+      listen: false,
+    );
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+
+    if (userRole == 'PORTIER') {
+      await provider.loadTransactionsForUser(
+        transactionType: _selectedTransactionType,
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        userId: _currentUserId,
+        reset: false,
+      );
+    } else {
+      await provider.loadTransactions(
+        transactionType: _selectedTransactionType,
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        reset: false,
+      );
+    }
+  }
+  /* /// Charge plus de transactions (scroll infini)
   Future<void> _loadMoreTransactions() async {
     final provider = Provider.of<TransactionHistoryProvider>(
       context,
@@ -114,7 +209,7 @@ class _HistoricBodyState extends State<HistoricBody> {
       endDate: _getEndDate(),
       reset: false,
     );
-  }
+  } */
 
   /// Récupère la date de début
   DateTime? _getStartDate() {
@@ -138,6 +233,32 @@ class _HistoricBodyState extends State<HistoricBody> {
       context,
       listen: false,
     );
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+
+    if (userRole == 'PORTIER') {
+      await provider.loadTransactionsForUser(
+        transactionType: _selectedTransactionType,
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        userId: _currentUserId,
+        reset: true,
+      );
+    } else {
+      await provider.loadTransactions(
+        transactionType: _selectedTransactionType,
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        reset: true,
+      );
+    }
+  }
+  /*  /// Applique les filtres et recharge les transactions
+  Future<void> _applyFilters() async {
+    final provider = Provider.of<TransactionHistoryProvider>(
+      context,
+      listen: false,
+    );
 
     await provider.loadTransactions(
       transactionType: _selectedTransactionType,
@@ -145,7 +266,7 @@ class _HistoricBodyState extends State<HistoricBody> {
       endDate: _getEndDate(),
       reset: true,
     );
-  }
+  } */
 
   /// Affiche le sélecteur de date
   Future<void> _selectDate(TextEditingController controller) async {
@@ -175,6 +296,8 @@ class _HistoricBodyState extends State<HistoricBody> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionHistoryProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
     final transactions = provider.transactions;
     final isLoading = provider.isLoading;
     final error = provider.error;
@@ -182,12 +305,14 @@ class _HistoricBodyState extends State<HistoricBody> {
     return Column(
       children: [
         // ========== FILTRES ==========
+        // Pour le portier, on désactive le dropdown car il n'a qu'une seule option
         Padding(
           padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 10.0),
           child: DropdownButtonFormField<String>(
-            value: _selectedTransactionType,
+            initialValue: _selectedTransactionType,
             decoration: const InputDecoration(
               labelText: 'Type de transaction',
+              // labelStyle: TextStyle(color: dateColor),
               border: OutlineInputBorder(),
             ),
             items: _filterOptions.map((option) {
@@ -196,14 +321,18 @@ class _HistoricBodyState extends State<HistoricBody> {
                 child: Text(option['label']!),
               );
             }).toList(),
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedTransactionType = newValue;
-                });
-                _applyFilters();
-              }
-            },
+            onChanged: userRole == 'PORTIER'
+                ? null // Pour le portier, le dropdown est désactivé
+                : (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedTransactionType = newValue;
+                      });
+                      _applyFilters();
+                    }
+                  },
+            // Si c'est un portier, afficher que c'est désactivé
+            hint: userRole == 'portier' ? const Text('Débits de compte') : null,
           ),
         ),
 
@@ -220,9 +349,9 @@ class _HistoricBodyState extends State<HistoricBody> {
                   child: Container(
                     height: 50,
                     decoration: BoxDecoration(
-                      color: kSecondColor,
+                      color: secondColor,
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: greyBorderColor, width: 1),
+                      border: Border.all(color: kPrimaryColor, width: 1),
                     ),
                     child: Row(
                       children: [
@@ -261,9 +390,9 @@ class _HistoricBodyState extends State<HistoricBody> {
                   child: Container(
                     height: 50,
                     decoration: BoxDecoration(
-                      color: kSecondColor,
+                      color: secondColor,
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: greyBorderColor, width: 1),
+                      border: Border.all(color: kPrimaryColor, width: 1),
                     ),
                     child: Row(
                       children: [
@@ -317,7 +446,10 @@ class _HistoricBodyState extends State<HistoricBody> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: kPrimaryColor,
                           ),
-                          child: const Text('Réessayer'),
+                          child: const Text(
+                            'Réessayer',
+                            style: TextStyle(color: kSecondColor),
+                          ),
                         ),
                       ],
                     ),
@@ -340,7 +472,9 @@ class _HistoricBodyState extends State<HistoricBody> {
                       if (index == transactions.length) {
                         return const Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(
+                            child: CustomCircularProgressIndicator(),
+                          ),
                         );
                       }
                       return _buildTransactionCard(transactions[index]);
@@ -385,7 +519,7 @@ class _HistoricBodyState extends State<HistoricBody> {
                     child: Text(
                       transaction.getTransactionLabel(),
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: kSecondColor,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -393,7 +527,7 @@ class _HistoricBodyState extends State<HistoricBody> {
                   ),
                   Text(
                     DateFormat('dd/MM/yyyy HH:mm').format(transaction.date),
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    style: const TextStyle(color: dateColor, fontSize: 12),
                   ),
                 ],
               ),
@@ -412,19 +546,27 @@ class _HistoricBodyState extends State<HistoricBody> {
                   const Icon(
                     Icons.confirmation_number,
                     size: 14,
-                    color: Colors.grey,
+                    color: greyBorderColor,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '${transaction.ticketsCount} ticket(s)',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: kThirdColor,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  const Icon(Icons.label, size: 14, color: Colors.grey),
+                  const Icon(Icons.label, size: 14, color: greyBorderColor),
                   const SizedBox(width: 4),
                   Text(
                     transaction.ticketTypes.join(', '),
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: greyBorderColor,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ],
               ),
@@ -435,10 +577,10 @@ class _HistoricBodyState extends State<HistoricBody> {
                 const Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    '⚠️ Transfert annulé',
+                    ' Transfert annulé',
                     style: TextStyle(
                       fontSize: 11,
-                      color: kPrimaryColor,
+                      color: dateColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -484,7 +626,7 @@ class _HistoricBodyState extends State<HistoricBody> {
               if (transaction.transactionType == TransactionType.transfer)
                 _buildDetailRow(
                   'Statut',
-                  transaction.transferCanceled == true ? 'Annulé' : 'Confirmé',
+                  transaction.transferCanceled == true ? 'Annulé' : 'Effectué',
                 ),
             ],
           ),
@@ -492,7 +634,13 @@ class _HistoricBodyState extends State<HistoricBody> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
+            child: const Text(
+              'Fermer',
+              style: TextStyle(
+                color: kPrimaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -527,18 +675,12 @@ class _HistoricBodyState extends State<HistoricBody> {
       case TransactionType.debit:
         return cyanColor;
       case TransactionType.transfer:
-        return Colors.blue;
+        return kPrimaryColor;
     }
   }
 }
 
-/* import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:senticket_front/UI/widgets/research.dart/research.listview.dart';
-import 'package:senticket_front/bloc/historic.bloc.dart';
-import 'package:senticket_front/constants.dart';
-import 'package:intl/intl.dart';
-
+/*
 class HistoricBody extends StatefulWidget {
   const HistoricBody({super.key});
 

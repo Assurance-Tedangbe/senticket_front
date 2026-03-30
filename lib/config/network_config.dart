@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart'; // Pour kIsWeb
  * Elle retourne l'URL correcte selon la plateforme d'exécution.
  */
 class NetworkConfig {
-  static const String _pcLocalIp = '192.168.1.5';
+  static const String _pcLocalIp = '192.168.1.3';
 
   /// ============ SECTION 1: URL DE BASE PAR PLATEFORME ============
   /// Retourne l'URL de base de l'API selon la plateforme d'exécution

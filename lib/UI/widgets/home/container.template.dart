@@ -34,7 +34,7 @@ class ContainerTemplate extends StatelessWidget {
         children: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: blueOfImages,
+              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
               elevation: 1.0,
             ),
             onPressed: press,
