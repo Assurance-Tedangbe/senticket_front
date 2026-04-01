@@ -8,7 +8,12 @@ import 'package:senticket_front/model/transaction_history_model.dart';
 import 'package:senticket_front/provider/transaction_history_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
-/// Widget principal de la page d'historique
+/// WIDGET PRINCIPAL DE LA PAGE D'HISTORIQUE
+/// Ce widget gère l'affichage de la liste des transactions avec :
+/// - Filtre par type de transaction (dropdown)
+/// - Filtre par dates (date de début et date de fin)
+/// - Chargement infini (scroll)
+/// - Affichage des détails d'une transaction (dialogue)
 class HistoricBody extends StatefulWidget {
   const HistoricBody({super.key});
 
@@ -17,11 +22,13 @@ class HistoricBody extends StatefulWidget {
 }
 
 class _HistoricBodyState extends State<HistoricBody> {
-  // Contrôleurs pour les dates
+  // ==================== CONTRÔLEURS ====================
+  // Contrôleurs pour les champs de date (texte et sélecteur)
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
-  // Type de transaction sélectionné
+  // ==================== ÉTATS ====================
+  // Type de transaction sélectionné dans le dropdown
   String _selectedTransactionType = 'ALL';
 
   // Options pour le dropdown selon le rôle de l'utilisateur
@@ -33,21 +40,26 @@ class _HistoricBodyState extends State<HistoricBody> {
   // Stocker l'ID de l'utilisateur connecté pour les filtres backend
   int? _currentUserId;
 
+  // ==================== CYCLE DE VIE ====================
+
   @override
   void initState() {
     super.initState();
-    _setupFilterOptions();
-    _setupScrollListener();
-    _loadInitialTransactions();
+    _setupFilterOptions(); // Configure les options selon le rôle de l'utilisateur
+    _setupScrollListener(); // Configure l'écouteur de scroll pour le chargement infini
+    _loadInitialTransactions(); // Charge les premières transactions
   }
 
+  // ==================== MÉTHODES D'INITIALISATION ====================
+
   /// Configure les options de filtre selon le rôle de l'utilisateur
+  /// Cette méthode détermine quelles options sont visibles dans le filtre
   void _setupFilterOptions() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.currentUser;
     final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
 
-    // Stocker l'ID de l'utilisateur connecté
+    // Stocker l'ID de l'utilisateur connecté pour les filtres backend
     _currentUserId = currentUser?.userId;
 
     // Réinitialiser les options
@@ -81,11 +93,10 @@ class _HistoricBodyState extends State<HistoricBody> {
       ];
     }
 
-    /*     // Options par défaut (pour tous)
+    /* // Options par défaut (pour tous)
     _filterOptions = [
       {'value': 'ALL', 'label': 'Toutes les transactions'},
     ];
-
     // Ajouter les options selon le rôle
     if (userRole == 'ETUDIANT') {
       // Étudiant: ne voit que ses achats et ses débits
@@ -108,7 +119,8 @@ class _HistoricBodyState extends State<HistoricBody> {
     } */
   }
 
-  /// Configure l'écouteur de scroll pour le chargement infini
+  /// Configure l'écouteur de scroll pour détecter quand l'utilisateur arrive en bas
+  ///  de la liste et déclencher le chargement de la page suivante (chargement infini)
   void _setupScrollListener() {
     _scrollController.addListener(() {
       final provider = Provider.of<TransactionHistoryProvider>(
@@ -116,6 +128,7 @@ class _HistoricBodyState extends State<HistoricBody> {
         listen: false,
       );
 
+      // Détecter si l'utilisateur a scrollé jusqu'en bas (avec une marge de 200px)
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 200) {
         if (!provider.isLoading && provider.hasMore) {
@@ -125,7 +138,12 @@ class _HistoricBodyState extends State<HistoricBody> {
     });
   }
 
-  /// Charge les transactions initiales
+  // ==================== CHARGEMENT DES DONNÉES ====================
+
+  /// Charge les premières transactions ou initiales (page 0)
+  /// Le comportement diffère selon le rôle :
+  /// - PORTIER : utilise loadTransactionsForUser avec son ID
+  /// - Autres : utilise loadTransactions normalement
   Future<void> _loadInitialTransactions() async {
     final provider = Provider.of<TransactionHistoryProvider>(
       context,
@@ -170,7 +188,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   } */
 
-  /// Charge plus de transactions (scroll infini)
+  /// Charge plus de transactions (page suivante) pour le scroll infini
   Future<void> _loadMoreTransactions() async {
     final provider = Provider.of<TransactionHistoryProvider>(
       context,
@@ -211,7 +229,9 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   } */
 
-  /// Récupère la date de début
+  // ==================== MÉTHODES UTILITAIRES ====================
+
+  /// Récupère la date de début depuis le contrôleur
   DateTime? _getStartDate() {
     if (_startDateController.text.isNotEmpty) {
       return DateTime.parse(_startDateController.text);
@@ -219,7 +239,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     return null;
   }
 
-  /// Récupère la date de fin
+  /// Récupère la date de fin depuis le contrôleur
   DateTime? _getEndDate() {
     if (_endDateController.text.isNotEmpty) {
       return DateTime.parse(_endDateController.text);
@@ -268,7 +288,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   } */
 
-  /// Affiche le sélecteur de date
+  /// Affiche le sélecteur de date et met à jour le contrôleur
   Future<void> _selectDate(TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -284,6 +304,8 @@ class _HistoricBodyState extends State<HistoricBody> {
       _applyFilters();
     }
   }
+
+  // ==================== BUILD ====================
 
   @override
   void dispose() {
@@ -304,7 +326,7 @@ class _HistoricBodyState extends State<HistoricBody> {
 
     return Column(
       children: [
-        // ========== FILTRES ==========
+        // ==================== FILTRE PAR TYPE DE TRANSACTION ====================
         // Pour le portier, on désactive le dropdown car il n'a qu'une seule option
         Padding(
           padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 10.0),
@@ -336,7 +358,7 @@ class _HistoricBodyState extends State<HistoricBody> {
           ),
         ),
 
-        // ========== SÉLECTEURS DE DATES ==========
+        // ==================== FILTRES PAR DATES ====================
         Padding(
           padding: const EdgeInsets.fromLTRB(20.0, 4.0, 20.0, 4.0),
           child: Row(
@@ -426,7 +448,7 @@ class _HistoricBodyState extends State<HistoricBody> {
           ),
         ),
 
-        // ========== LISTE DES TRANSACTIONS ==========
+        // ==================== LISTE DES TRANSACTIONS ====================
         Expanded(
           child: RefreshIndicator(
             onRefresh: _applyFilters,
@@ -486,7 +508,10 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
-  /// Construit la carte d'une transaction
+  // ==================== MÉTHODES D'AFFICHAGE ====================
+
+  /// Construit la carte d'affichage d'une transaction
+  /// Affiche le type, la date, les détails et les informations sur les tickets
   Widget _buildTransactionCard(TransactionHistoryDTO transaction) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -503,7 +528,7 @@ class _HistoricBodyState extends State<HistoricBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // En-tête avec type et date
+              // En-tête avec le type de transaction et la date
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -647,7 +672,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
-  /// Construit une ligne de détail
+  /// Construit une ligne de détail pour la boîte de dialogue
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -667,7 +692,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
-  /// Retourne la couleur associée au type de transaction
+  /// Retourne la couleur associée au type de transaction  pour l'affichage
   Color _getTransactionColor(TransactionType type) {
     switch (type) {
       case TransactionType.purchase:
@@ -680,7 +705,7 @@ class _HistoricBodyState extends State<HistoricBody> {
   }
 }
 
-/*
+/* sans dynamisation
 class HistoricBody extends StatefulWidget {
   const HistoricBody({super.key});
 

@@ -4,15 +4,21 @@ import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
 
 /// Service pour les appels API liés à l'historique des transactions
+/// Ce service est responsable de toutes les communications HTTP avec le backend
+/// pour récupérer l'historique des transactions.
 class TransactionHistoryApiService {
+  /// URL de base pour les endpoints d'historique
+
   final baseUrl = '${NetworkConfig.baseUrl}/api/transactions';
 
-  /// Headers HTTP pour les requêtes
+  /// Headers HTTP communs à toutes les requêtes
+  /// Indiquent que nous envoyons et attendons du JSON
   static final Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
+  /// MÉTHODE PRINCIPALE : RÉCUPÉRATION DE L'HISTORIQUE AVEC FILTRES
   /// Récupère l'historique des transactions avec filtres
   /// @param transactionType - Type de transaction ("ALL", "PURCHASE", "DEBIT", "TRANSFER")
   /// @param startDate - Date de début (optionnelle)
@@ -41,6 +47,7 @@ class TransactionHistoryApiService {
         'size': size.toString(),
       };
 
+      // Ajout des dates si elles sont fournies (format YYYY-MM-DD)
       if (startDate != null) {
         params['startDate'] = startDate.toIso8601String().split('T')[0];
       }
@@ -48,7 +55,7 @@ class TransactionHistoryApiService {
         params['endDate'] = endDate.toIso8601String().split('T')[0];
       }
 
-      // Construire l'URI avec les paramètres
+      // Construction de l'URI complète avec les paramètres
       final uri = Uri.parse(baseUrl).replace(queryParameters: params);
 
       print("URL: $uri");
@@ -60,10 +67,12 @@ class TransactionHistoryApiService {
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
+        // Succès : décodage du JSON et conversion en DTO
         final Map<String, dynamic> jsonData = json.decode(response.body);
         print("========== FIN RÉCUPÉRATION HISTORIQUE ==========");
         return TransactionHistoryResponseDTO.fromJson(jsonData);
       } else {
+        // Erreur : extraction du message d'erreur
         final errorBody = json.decode(response.body);
         final errorMessage =
             errorBody['message'] ??
@@ -77,8 +86,8 @@ class TransactionHistoryApiService {
   }
 
   /// Récupère l'historique des transactions pour un utilisateur spécifique
-  /// @param userId - ID de l'utilisateur (portier pour ses débits, ou étudiant pour ses transactions)
-  /// @param transactionType - Type de transaction ("ALL", "PURCHASE", "DEBIT", "TRANSFER")
+  /// @param userId - ID de l'utilisateur
+  /// @param transactionType - Type de transaction
   /// @param startDate - Date de début (optionnelle)
   /// @param endDate - Date de fin (optionnelle)
   /// @param page - Numéro de la page (défaut 0)
@@ -98,7 +107,7 @@ class TransactionHistoryApiService {
       print("Type: $transactionType");
       print("Page: $page, Size: $size");
 
-      // Construire les paramètres de la requête
+      // Construction des paramètres incluant l'ID utilisateur
       final params = <String, String>{
         'userId': userId.toString(),
         'transactionType': transactionType,
@@ -106,6 +115,7 @@ class TransactionHistoryApiService {
         'size': size.toString(),
       };
 
+      // Ajout des dates si fournies
       if (startDate != null) {
         params['startDate'] = startDate.toIso8601String().split('T')[0];
       }
@@ -113,10 +123,12 @@ class TransactionHistoryApiService {
         params['endDate'] = endDate.toIso8601String().split('T')[0];
       }
 
+      // Construction de l'URI
       final uri = Uri.parse('$baseUrl/user').replace(queryParameters: params);
 
       print("URL: $uri");
 
+      // Envoi de la requête GET
       final response = await http.get(uri, headers: headers);
 
       print("Status code: ${response.statusCode}");

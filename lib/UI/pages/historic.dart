@@ -5,7 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:senticket_front/provider/transaction_history_provider.dart';
 import 'package:senticket_front/services/transaction_history_api_service.dart';
 
-/// Page d'historique des transactions
+/// /// PAGE D'HISTORIQUE DES TRANSACTIONS
+/// Cette page affiche l'historique des transactions effectuées.
+/// Le contenu affiché dépend du rôle de l'utilisateur connecté :
+///   - ÉTUDIANT : voit ses propres transactions (achats, débits, transferts)
+///   - PORTIER : voit uniquement les débits qu'il a effectués
+///   - ADMIN : voit toutes les transactions de tous les utilisateurs
 class Historic extends StatelessWidget {
   static const String _title = 'Historique';
 
@@ -13,6 +18,8 @@ class Historic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Injection du provider TransactionHistoryProvider
+    // Ce provider sera accessible dans toute la page via Provider.of
     return ChangeNotifierProvider(
       create: (_) => TransactionHistoryProvider(TransactionHistoryApiService()),
       child: Scaffold(

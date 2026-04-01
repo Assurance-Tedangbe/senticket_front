@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
 import 'package:senticket_front/services/transaction_history_api_service.dart';
 
-/// Provider pour gérer l'état de l'historique des transactions
+/// Ce provider gère l'état de l'historique des transactions :
+/// - Stockage des transactions chargées
+/// - Gestion du chargement (loading states)
+/// - Gestion des erreurs
+/// - Pagination pour le scroll infini
 class TransactionHistoryProvider extends ChangeNotifier {
   final TransactionHistoryApiService _service;
 
-  // ==================== ÉTATS ====================
+  // ==================== ÉTATS INTERNES ====================
 
   /// Liste des transactions chargées
   List<TransactionHistoryDTO> _transactions = [];
@@ -14,28 +18,29 @@ class TransactionHistoryProvider extends ChangeNotifier {
   /// Indique si le chargement est en cours
   bool _isLoading = false;
 
-  /// Message d'erreur éventuel
+  /// Message d'erreur (vide si aucune erreur)
   String _error = '';
 
-  /// Indique s'il y a plus de données à charger
+  /// Indique s'il y a plus de données à charger(scroll infini)
   bool _hasMore = true;
 
-  /// Page courante
+  /// Page courante (0-indexé)
   int _currentPage = 0;
 
   /// Taille de la page
   final int _pageSize = 20;
 
   // ==================== GETTERS ====================
-
+  // Ces getters exposent l'état en lecture seule aux widgets UI
   List<TransactionHistoryDTO> get transactions => _transactions;
   bool get isLoading => _isLoading;
   String get error => _error;
   bool get hasMore => _hasMore;
 
-  // ==================== MÉTHODES ====================
-
+  // ==================== CONSTRUCTEUR ====================
   TransactionHistoryProvider(this._service);
+
+  // ==================== MÉTHODES ====================
 
   /// Charge les transactions avec les filtres spécifiés
   /// @param transactionType - Type de transaction à filtrer
@@ -54,6 +59,7 @@ class TransactionHistoryProvider extends ChangeNotifier {
       _hasMore = true;
     }
 
+    // Évite les chargements multiples et le chargement si fin des données
     if (_isLoading || !_hasMore) return;
 
     _isLoading = true;
@@ -65,6 +71,7 @@ class TransactionHistoryProvider extends ChangeNotifier {
       print("Type: $transactionType");
       print("Page: $_currentPage");
 
+      // Appel au service API
       final response = await _service.getTransactionHistory(
         transactionType: transactionType,
         startDate: startDate,
@@ -73,7 +80,7 @@ class TransactionHistoryProvider extends ChangeNotifier {
         size: _pageSize,
       );
 
-      // Ajouter les nouvelles transactions
+      // Ajout des nouvelles transactions à la liste existante
       _transactions.addAll(response.content);
       _currentPage++;
       _hasMore = response.hasNext;
@@ -101,11 +108,11 @@ class TransactionHistoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Charge les transactions pour un utilisateur spécifique (pour PORTIER)
+  /// Charge les transactions pour un utilisateur spécifique
   /// @param transactionType - Type de transaction à filtrer
   /// @param startDate - Date de début (optionnelle)
   /// @param endDate - Date de fin (optionnelle)
-  /// @param userId - ID de l'utilisateur pour filtrer les transactions (portier)
+  /// @param userId - ID de l'utilisateur pour filtrer les transactions
   /// @param reset - Si true, réinitialise la liste avant de charger
   Future<void> loadTransactionsForUser({
     String transactionType = 'ALL',
