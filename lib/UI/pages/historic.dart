@@ -33,18 +33,3 @@ class Historic extends StatelessWidget {
     );
   }
 }
-
-/* class Historic extends StatelessWidget {
-  static const String _title = 'Historique';
-  const Historic({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: const Text(_title), backgroundColor: kPrimaryColor),
-      body: HistoricBody(),
-    );
-  }
-}
- */
