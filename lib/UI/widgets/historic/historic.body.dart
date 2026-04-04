@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/transaction_type.dart';
@@ -40,14 +41,37 @@ class _HistoricBodyState extends State<HistoricBody> {
   // Stocker l'ID de l'utilisateur connecté pour les filtres backend
   int? _currentUserId;
 
-  // ==================== CYCLE DE VIE ====================
+  /// Indique si l'utilisateur est authentifié
+  bool _isAuthenticated = false;
 
+  /// Rôle de l'utilisateur connecté
+  String _userRole = '';
+
+  // ==================== CYCLE DE VIE ====================
   @override
   void initState() {
     super.initState();
-    _setupFilterOptions(); // Configure les options selon le rôle de l'utilisateur
-    _setupScrollListener(); // Configure l'écouteur de scroll pour le chargement infini
-    _loadInitialTransactions(); // Charge les premières transactions
+    _checkAuthenticationAndLoad();
+  }
+
+  /// Vérifie l'authentification et charge les données si l'utilisateur est connecté
+  void _checkAuthenticationAndLoad() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.currentUser;
+
+    setState(() {
+      _isAuthenticated = currentUser != null;
+      if (_isAuthenticated) {
+        _userRole = currentUser!.role.name.toUpperCase();
+        _currentUserId = currentUser.userId;
+      }
+    });
+
+    if (_isAuthenticated) {
+      _setupFilterOptions(); // Configure les options selon le rôle
+      _setupScrollListener(); // Configure l'écouteur de scroll pour le chargement infini
+      _loadInitialTransactions(); // Charge les premières transactions
+    }
   }
 
   // ==================== MÉTHODES D'INITIALISATION ====================
@@ -55,36 +79,26 @@ class _HistoricBodyState extends State<HistoricBody> {
   /// Configure les options de filtre selon le rôle de l'utilisateur
   /// Cette méthode détermine quelles options sont visibles dans le filtre
   void _setupFilterOptions() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final currentUser = userProvider.currentUser;
-    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
-
-    // Stocker l'ID de l'utilisateur connecté pour les filtres backend
-    _currentUserId = currentUser?.userId;
-
     // Réinitialiser les options
     _filterOptions = [];
 
     // Configurer les options selon le rôle
-    if (userRole == 'ETUDIANT') {
-      // Étudiant: voit toutes les options (Toutes, Achats, Débits, Transferts)
-      // Les transactions sont filtrées automatiquement par le backend avec userId
+    if (_userRole == 'ETUDIANT') {
+      // Étudiant: voit toutes ses propres transactions
       _filterOptions = [
         {'value': 'ALL', 'label': 'Toutes les transactions'},
         {'value': 'PURCHASE', 'label': 'Achats de tickets'},
         {'value': 'DEBIT', 'label': 'Débits de compte'},
         {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
       ];
-    } else if (userRole == 'PORTIER') {
-      // Portier: voit uniquement l'option "Débits de compte"
-      // Les transactions sont filtrées par le backend avec l'ID du portier
+    } else if (_userRole == 'PORTIER') {
+      // Portier: voit uniquement les débits qu'il a effectués
       _filterOptions = [
         {'value': 'DEBIT', 'label': 'Débits de compte'},
       ];
-      // Pour le portier, on force le type à DEBIT
       _selectedTransactionType = 'DEBIT';
-    } else if (userRole == 'ADMIN') {
-      // Admin: voit toutes les options (Toutes, Achats, Débits, Transferts)
+    } else if (_userRole == 'ADMIN') {
+      // Admin: voit toutes les transactions de tous les utilisateurs
       _filterOptions = [
         {'value': 'ALL', 'label': 'Toutes les transactions'},
         {'value': 'PURCHASE', 'label': 'Achats de tickets'},
@@ -92,31 +106,6 @@ class _HistoricBodyState extends State<HistoricBody> {
         {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
       ];
     }
-
-    /* // Options par défaut (pour tous)
-    _filterOptions = [
-      {'value': 'ALL', 'label': 'Toutes les transactions'},
-    ];
-    // Ajouter les options selon le rôle
-    if (userRole == 'ETUDIANT') {
-      // Étudiant: ne voit que ses achats et ses débits
-      _filterOptions.addAll([
-        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
-        {'value': 'DEBIT', 'label': 'Débits de compte'},
-      ]);
-    } else if (userRole == 'PORTIER') {
-      // Portier: ne voit que les débits qu'il a effectués
-      _filterOptions.addAll([
-        {'value': 'DEBIT', 'label': 'Débits de compte'},
-      ]);
-    } else if (userRole == 'ADMIN') {
-      // Admin: voit tout
-      _filterOptions.addAll([
-        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
-        {'value': 'DEBIT', 'label': 'Débits de compte'},
-        {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
-      ]);
-    } */
   }
 
   /// Configure l'écouteur de scroll pour détecter quand l'utilisateur arrive en bas
@@ -141,29 +130,32 @@ class _HistoricBodyState extends State<HistoricBody> {
   // ==================== CHARGEMENT DES DONNÉES ====================
 
   /// Charge les premières transactions ou initiales (page 0)
-  /// Le comportement diffère selon le rôle :
-  /// - PORTIER : utilise loadTransactionsForUser avec son ID
-  /// - Autres : utilise loadTransactions normalement
   Future<void> _loadInitialTransactions() async {
     final provider = Provider.of<TransactionHistoryProvider>(
       context,
       listen: false,
     );
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
 
-    // Pour le portier, on passe l'ID du portier comme paramètre pour filtrer
-    // ses propres débits
-    if (userRole == 'PORTIER') {
+    if (_userRole == 'ETUDIANT') {
+      // Pour l'étudiant : charger ses propres transactions avec son ID
       await provider.loadTransactionsForUser(
         transactionType: _selectedTransactionType,
         startDate: _getStartDate(),
         endDate: _getEndDate(),
-        userId: _currentUserId, // Filtrer par l'ID du portier
+        userId: _currentUserId,
         reset: true,
       );
-    } else {
-      // Pour les autres rôles, on charge normalement
+    } else if (_userRole == 'PORTIER') {
+      // Pour le portier : charger uniquement les débits qu'il a effectués
+      await provider.loadTransactionsForUser(
+        transactionType: 'DEBIT',
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        userId: _currentUserId,
+        reset: true,
+      );
+    } else if (_userRole == 'ADMIN') {
+      // Pour l'admin : charger toutes les transactions
       await provider.loadTransactions(
         transactionType: _selectedTransactionType,
         startDate: _getStartDate(),
@@ -172,21 +164,6 @@ class _HistoricBodyState extends State<HistoricBody> {
       );
     }
   }
-
-  /* /// Charge les transactions initiales
-  Future<void> _loadInitialTransactions() async {
-    final provider = Provider.of<TransactionHistoryProvider>(
-      context,
-      listen: false,
-    );
-
-    await provider.loadTransactions(
-      transactionType: _selectedTransactionType,
-      startDate: _getStartDate(),
-      endDate: _getEndDate(),
-      reset: true,
-    );
-  } */
 
   /// Charge plus de transactions (page suivante) pour le scroll infini
   Future<void> _loadMoreTransactions() async {
@@ -194,10 +171,8 @@ class _HistoricBodyState extends State<HistoricBody> {
       context,
       listen: false,
     );
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
 
-    if (userRole == 'PORTIER') {
+    if (_userRole == 'ETUDIANT') {
       await provider.loadTransactionsForUser(
         transactionType: _selectedTransactionType,
         startDate: _getStartDate(),
@@ -205,7 +180,15 @@ class _HistoricBodyState extends State<HistoricBody> {
         userId: _currentUserId,
         reset: false,
       );
-    } else {
+    } else if (_userRole == 'PORTIER') {
+      await provider.loadTransactionsForUser(
+        transactionType: 'DEBIT',
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        userId: _currentUserId,
+        reset: false,
+      );
+    } else if (_userRole == 'ADMIN') {
       await provider.loadTransactions(
         transactionType: _selectedTransactionType,
         startDate: _getStartDate(),
@@ -214,21 +197,6 @@ class _HistoricBodyState extends State<HistoricBody> {
       );
     }
   }
-  /* /// Charge plus de transactions (scroll infini)
-  Future<void> _loadMoreTransactions() async {
-    final provider = Provider.of<TransactionHistoryProvider>(
-      context,
-      listen: false,
-    );
-
-    await provider.loadTransactions(
-      transactionType: _selectedTransactionType,
-      startDate: _getStartDate(),
-      endDate: _getEndDate(),
-      reset: false,
-    );
-  } */
-
   // ==================== MÉTHODES UTILITAIRES ====================
 
   /// Récupère la date de début depuis le contrôleur
@@ -253,10 +221,8 @@ class _HistoricBodyState extends State<HistoricBody> {
       context,
       listen: false,
     );
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
 
-    if (userRole == 'PORTIER') {
+    if (_userRole == 'ETUDIANT') {
       await provider.loadTransactionsForUser(
         transactionType: _selectedTransactionType,
         startDate: _getStartDate(),
@@ -264,7 +230,15 @@ class _HistoricBodyState extends State<HistoricBody> {
         userId: _currentUserId,
         reset: true,
       );
-    } else {
+    } else if (_userRole == 'PORTIER') {
+      await provider.loadTransactionsForUser(
+        transactionType: 'DEBIT',
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+        userId: _currentUserId,
+        reset: true,
+      );
+    } else if (_userRole == 'ADMIN') {
       await provider.loadTransactions(
         transactionType: _selectedTransactionType,
         startDate: _getStartDate(),
@@ -273,20 +247,6 @@ class _HistoricBodyState extends State<HistoricBody> {
       );
     }
   }
-  /*  /// Applique les filtres et recharge les transactions
-  Future<void> _applyFilters() async {
-    final provider = Provider.of<TransactionHistoryProvider>(
-      context,
-      listen: false,
-    );
-
-    await provider.loadTransactions(
-      transactionType: _selectedTransactionType,
-      startDate: _getStartDate(),
-      endDate: _getEndDate(),
-      reset: true,
-    );
-  } */
 
   /// Affiche le sélecteur de date et met à jour le contrôleur
   Future<void> _selectDate(TextEditingController controller) async {
@@ -305,8 +265,6 @@ class _HistoricBodyState extends State<HistoricBody> {
     }
   }
 
-  // ==================== BUILD ====================
-
   @override
   void dispose() {
     _startDateController.dispose();
@@ -315,15 +273,34 @@ class _HistoricBodyState extends State<HistoricBody> {
     super.dispose();
   }
 
+  // ==================== BUILD ====================
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TransactionHistoryProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
-    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+    /* final userProvider = Provider.of<UserProvider>(context);
+    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? ''; */
     final transactions = provider.transactions;
     final isLoading = provider.isLoading;
     final error = provider.error;
 
+    // ==================== CAS 1: UTILISATEUR NON AUTHENTIFIÉ ====================
+    if (!_isAuthenticated) {
+      return _buildEmptyHistory(
+        message: 'Veuillez vous connecter pour voir l\'historique',
+        icon: Icons.lock_outline,
+      );
+    }
+
+    // ==================== CAS 2: UTILISATEUR AUTHENTIFIÉ MAIS AUCUNE TRANSACTION ====================
+    if (!isLoading && transactions.isEmpty && error.isEmpty) {
+      return _buildEmptyHistory(
+        message: 'Aucun historique trouvé',
+        icon: Icons.history,
+        subtitle: 'Les transactions que vous effectuerez apparaîtront ici',
+      );
+    }
+
+    // ==================== CAS 3: AFFICHAGE NORMAL DE L'HISTORIQUE ====================
     return Column(
       children: [
         // ==================== FILTRE PAR TYPE DE TRANSACTION ====================
@@ -343,7 +320,7 @@ class _HistoricBodyState extends State<HistoricBody> {
                 child: Text(option['label']!),
               );
             }).toList(),
-            onChanged: userRole == 'PORTIER'
+            onChanged: _userRole == 'PORTIER'
                 ? null // Pour le portier, le dropdown est désactivé
                 : (String? newValue) {
                     if (newValue != null) {
@@ -354,7 +331,9 @@ class _HistoricBodyState extends State<HistoricBody> {
                     }
                   },
             // Si c'est un portier, afficher que c'est désactivé
-            hint: userRole == 'portier' ? const Text('Débits de compte') : null,
+            hint: _userRole == 'portier'
+                ? const Text('Débits de compte')
+                : null,
           ),
         ),
 
@@ -476,13 +455,13 @@ class _HistoricBodyState extends State<HistoricBody> {
                       ],
                     ),
                   )
-                : transactions.isEmpty && !isLoading
+                /*  : transactions.isEmpty && !isLoading
                 ? const Center(
                     child: Text(
                       'Aucune transaction trouvée',
                       style: TextStyle(color: greyBorderColor),
                     ),
-                  )
+                  ) */
                 : ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
@@ -508,6 +487,56 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
+  /// Construit un message d'historique vide avec icône et message personnalisé
+  Widget _buildEmptyHistory({
+    required String message,
+    required IconData icon,
+    String? subtitle,
+  }) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 80, color: greyBorderColor),
+          const SizedBox(height: 20),
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: kPrimaryColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 14, color: greyBorderColor),
+              textAlign: TextAlign.center,
+            ),
+          ],
+
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => LoginPage()),
+              );
+            },
+            icon: const Icon(Icons.login),
+            label: const Text('Se connecter'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryColor,
+              foregroundColor: kSecondColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ==================== MÉTHODES D'AFFICHAGE ====================
 
   /// Construit la carte d'affichage d'une transaction
@@ -519,7 +548,6 @@ class _HistoricBodyState extends State<HistoricBody> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          // Optionnel: afficher les détails dans un dialogue
           _showTransactionDetails(transaction);
         },
         borderRadius: BorderRadius.circular(12),
