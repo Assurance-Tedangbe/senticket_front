@@ -13,6 +13,7 @@ import 'package:senticket_front/model/ticket_model.dart';
 */
 class TicketApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/tickets';
+  final transactionHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transactions';
   final transferHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transferHistory';
 
   // Configure HTTP headers for all requests
@@ -95,8 +96,12 @@ class TicketApiService {
         "Achat de tickets par: ${purchaseTicketsRequestDTO.purchaseUserDTO.username}",
       );
       print("URL: $baseUrl/purchase");
-      print("PurchaseUserDTO: ${purchaseTicketsRequestDTO.purchaseUserDTO.toJson()}",);
-      print("Ticket IDs count: ${purchaseTicketsRequestDTO.selectedTicketIds.length}",);
+      print(
+        "PurchaseUserDTO: ${purchaseTicketsRequestDTO.purchaseUserDTO.toJson()}",
+      );
+      print(
+        "Ticket IDs count: ${purchaseTicketsRequestDTO.selectedTicketIds.length}",
+      );
       print("Ticket IDs: ${purchaseTicketsRequestDTO.selectedTicketIds}");
 
       final response = await http.put(
@@ -230,8 +235,7 @@ class TicketApiService {
   }
 
   // ******************** FOR TRANSFER TICKETS OPERATION ************************
-
-  Future<TransfertHistoryDTO> transferTickets(
+  Future<TransactionHistoryDTO> transferTickets(
     TransfertTicketRequestDTO request,
   ) async {
     try {
@@ -251,7 +255,7 @@ class TicketApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        return TransfertHistoryDTO.fromJson(jsonData);
+        return TransactionHistoryDTO.fromJson(jsonData);
       } else {
         final errorBody = json.decode(response.body);
         final errorMessage =
@@ -264,23 +268,28 @@ class TicketApiService {
       rethrow;
     }
   }
-  // ******************** FOR GET TRANSFER_HISTORY BY ID OPERATION ************************
 
-  Future<TransfertHistoryDTO> getTransferHistoryById(int transactionId) async {
+  // ******************** FOR GET TRANSACTION_HISTORY BY ID OPERATION ************************
+  Future<TransactionHistoryDTO> getTransactionHistoryById(
+    int transactionId,
+  ) async {
     try {
       final response = await http.get(
-        Uri.parse('$transferHistoryBaseUrl/$transactionId'),
+        Uri.parse('$transactionHistoryBaseUrl/$transactionId'),
         headers: headers,
       );
+      print("Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
       if (response.statusCode == 200) {
-        return TransfertHistoryDTO.fromJson(json.decode(response.body));
+        return TransactionHistoryDTO.fromJson(json.decode(response.body));
       } else {
         throw Exception(
-          'Erreur récupération historique: ${response.statusCode}',
+          'Erreur récupération historique transaction: ${response.statusCode}',
         );
       }
     } catch (e) {
-      print("Erreur getTransferHistoryById: $e");
+      print("Erreur getTransactionHistoryById: $e");
       rethrow;
     }
   }
@@ -313,7 +322,7 @@ class TicketApiService {
     }
   }
 
-// ******************** 📊 FOR STATISTICS OPERATION ************************
+  // ******************** 📊 FOR STATISTICS OPERATION ************************
 
   /// Récupère les statistiques des tickets
   /// @param userId (optionnel) - ID de l'utilisateur pour les stats spécifiques
@@ -340,7 +349,8 @@ class TicketApiService {
       } else {
         final errorBody = json.decode(response.body);
         final errorMessage =
-            errorBody['message'] ?? 'Erreur récupération statistiques: ${response.statusCode}';
+            errorBody['message'] ??
+            'Erreur récupération statistiques: ${response.statusCode}';
         throw Exception(errorMessage);
       }
     } catch (e) {
@@ -431,5 +441,3 @@ class TicketApiService {
     }
   }
 */
-
-

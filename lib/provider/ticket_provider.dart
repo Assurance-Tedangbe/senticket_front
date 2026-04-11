@@ -30,9 +30,11 @@ class TicketProvider with ChangeNotifier {
   List<Ticket> _tickets =
       []; // "Liste vide pour stocker tous les tickets chargés depuis l'API"
 
-  Ticket? _currentTicket; // ticket currently selected (null if any ticket selected)"
+  Ticket?
+  _currentTicket; // ticket currently selected (null if any ticket selected)"
 
-  bool _isLoading = false; // "Indicateur global de chargement (initialement false)"
+  bool _isLoading =
+      false; // "Indicateur global de chargement (initialement false)"
   // true quand une opération asynchrone est en cours
 
   String _error = ''; // "Stocke les messages d'erreur (initialement vide)"
@@ -63,14 +65,12 @@ class TicketProvider with ChangeNotifier {
   bool _isLoadingStudentTickets = false;
 
   // State for transferTickets operation
-  String? _numberOfTicketsError; // Stocke les erreurs liées au nombre de tickets à transférer
+  String?
+  _numberOfTicketsError; // Stocke les erreurs liées au nombre de tickets à transférer
 
   // State pour cancelTransfer operation
-  TransfertHistoryDTO? _lastTransfer;
+  TransactionHistoryDTO? _lastTransfer;
   String? _transactionIdError;
-  SenderDTO? _lastSenderDTO;
-  RecipientDTO? _lastRecipientDTO;
-  List<int> _lastTicketIds = [];
 
   // State for statistics
   TicketStatisticsDTO? _ticketStatistics;
@@ -125,11 +125,8 @@ class TicketProvider with ChangeNotifier {
   String? get numberOfTicketsError => _numberOfTicketsError;
 
   // Getters for cancelTransfer operation
-  TransfertHistoryDTO? get lastTransfer => _lastTransfer;
   String? get transactionIdError => _transactionIdError;
-  // SenderDTO? get lastSenderDTO => _lastSenderDTO;
-  // RecipientDTO? get lastRecipientDTO => _lastRecipientDTO;
-  // List<int> get lastTicketIds => _lastTicketIds;
+  TransactionHistoryDTO? get lastTransfer => _lastTransfer;
 
   // Getters for statistics
   TicketStatisticsDTO? get ticketStatistics => _ticketStatistics;
@@ -150,7 +147,8 @@ class TicketProvider with ChangeNotifier {
   GlobalTicketStats? get globalStats => _ticketStatistics?.globalStats;
 
   // Getter pour les statistiques des tickets disponibles
-  AvailableTicketsStats? get availableStats => _ticketStatistics?.availableStats;
+  AvailableTicketsStats? get availableStats =>
+      _ticketStatistics?.availableStats;
 
   // ******************** SETTERS ********************
 
@@ -445,8 +443,7 @@ class TicketProvider with ChangeNotifier {
   }
 
   // ******************** FOR TRANSFER TICKETS OPERATION ************************
-
-  Future<TransfertHistoryDTO?> transferTickets(
+  Future<TransactionHistoryDTO?> transferTickets(
     TransfertTicketRequestDTO request,
   ) async {
     _isTransferringTickets = true;
@@ -471,19 +468,20 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
-  // ******************** FOR GET TRANSFER_HISTORY BY ID OPERATION ************************
-
-  Future<TransfertHistoryDTO?> getTransferHistoryById(int transactionId) async {
+  // ******************** FOR GET TRANSACTION HISTORY BY ID OPERATION ************************
+  Future<TransactionHistoryDTO?> getTransactionHistoryById(
+    int transactionId,
+  ) async {
     _isLoading = true;
     _error = '';
     notifyListeners();
 
     try {
-      final history = await _service.getTransferHistoryById(transactionId);
+      final history = await _service.getTransactionHistoryById(transactionId);
       return history;
     } catch (e) {
       _error = 'Erreur lors de la récupération: ${e.toString()}';
-      print("Erreur getTransferHistoryById: $e");
+      print("Erreur getTransactionHistoryById: $e");
       return null;
     } finally {
       _isLoading = false;
@@ -537,7 +535,7 @@ class TicketProvider with ChangeNotifier {
       print("User ID passé: $userId");
 
       _ticketStatistics = await _service.getTicketStatistics(userId: userId);
-     // _error = '';
+      // _error = '';
       /// Statistiques par utilisateur
       if (_ticketStatistics!.userStats.isNotEmpty) {
         print("--- STATISTIQUES UTILISATEUR ---");
@@ -554,15 +552,27 @@ class TicketProvider with ChangeNotifier {
 
       /// Statistiques globales
       print("--- STATISTIQUES GLOBALES ---");
-      print("TT achetés (tous utilisateurs): ${_ticketStatistics!.globalStats.totalPurchasedTickets}");
-      print("TT débités (tous comptes): ${_ticketStatistics!.globalStats.totalDebitedTickets}");
-      print("TT traités (achetés + débités): ${_ticketStatistics!.globalStats.totalTicketsProcessed}");
+      print(
+        "TT achetés (tous utilisateurs): ${_ticketStatistics!.globalStats.totalPurchasedTickets}",
+      );
+      print(
+        "TT débités (tous comptes): ${_ticketStatistics!.globalStats.totalDebitedTickets}",
+      );
+      print(
+        "TT traités (achetés + débités): ${_ticketStatistics!.globalStats.totalTicketsProcessed}",
+      );
 
       /// Statistiques des tickets disponibles
       print("--- STATISTIQUES TICKETS DISPONIBLES ---");
-      print("T. Type A disponibles: ${_ticketStatistics!.availableStats.typeATicketsAvailable}");
-      print("T. Type B disponibles: ${_ticketStatistics!.availableStats.typeBTicketsAvailable}");
-      print("TT disponibles: ${_ticketStatistics!.availableStats.totalTicketsAvailable}");
+      print(
+        "T. Type A disponibles: ${_ticketStatistics!.availableStats.typeATicketsAvailable}",
+      );
+      print(
+        "T. Type B disponibles: ${_ticketStatistics!.availableStats.typeBTicketsAvailable}",
+      );
+      print(
+        "TT disponibles: ${_ticketStatistics!.availableStats.totalTicketsAvailable}",
+      );
 
       _error = '';
       return true;

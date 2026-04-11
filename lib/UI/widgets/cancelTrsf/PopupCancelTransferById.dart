@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/enums/transaction_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -25,46 +26,35 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
     super.dispose();
   }
 
-  Future<void> _validateTransactionID(TicketProvider ticketProvider) async {
-    final idText = _transactionIdController.text.trim();
-    if (idText.isEmpty) {
-      ticketProvider.setTransactionIdError(
-        'Veuillez entrer l\'ID de la transaction',
-      );
-      return;
-    }
-  }
-
   Future<void> _handleValidate() async {
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
 
     final idText = _transactionIdController.text.trim();
     if (idText.isEmpty) {
-     // await _validateTransactionID(ticketProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Veuillez entrer un ID de transaction'),
-           backgroundColor: redErrorColor,
-           duration: Duration(seconds: 3),
+          backgroundColor: redErrorColor,
+          duration: Duration(seconds: 3),
         ),
       );
       return;
     }
     final transactionId = int.tryParse(idText);
     if (transactionId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('ID null'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('ID invalide')));
       Navigator.pop(context);
       return;
     }
 
     setState(() => _isLoading = true);
 
-   // final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    final history = await ticketProvider.getTransferHistoryById(transactionId);
+    // Utiliser la nouvelle méthode
+    final history = await ticketProvider.getTransactionHistoryById(
+      transactionId,
+    );
 
     setState(() => _isLoading = false);
 
@@ -82,24 +72,38 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
       return;
     }
 
-    if(history.canceled){
-     // if (context.mounted) {
+    // Vérifier que c'est bien une transaction de type TRANSFER
+    if (history.transactionType != TransactionType.transfer) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('This transaction is already canceled'),
+          const SnackBar(
+            content: Text('Cette transaction n\'est pas un transfert'),
             backgroundColor: redErrorColor,
           ),
         );
         Navigator.pop(context);
-    //  }
+      }
       return;
     }
 
+    // Vérifier si déjà annulé
+    if (history.transferCanceled == true) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Ce transfert a déjà été annulé'),
+            backgroundColor: redErrorColor,
+          ),
+        );
+        Navigator.pop(context);
+      }
+      return;
+    }
 
     // Vérifier que l'utilisateur connecté est le sender du transfert
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.currentUser;
-    if (currentUser == null || currentUser.userId != history.senderDTO.id) {
+    if (currentUser == null || currentUser.userId != history.senderDTO?.id) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -124,13 +128,14 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Destinataire : ${history.recipientDTO.username}'),
               Text(
-                'Nombre de tickets : ${_parseTicketIds(history.ticketIdsTransfered).length}',
+                'Destinataire : ${history.recipientDTO?.username ?? 'Inconnu'}',
               ),
+              Text('Nombre de tickets : ${history.ticketsCount}'),
               Text(
-                'Date : ${history.transferDate.toLocal().toString().split('.').first}',
+                'Date : ${history.date.toLocal().toString().split('.').first}',
               ),
+              Text('ID transaction : ${history.id}'),
             ],
           ),
           actions: [
@@ -144,20 +149,19 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final ticketIds = _parseTicketIds(history.ticketIdsTransfered);
                 final request = CancelTransferTicketsRequestDTO(
                   cancelTransferDTO: CancelTransferDTO(
                     transactionId: history.id,
                     originalSenderDTO: OriginalSenderDTO(
-                      senderId: history.senderDTO.id,
-                      senderUsername: history.senderDTO.username,
+                      senderId: history.senderDTO!.id,
+                      senderUsername: history.senderDTO!.username,
                     ),
                     currentOwnerDTO: RecipientDTO(
-                      recipientId: history.recipientDTO.id,
-                      recipientUsername: history.recipientDTO.username,
+                      recipientId: history.recipientDTO!.id,
+                      recipientUsername: history.recipientDTO!.username,
                     ),
                   ),
-                  ticketIdsToCancel: ticketIds,
+                  ticketIdsToCancel: history.ticketIds,
                 );
 
                 final success = await ticketProvider.cancelTransfer(request);
@@ -193,12 +197,6 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
         ),
       );
     }
-  }
-
-  List<int> _parseTicketIds(String ticketIdsStr) {
-    String cleaned = ticketIdsStr.replaceAll('[', '').replaceAll(']', '');
-    if (cleaned.isEmpty) return [];
-    return cleaned.split(',').map((s) => int.parse(s.trim())).toList();
   }
 
   @override

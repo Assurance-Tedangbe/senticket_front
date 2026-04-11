@@ -1,5 +1,6 @@
 import 'package:senticket_front/enums/ticket_status.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
+import 'package:senticket_front/enums/transaction_type.dart';
 
 /* role(Conversion données), utilise forApi, fromApi, toBackend, fromBackend  */
 class Ticket {
@@ -385,6 +386,92 @@ class UserDTO {
   }
 }
 
+// ==================== TRANSACTION HISTORY DTO (UNIFIÉ) ====================
+
+/// DTO pour une transaction individuelle (unifiée)
+class TransactionHistoryDTO {
+  final int id;
+  final TransactionType transactionType;
+  final DateTime date;
+  final int ticketsCount;
+  final List<int> ticketIds;
+  final List<String> ticketTypes;
+
+  // Champs spécifiques aux achats
+  final UserDTO? purchaserDTO;
+
+  // Champs spécifiques aux débits
+  final UserDTO? porterDTO;
+  final UserDTO? studentDTO;
+
+  // Champs spécifiques aux transferts
+  final UserDTO? senderDTO;
+  final UserDTO? recipientDTO;
+  final bool? transferCanceled;
+
+  TransactionHistoryDTO({
+    required this.id,
+    required this.transactionType,
+    required this.date,
+    required this.ticketsCount,
+    required this.ticketIds,
+    required this.ticketTypes,
+    this.purchaserDTO,
+    this.porterDTO,
+    this.studentDTO,
+    this.senderDTO,
+    this.recipientDTO,
+    this.transferCanceled,
+  });
+
+  /// Convertit un JSON en objet TransactionHistoryDTO
+  factory TransactionHistoryDTO.fromJson(Map<String, dynamic> json) {
+    return TransactionHistoryDTO(
+      id: json['id'],
+      transactionType: TransactionType.fromApi(json['transactionType']),
+      date: DateTime.parse(json['date']),
+      ticketsCount: json['ticketsCount'],
+      ticketIds: (json['ticketIds'] as List<dynamic>?)?.cast<int>() ?? [],
+      ticketTypes:
+          (json['ticketTypes'] as List<dynamic>?)?.cast<String>() ?? [],
+      purchaserDTO: json['purchaserDTO'] != null
+          ? UserDTO.fromJson(json['purchaserDTO'])
+          : null,
+      porterDTO: json['porterDTO'] != null
+          ? UserDTO.fromJson(json['porterDTO'])
+          : null,
+      studentDTO: json['studentDTO'] != null
+          ? UserDTO.fromJson(json['studentDTO'])
+          : null,
+      senderDTO: json['senderDTO'] != null
+          ? UserDTO.fromJson(json['senderDTO'])
+          : null,
+      recipientDTO: json['recipientDTO'] != null
+          ? UserDTO.fromJson(json['recipientDTO'])
+          : null,
+      transferCanceled: json['transferCanceled'],
+    );
+  }
+
+  /// Retourne le libellé de la transaction selon son type
+  String getTransactionLabel() {
+    return transactionType.getDisplayName();
+  }
+
+  /// Retourne les détails de la transaction selon son type
+  String getTransactionDetails() {
+    switch (transactionType) {
+      case TransactionType.purchase:
+        return 'Par ${purchaserDTO?.username ?? 'Inconnu'}';
+      case TransactionType.debit:
+        return 'Par ${porterDTO?.username ?? 'Inconnu'} sur ${studentDTO?.username ?? 'Inconnu'}';
+      case TransactionType.transfer:
+        return 'De ${senderDTO?.username ?? 'Inconnu'} à ${recipientDTO?.username ?? 'Inconnu'}'
+            '${transferCanceled == true ? ' (Annulé)' : ''}';
+    }
+  }
+}
+
 // ==================== STATISTICS DTO ====================
 /// DTO pour les statistiques des tickets
 class TicketStatisticsDTO {
@@ -515,8 +602,10 @@ class GlobalTicketStats {
 
 /// Statistiques des tickets disponibles (status = AVAILABLE)
 class AvailableTicketsStats {
-  final int typeATicketsAvailable; // Tickets Type A disponibles (non achetés, non débités)
-  final int typeBTicketsAvailable; // Tickets Type B disponibles (non achetés, non débités)
+  final int
+  typeATicketsAvailable; // Tickets Type A disponibles (non achetés, non débités)
+  final int
+  typeBTicketsAvailable; // Tickets Type B disponibles (non achetés, non débités)
   final int totalTicketsAvailable; // Total tickets disponibles (A + B)
 
   AvailableTicketsStats({

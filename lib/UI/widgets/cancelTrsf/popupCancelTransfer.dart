@@ -6,12 +6,14 @@ import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
 class PopupCancelTransfer extends StatelessWidget {
-  final TransfertHistoryDTO transferHistoryDTO;
+  final TransactionHistoryDTO transactionHistoryDTO;
   final VoidCallback? onCancelSuccess;
 
-  const PopupCancelTransfer({super.key,
-    required this.transferHistoryDTO,
-    this.onCancelSuccess});
+  const PopupCancelTransfer({
+    super.key,
+    required this.transactionHistoryDTO,
+    this.onCancelSuccess,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +21,8 @@ class PopupCancelTransfer extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.currentUser;
 
-    // Extraire les IDs des tickets depuis la chaîne
-    final ticketIds = _parseTicketIds(transferHistoryDTO.ticketIdsTransfered);
+    // Extraire les IDs des tickets depuis la liste directe
+    final ticketIds = transactionHistoryDTO.ticketIds;
     final numberOfTickets = ticketIds.length;
 
     return AlertDialog(
@@ -29,9 +31,11 @@ class PopupCancelTransfer extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Destinataire : ${transferHistoryDTO.recipientDTO.username}'),
+          Text(
+            'Destinataire : ${transactionHistoryDTO.recipientDTO?.username ?? 'Inconnu'}',
+          ),
           Text('Nombre de tickets : $numberOfTickets'),
-          Text('ID transaction : ${transferHistoryDTO.id}'),
+          Text('ID transaction : ${transactionHistoryDTO.id}'),
           const SizedBox(height: 10),
           const Text('Voulez-vous annuler ce transfert ?'),
         ],
@@ -46,7 +50,7 @@ class PopupCancelTransfer extends StatelessWidget {
           onPressed: () async {
             // Vérifier que l'utilisateur est bien l'expéditeur original
             if (currentUser == null ||
-                currentUser.userId != transferHistoryDTO.senderDTO.id) {
+                currentUser.userId != transactionHistoryDTO.senderDTO?.id) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Non autorisé'),
@@ -61,14 +65,15 @@ class PopupCancelTransfer extends StatelessWidget {
             // Construire la requête d'annulation
             final request = CancelTransferTicketsRequestDTO(
               cancelTransferDTO: CancelTransferDTO(
-                transactionId: transferHistoryDTO.id,
+                transactionId: transactionHistoryDTO.id,
                 originalSenderDTO: OriginalSenderDTO(
-                  senderId: transferHistoryDTO.senderDTO.id,
-                  senderUsername: transferHistoryDTO.senderDTO.username,
+                  senderId: transactionHistoryDTO.senderDTO!.id,
+                  senderUsername: transactionHistoryDTO.senderDTO!.username,
                 ),
                 currentOwnerDTO: RecipientDTO(
-                  recipientId: transferHistoryDTO.recipientDTO.id,
-                  recipientUsername: transferHistoryDTO.recipientDTO.username,
+                  recipientId: transactionHistoryDTO.recipientDTO!.id,
+                  recipientUsername:
+                      transactionHistoryDTO.recipientDTO!.username,
                 ),
               ),
               ticketIdsToCancel: ticketIds,
@@ -101,11 +106,4 @@ class PopupCancelTransfer extends StatelessWidget {
       ],
     );
   }
-
-  List<int> _parseTicketIds(String ticketIdsStr) {
-    String cleaned = ticketIdsStr.replaceAll('[', '').replaceAll(']', '');
-    if (cleaned.isEmpty) return [];
-    return cleaned.split(',').map((s) => int.parse(s.trim())).toList();
-  }
 }
-

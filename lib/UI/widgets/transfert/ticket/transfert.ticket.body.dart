@@ -32,7 +32,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
   TicketType? _selectedTicketType;
 
   // Stocker l'historique du dernier transfert pour pouvoir l'annuler
-  TransfertHistoryDTO? _lastTransferHistory;
+  TransactionHistoryDTO? _lastTransferHistory;
 
   @override
   void initState() {
@@ -75,9 +75,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {
-      userProvider.setUsernameError(
-        'Veuillez entrer le nom du destinataire',
-      );
+      userProvider.setUsernameError('Veuillez entrer le nom du destinataire');
       return;
     }
 
@@ -91,18 +89,14 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
 
       // Vérifier que l'utilisateur trouvé est un étudiant
       if (searchedUser.role.name != 'ETUDIANT') {
-        userProvider.setUsernameError(
-          'Le destinataire doit être un étudiant',
-        );
+        userProvider.setUsernameError('Le destinataire doit être un étudiant');
         return;
       }
     } else {
       // L'erreur est déjà gérée dans le provider
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            userProvider.debitUsernameError ?? 'Erreur inconnue',
-          ),
+          content: Text(userProvider.debitUsernameError ?? 'Erreur inconnue'),
           backgroundColor: redErrorColor,
           duration: const Duration(seconds: 5),
         ),
@@ -205,7 +199,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       }
     }
     final recipient = userProvider.searchedUser!;
-   // final number = int.parse(_numberController.text.trim());
+    // final number = int.parse(_numberController.text.trim());
 
     // Construire la requête
     final request = TransfertTicketRequestDTO(
@@ -232,8 +226,8 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '$number ticket(s) transferé(s)'
-           /* '$number ticket(s) de type ${_selectedTicketType == TicketType.a ? 'A' : 'B'} '
+            '$number ticket(s) transferé(s)',
+            /* '$number ticket(s) de type ${_selectedTicketType == TicketType.a ? 'A' : 'B'} '
             'transféré(s) à ${recipient.username}',*/
           ),
           backgroundColor: validateBtnColor,
@@ -278,7 +272,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     showDialog(
       context: context,
       builder: (_) => PopupCancelTransfer(
-        transferHistoryDTO: _lastTransferHistory!,
+        transactionHistoryDTO: _lastTransferHistory!,
         onCancelSuccess: () {
           // Réinitialiser l'historique après annulation réussie
           setState(() {
@@ -455,18 +449,20 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
                 ),
               ],
               onChanged: (value) => setState(() => _selectedTicketType = value),
-              hint: const Text('Sélectionnez un type de ticket', style: TextStyle(
-                color: kPrimaryColor,
-                fontSize: 13,
-              )),
+              hint: const Text(
+                'Sélectionnez un type de ticket',
+                style: TextStyle(color: kPrimaryColor, fontSize: 13),
+              ),
             ),
           ],
         ),
         const SizeboxHeightSession(),
-        NumberTicketsSection(controller: _numberController,
+        NumberTicketsSection(
+          controller: _numberController,
           onChanged: (value) {
-          setState(() {});
-        },),
+            setState(() {});
+          },
+        ),
         const SizeboxHeightSession(),
         SenderPasswordTrsfTicket(
           controller: _passwordController,
@@ -489,7 +485,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
               hasTransferToCancel: _lastTransferHistory != null,
             ),
 
-          /*  // Afficher le badge du nombre de transferts à annuler si disponible
+            /*  // Afficher le badge du nombre de transferts à annuler si disponible
             if (_lastTransferHistory != null)
               Container(
                 margin: const EdgeInsets.only(right: 8),
