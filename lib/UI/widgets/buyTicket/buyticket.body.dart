@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+import 'package:senticket_front/services/payment_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
@@ -10,6 +11,10 @@ import 'package:senticket_front/UI/widgets/buyTicket/ticketASection.dart';
 import 'package:senticket_front/UI/widgets/buyTicket/ticketBSection.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
+import 'package:senticket_front/provider/payment_provider.dart';
+
+// Page d'achat de tickets incluant le PaymentProvider.
+// Le MultiProvider permet d'avoir accès à TicketProvider ET PaymentProvider.
 
 class BuyTicketBody extends StatefulWidget {
   const BuyTicketBody({super.key});
@@ -68,7 +73,7 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
     );
   }
 
-  Widget _buildTicketInterface(BuildContext context) {
+  /*   Widget _buildTicketInterface(BuildContext context) {
     return Consumer<TicketProvider>(
       builder: (context, ticketProvider, child) {
         return Column(
@@ -84,6 +89,38 @@ class _BuyTicketBodyState extends State<BuyTicketBody> {
           ],
         );
       },
+    );
+  } */
+
+  Widget _buildTicketInterface(BuildContext context) {
+    // MultiProvider permet d'injecter plusieurs providers simultanément
+    return MultiProvider(
+      providers: [
+        // Garder le TicketProvider existant
+        ChangeNotifierProvider.value(
+          value: Provider.of<TicketProvider>(context),
+        ),
+        // Ajouter le PaymentProvider pour les paiements PayDunya
+        ChangeNotifierProvider(
+          create: (_) => PaymentProvider(PaymentApiService()),
+        ),
+      ],
+      child: Consumer<TicketProvider>(
+        builder: (context, ticketProvider, child) {
+          return Column(
+            children: [
+              if (ticketProvider.error.isNotEmpty)
+                _buildErrorDisplay(ticketProvider),
+              const TicketASection(),
+              const SizeboxTemplate(),
+              const SizeboxTemplate(),
+              const TicketBSection(),
+              const SizeboxTemplate(),
+              const RequestSection(),
+            ],
+          );
+        },
+      ),
     );
   }
 
