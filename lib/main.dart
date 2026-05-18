@@ -21,9 +21,11 @@ import 'package:senticket_front/UI/pages/updateProfile.dart';
 import 'package:senticket_front/bloc/historic.bloc.dart';
 import 'package:senticket_front/bloc/services.bloc.dart';
 import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/provider/payment_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+import 'package:senticket_front/services/payment_service.dart';
 import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
@@ -53,6 +55,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<TicketProvider>(
           create: (context) => TicketProvider(TicketApiService()),
+        ),
+        // PROVIDER PAIEMENT PAYDUNYA
+        // Enregistré au niveau global pour être accessible partout dans l'app
+        // PaymentApiService est injecté par le constructeur (Dependency Injection)
+        ChangeNotifierProvider(
+          create: (_) => PaymentProvider(PaymentApiService()),
         ),
       ],
       child: const RootView(),

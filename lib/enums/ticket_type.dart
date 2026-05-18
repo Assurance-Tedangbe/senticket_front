@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 // 🎫 ENUMERATION DES TYPES DE TICKETS
 // Définit tous les types possibles qu'un ticket peut avoir dans l'application
 enum TicketType { a, b }
@@ -26,15 +24,6 @@ extension TicketTypeExtension on TicketType {
         return 'A';
       case TicketType.b:
         return 'B';
-    }
-  }
-
-  Color get displayColor {
-    switch (this) {
-      case TicketType.a:
-        return Colors.blue;
-      case TicketType.b:
-        return Colors.cyan;
     }
   }
 }
