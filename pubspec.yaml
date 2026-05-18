@@ -48,6 +48,19 @@ dependencies:
   # Pour les deep links (retour de paiement)
   uni_links: ^0.5.1
 
+  # WebView pour afficher la page de paiement PayDunya dans l'application
+  # L'utilisateur paie directement dans un navigateur intégré sans quitter l'app
+  webview_flutter: ^4.4.2
+
+  # Vérification de la connectivité réseau avant d'initier un paiement
+  connectivity_plus: ^5.0.2
+
+  # Stockage local sécurisé (token JWT, userId, etc.)
+  #flutter_secure_storage: ^9.0.0
+
+  # Alertes/dialogs stylisés
+  #fluttertoast: ^8.2.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
