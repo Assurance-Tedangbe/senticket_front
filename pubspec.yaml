@@ -30,7 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Requêtes HTTP vers le backend Spring Boot
   http: ^1.1.0
+  # Navigation et gestion d'état
   provider: ^6.1.1
   dio: ^5.3.2
   # The following adds the Cupertino Icons font to your application.
@@ -45,21 +47,11 @@ dependencies:
   
   # Pour ouvrir l'URL de paiement dans le navigateur
   url_launcher: ^6.2.1
-  # Pour les deep links (retour de paiement)
-  uni_links: ^0.5.1
-
   # WebView pour afficher la page de paiement PayDunya dans l'application
   # L'utilisateur paie directement dans un navigateur intégré sans quitter l'app
   webview_flutter: ^4.4.2
-
   # Vérification de la connectivité réseau avant d'initier un paiement
   connectivity_plus: ^5.0.2
-
-  # Stockage local sécurisé (token JWT, userId, etc.)
-  #flutter_secure_storage: ^9.0.0
-
-  # Alertes/dialogs stylisés
-  #fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:
