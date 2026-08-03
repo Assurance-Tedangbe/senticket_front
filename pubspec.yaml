@@ -52,6 +52,7 @@ dependencies:
   webview_flutter: ^4.4.2
   # Vérification de la connectivité réseau avant d'initier un paiement
   connectivity_plus: ^5.0.2
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
