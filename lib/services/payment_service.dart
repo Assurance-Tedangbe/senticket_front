@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/payment_model.dart';
+import 'package:senticket_front/http/auth_http_client.dart';
+
 
 // SERVICE HTTP PAIEMENT
 // Responsable de TOUTES les communications HTTP avec les
@@ -24,9 +26,10 @@ import 'package:senticket_front/model/payment_model.dart';
 class PaymentApiService {
   // URL de base pour les endpoints de paiement
   final String _baseUrl = '${NetworkConfig.baseUrl}/api/payments';
-
-  // Timeout des requêtes HTTP (30s comme configuré dans OkHttpClient du backend)
   static const Duration _timeout = Duration(seconds: 30);
+
+  // Remplacer http.Client() par AuthHttpClient
+  final AuthHttpClient _authClient = AuthHttpClient();
 
   // Headers HTTP communs à toutes les requêtes (application/json)
   static const Map<String, String> _headers = {
@@ -58,7 +61,8 @@ class PaymentApiService {
       print('Payload: ${jsonEncode(request.toJson())}');
 
       // Envoi de la requête POST avec le payload JSON sérialisé
-      final response = await http
+      // _authClient.post au lieu de http.post
+      final response = await _authClient
           .post(url, headers: _headers, body: jsonEncode(request.toJson()))
           .timeout(_timeout);
 
@@ -129,7 +133,7 @@ class PaymentApiService {
     try {
       print('Polling statut - Token: $transactionId');
 
-      final response = await http.get(url, headers: _headers).timeout(_timeout);
+      final response = await _authClient.get(url, headers: _headers).timeout(_timeout);
 
       print(
         'Polling - Status code: ${response.statusCode}, Body: ${response.body}',

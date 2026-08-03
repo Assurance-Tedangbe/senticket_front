@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/role_model.dart';
 import 'package:senticket_front/model/user_model.dart';
+import 'package:senticket_front/http/auth_http_client.dart';
+import 'package:senticket_front/services/token_storage_service.dart';
 
 /*- Service combiné qui gère :
   - Appels HTTP vers l'API Spring Boot: handles all communication with the API
@@ -14,10 +16,13 @@ class UserApiService {
   final authUrl =
       '${NetworkConfig.baseUrl}/api/auth'; // URL pour l'authentification
 
-  // Configure HTTP headers for all requests
-  static final Map<String, String> headers = {
-    'Content-Type': 'application/json', // Tells the server "I'm sending JSON"
-    'Accept': 'application/json', // Tells the server "I want to receive JSON"
+  // Client authentifié pour les routes protégées
+  final AuthHttpClient _authClient = AuthHttpClient();
+
+  // Configure HTTP headers for all requests (sans Authorization — le client l'ajoute automatiquement)
+  static const Map<String, String> _jsonHeaders = {
+    'Content-Type': 'application/json',  // Tells the server "I'm sending JSON"
+    'Accept': 'application/json',        // Tells the server "I want to receive JSON"
   };
 
   // CACHE SIMPLE INTÉGRÉ
@@ -25,15 +30,16 @@ class UserApiService {
   DateTime? _lastFetchTime; // Dernière récupération
   static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
 
-  // ****************** CREATE USER (POST /api/users) **********************
+  // ************ INSCRIPTION (public — pas de token)(POST /api/users) **************
   Future<User> createUser(User user) async {
     try {
       print('Envoi de la requête POST pour créer un utilisateur');
 
+      // http.post direct car endpoint public (pas d'auth nécessaire)
       final response = await http.post(
         // sending a POST request:
         Uri.parse(baseUrl), // Converts the URL string to a Uri object
-        headers: headers, // Uses the configured headers
+        headers: _jsonHeaders, // Uses the configured headers
         body: json.encode(user.toJson()), // Converts User object → JSON string
       );
 
@@ -79,14 +85,15 @@ class UserApiService {
     }
   }
 
-  // ****************** LOGIN USER (POST /api/auth/login) **********************
+  // ****************** LOGIN (public — génère le token)(POST /api/auth/login) **********************
   Future<User> login(String username, String password) async {
     try {
-      print('🔐 Tentative de connexion pour: $username');
+      print('Connexion pour: $username');
 
+      // http.post direct car endpoint public
       final response = await http.post(
         Uri.parse('$authUrl/login'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode({'username': username, 'password': password}),
       );
 
@@ -104,6 +111,7 @@ class UserApiService {
         }
         // Si votre API retourne un token et des infos utilisateur séparément
         // Cas 2: Format avec token et user séparé
+        // Format attendu du backend : { token, success, user: { id, username, roleDTO: { name } } }
         else if (responseData.containsKey('token') &&
             responseData.containsKey('user')) {
           final token = responseData['token'] as String;
@@ -113,9 +121,16 @@ class UserApiService {
           // Vous pourriez stocker le token pour les futures requêtes
           // _saveToken(token);
 
-          print(
-            '✅ Connexion réussie avec token, utilisateur: ${user.username}',
+          // SAUVEGARDER LE TOKEN — c'est ici que tout se joue
+          // Toutes les requêtes suivantes l'auront automatiquement
+          await TokenStorageService.instance.saveToken(token);
+          await TokenStorageService.instance.saveUserInfo(
+            userId: user.userId?.toString() ?? '',
+            username: user.username,
+            role: user.role.name,
           );
+
+          print('Connexion réussie avec token, Token sauvegardé pour: ${user.username} (${user.role.name})');
           return user;
         }
         // Cas 3: Format spécifique de mon API
@@ -207,7 +222,24 @@ class UserApiService {
     }
   }
 
-  // READ ALL USERS (GET /api/users)
+  // ************ LOGOUT **************
+  Future<void> logout() async {
+    try {
+      // Informer le serveur (token ajouté automatiquement par _authClient)
+      await _authClient.post(
+        Uri.parse('$authUrl/logout'),
+        headers: _jsonHeaders,
+      );
+    } catch (e) {
+      print('Erreur logout serveur (ignorée): $e');
+    } finally {
+      // Le vrai logout : supprimer le token localement
+      await TokenStorageService.instance.clearAll();
+      print('Token supprimé — utilisateur déconnecté');
+    }
+  }
+
+  // READ ALL USERS (GET /api/users) (protégé)
   // Uses caching to avoid unnecessary API calls
   Future<List<User>> getAllUsers({bool forceRefresh = false}) async {
     // Checks if the cache is still valid
@@ -226,8 +258,11 @@ class UserApiService {
 
     try {
       print("Retrieving users from the API");
-
-      final response = await http.get(Uri.parse(baseUrl), headers: headers);
+      // _authClient ajoute Authorization: Bearer <token> automatiquement
+      final response = await _authClient.get(
+        Uri.parse(baseUrl),
+        headers: _jsonHeaders,
+      );
 
       if (response.statusCode == 200) {
         // the JSON response → a list of User objects
@@ -263,7 +298,7 @@ class UserApiService {
     }
   }
 
-  // READ USER BY ID (GET /api/users/{userId})
+  // READ USER BY ID (GET /api/users/{userId}) (protégé)
   Future<User> getUserById(int userId) async {
     try {
       print("Retrieving user with ID: $userId");
@@ -295,10 +330,9 @@ class UserApiService {
       }
 
       // Si l'utilisateur n'est pas dans le cache, on fait un appel API
-      final response = await http.get(
+      final response = await _authClient.get(
         Uri.parse('$baseUrl/$userId'),
-        headers:
-            headers, // Utilise les headers configurés (Content-Type, Accept, etc.)
+        headers: _jsonHeaders, // Utilise les headers configurés (Content-Type, Accept, etc.)
       );
 
       // Vérifie le code de statut HTTP de la réponse
@@ -326,18 +360,17 @@ class UserApiService {
     }
   }
 
-  // READ USER BY USERNAME (GET /api/users/username/{username})
+  // READ USER BY USERNAME (GET /api/users/username/{username}) (protégé)
   // without cahe
   Future<User> getUserByUsername(String username) async {
     try {
-      print("Récupération de l'utilisateur par username: $username");
+      print("getUserByUsername: $username");
 
-      final response = await http.get(
+      final response = await _authClient.get(
         Uri.parse('$baseUrl/username/$username'),
-        headers: headers,
+        headers: _jsonHeaders,
       );
 
-      print("Status code getUserByUsername: ${response.statusCode}");
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
@@ -347,7 +380,6 @@ class UserApiService {
           "Utilisateur trouvé: ${userData['username']} (Rôle: ${userData['role']?['name']})",
         );
         return User.fromJson(userData);
-        /*  return User.fromJson(json.decode(response.body)); */
       } else if (response.statusCode == 404) {
         throw Exception('Utilisateur non trouvé');
       } else {
@@ -360,24 +392,14 @@ class UserApiService {
     }
   }
 
-  /*  Future<User> getUserByUsername(String username) async {
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final user = User.fromJson(jsonData);
-        print(
-          "Utilisateur trouvé: ${user.username} (Rôle: ${user.role?.name})",
-        );
-        return user; 
-  } */
-
-  // UPDATE USER (PUT /api/users/{userId})
+  // UPDATE USER (PUT /api/users/{userId}) (protégé)
   Future<User> updateUser(User user) async {
     try {
       print("Update user with ID: ${user.userId}");
 
-      final response = await http.put(
+      final response = await _authClient.put(
         Uri.parse('$baseUrl/${user.userId}'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode(user.toJson()), // Sends the new data"
       );
 
@@ -403,14 +425,14 @@ class UserApiService {
     }
   }
 
-  // DELETE USER (DELETE /api/users/{userId})
+  // DELETE USER (DELETE /api/users/{userId}) (protégé)
   Future<void> deleteUser(int userId) async {
     try {
       print("Deleting user with ID: $userId");
 
-      final response = await http.delete(
+      final response = await _authClient.delete(
         Uri.parse('$baseUrl/$userId'),
-        headers: headers,
+        headers: _jsonHeaders,
       );
 
       if (response.statusCode == 204) {
@@ -432,56 +454,19 @@ class UserApiService {
 
   // Basic validation of user data
   void validateUserData(User user) {
-    if (user.username.length < 3) {
-      throw Exception(
-        'Le nom d\'utilisateur doit contenir au moins 3 caractères',
-      );
-    }
-
-    // Validation de la longueur maximale (comme @Size(max = 70))
-    if (user.username.length > 70) {
-      throw Exception(
-        'Le nom d\'utilisateur ne peut pas dépasser 70 caractères',
-      );
-    }
-
-    if (user.password.length < 6) {
-      throw Exception('Le mot de passe doit contenir au moins 6 caractères');
-    }
-
-    if (!user.email.contains('@')) {
-      throw Exception('Email invalide');
-    }
+    if (user.username.length < 3) {throw Exception('Nom d\'utilisateur trop court (min 3 caractères)');}
+    if (user.username.length > 70) {throw Exception('Nom d\'utilisateur trop court (max 70 caractères)');}
+    if (user.password.length < 6) {throw Exception('Mot de passe trop court (min 6 caractères)');}
+    if (!user.email.contains('@')) {throw Exception('Email invalide');}
   }
 
-  /* Future<void> logout() async {
-    final url = Uri.parse('$authUrl/logout');
-    final token =
-        await _getToken(); // récupérez le token depuis SharedPreferences
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    if (response.statusCode != 200) {
-      // Vous pouvez logger l'erreur mais ne pas échouer la déconnexion locale
-      print(
-        'Erreur lors de la déconnexion côté serveur : ${response.statusCode}',
-      );
-    }
-  } */
-}
-  //********** Suppl services not used ************
-  /*
   // UPDATE PASSWORD (PUT /api/users/password/{userId})
   // without cahe
   Future<void> updatePassword(int userId, String newPassword) async {
     try {
-      final response = await http.put(
+      final response = await _authClient.put(
         Uri.parse('$baseUrl/password/$userId'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode(
           newPassword,
         ), // Sends only the new password (not the entire User object)"
@@ -498,76 +483,4 @@ class UserApiService {
       throw Exception('Erreur réseau: $e');
     }
   }
-
-  
-   // Méthode pour obtenir les headers avec authentification
-  Future<Map<String, String>> getAuthHeaders() async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-
-    // Si vous avez un token, l'ajouter aux headers
-    // final token = await _getToken();
-    // if (token != null) {
-    //   headers['Authorization'] = 'Bearer $token';
-    // }
-    return headers;
-  }
-
-   // Searching for users in the local cache
-  List<User> searchUsers(String query) {
-    print("searching for users with query: $query");
-
-    if (query.isEmpty) return _cachedUsers;
-
-    final queryLower = query.toLowerCase();
-
-    return _cachedUsers
-        .where(
-          (user) =>
-              user.username.toLowerCase().contains(queryLower) ||
-              user.email.toLowerCase().contains(queryLower) ||
-              user.firstName.toLowerCase().contains(queryLower) ||
-              user.lastName.toLowerCase().contains(queryLower) ||
-              user.role.name.toLowerCase().contains(queryLower),
-        )
-        .toList();
-  }
-
-  // Clear the cache (useful for forcing a refresh)
-  void clearCache() {
-    print("Clearing the cache");
-    _cachedUsers.clear();
-    _lastFetchTime = null;
-    print("🗑️ Cache utilisateurs vidé");
-  } */
-
-  /* // Dans UserApiService, ajoutez cette méthode pour forcer le rafraîchissement du cache
-  void invalidateUserCache(int userId) {
-    // Retirer l'utilisateur du cache pour forcer une nouvelle récupération
-    _cachedUsers.removeWhere((user) => user.userId == userId);
-    print('🗑️ Cache invalidé pour l\'utilisateur ID: $userId');
-  }
-
-  // ADD ROLE TO USER (PUT /api/users/{userId}/roles/{roleId})
-  // without cahe
-  Future<void> addRoleToUser(int userId, int roleId) async {
-    print("Add role : $roleId to user : $userId");
-
-    try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/$userId/roles/$roleId'),
-        headers: headers,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Erreur ajout rôle: ${response.statusCode}');
-      }
-
-      print("Rôle $roleId ajouté à l'utilisateur $userId");
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
- */
+}

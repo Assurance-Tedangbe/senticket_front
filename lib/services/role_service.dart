@@ -1,5 +1,4 @@
 import 'dart:convert';
-//import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/role_model.dart';
@@ -8,17 +7,17 @@ class RoleApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/roles';
 
   /// Headers HTTP pour indiquer qu'on travaille avec du JSON
-  static final Map<String, String> headers = {
+  /// GET /api/roles est public (nécessaire pour l'inscription)
+  /// donc on utilise http directement, pas AuthHttpClient
+  static const Map<String, String> headers = {
     'Content-Type': 'application/json', // Type de contenu qu'on envoie
     'Accept': 'application/json', // Type de contenu qu'on accepte en retour
   };
 
   // Cache en mémoire pour stocker la liste des rôles
   List<Role> _cachedRoles = [];
-
   // Timestamp de la dernière récupération des données
   DateTime? _lastFetchTime;
-
   // Durée de validité du cache (10 minutes pour les rôles qui changent peu)
   static const Duration cacheDuration = Duration(minutes: 10);
 
@@ -28,9 +27,7 @@ class RoleApiService {
   Future<List<Role>> getAllRoles({bool forceRefresh = false}) async {
     // Vérification de la validité du cache
     final now = DateTime.now();
-    final cacheValide =
-        _lastFetchTime != null &&
-        now.difference(_lastFetchTime!) < cacheDuration;
+    final cacheValide = _lastFetchTime != null && now.difference(_lastFetchTime!) < cacheDuration;
 
     // Retourne les données du cache si valides et non forcées
     if (!forceRefresh && cacheValide && _cachedRoles.isNotEmpty) {
@@ -50,7 +47,6 @@ class RoleApiService {
       // Vérification du code HTTP 200 (OK) comme dans le Controller
       if (response.statusCode == 200) {
         print(' 200 OK - succès');
-
         // JSON response → Role object list
         final List<dynamic> jsonList = json.decode(response.body);
         _cachedRoles = jsonList.map((json) => Role.fromJson(json)).toList();
@@ -71,7 +67,6 @@ class RoleApiService {
         print(" API inaccessible - Retourne cache expiré en fallback");
         return _cachedRoles;
       }
-
       throw Exception('Erreur réseau: $e');
     }
   }

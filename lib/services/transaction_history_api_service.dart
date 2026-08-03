@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
+import 'package:senticket_front/http/auth_http_client.dart';
 
 /// Service pour les appels API liés à l'historique des transactions
 /// Ce service est responsable de toutes les communications HTTP avec le backend
@@ -11,9 +12,12 @@ class TransactionHistoryApiService {
 
   final baseUrl = '${NetworkConfig.baseUrl}/api/transactions';
 
+  // Remplacer http.Client() par AuthHttpClient
+  final AuthHttpClient _authClient = AuthHttpClient();
+
   /// Headers HTTP communs à toutes les requêtes
   /// Indiquent que nous envoyons et attendons du JSON
-  static final Map<String, String> headers = {
+  static const Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
@@ -61,7 +65,7 @@ class TransactionHistoryApiService {
       print("URL: $uri");
 
       // Envoyer la requête GET
-      final response = await http.get(uri, headers: headers);
+      final response = await _authClient.get(uri, headers: headers);
 
       print("Status code: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -129,7 +133,7 @@ class TransactionHistoryApiService {
       print("URL: $uri");
 
       // Envoi de la requête GET
-      final response = await http.get(uri, headers: headers);
+      final response = await _authClient.get(uri, headers: headers);
 
       print("Status code: ${response.statusCode}");
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/ticket_model.dart';
+import 'package:senticket_front/http/auth_http_client.dart';
 
 /* 
   - Service combiné qui gère :
@@ -14,13 +15,14 @@ import 'package:senticket_front/model/ticket_model.dart';
 class TicketApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/tickets';
   final transactionHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transactions';
-  final transferHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transferHistory';
+
+  // Remplacer les headers statiques par le client authentifié
+  final AuthHttpClient _authClient = AuthHttpClient();
 
   // Configure HTTP headers for all requests
-  static final Map<String, String> headers = {
+  static const Map<String, String> _jsonHeaders = {
     'Content-Type': 'application/json', // Indique au serveur "J'envoie du JSON"
-    'Accept':
-        'application/json', // Indique au serveur "Je veux recevoir du JSON"
+    'Accept': 'application/json', // Indique au serveur "Je veux recevoir du JSON"
   };
 
   // CACHE SIMPLE INTÉGRÉ
@@ -49,7 +51,7 @@ class TicketApiService {
     try {
       print("Récupération des tickets depuis l'API");
 
-      final response = await http.get(Uri.parse(baseUrl), headers: headers);
+      final response = await _authClient.get(Uri.parse(baseUrl), headers: _jsonHeaders);
 
       if (response.statusCode == 200) {
         // "Convertit la réponse JSON → liste d'objets Ticket"
@@ -104,9 +106,9 @@ class TicketApiService {
       );
       print("Ticket IDs: ${purchaseTicketsRequestDTO.selectedTicketIds}");
 
-      final response = await http.put(
+      final response = await _authClient.put(
         Uri.parse('$baseUrl/purchase'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode(({
           'purchaseUserDTO': {
             'userId': purchaseTicketsRequestDTO.purchaseUserDTO.userId,
@@ -156,9 +158,9 @@ class TicketApiService {
         "Debiter le compte de l'utilisateur ID: ${debitAccountRequestDTO.debitStudentDTO.debitStudentId}",
       );
 
-      final response = await http.put(
+      final response = await _authClient.put(
         Uri.parse('$baseUrl/debit'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode(debitAccountRequestDTO.toJson()),
       );
 
@@ -215,7 +217,7 @@ class TicketApiService {
       final uri = Uri.parse(
         '$baseUrl/user/$userId/purchased',
       ).replace(queryParameters: params);
-      final response = await http.get(uri, headers: headers);
+      final response = await _authClient.get(uri, headers: _jsonHeaders);
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
@@ -245,9 +247,9 @@ class TicketApiService {
       print("Type: ${request.ticketType}");
       print("Nbr tickets: ${request.numberOfTicketsToTransfer}");
 
-      final response = await http.put(
+      final response = await _authClient.put(
         Uri.parse('$baseUrl/transferTickets'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode(request.toJson()),
       );
       print("Status code: ${response.statusCode}");
@@ -274,9 +276,9 @@ class TicketApiService {
     int transactionId,
   ) async {
     try {
-      final response = await http.get(
+      final response = await _authClient.get(
         Uri.parse('$transactionHistoryBaseUrl/$transactionId'),
-        headers: headers,
+        headers: _jsonHeaders,
       );
       print("Status code: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -302,9 +304,9 @@ class TicketApiService {
       print("************** ANNULATION TRANSFERT **************");
       print("Transaction ID: ${request.cancelTransferDTO.transactionId}");
 
-      final response = await http.put(
+      final response = await _authClient.put(
         Uri.parse('$baseUrl/cancelTransfer'),
-        headers: headers,
+        headers: _jsonHeaders,
         body: json.encode(request.toJson()),
       );
       if (response.statusCode == 200) {
@@ -338,7 +340,7 @@ class TicketApiService {
           ? Uri.parse('$baseUrl/statistics?userId=$userId')
           : Uri.parse('$baseUrl/statistics');
 
-      final response = await http.get(uri, headers: headers);
+      final response = await _authClient.get(uri, headers: _jsonHeaders);
 
       print("Status code: ${response.statusCode}");
       print("Response body: ${response.body}");
