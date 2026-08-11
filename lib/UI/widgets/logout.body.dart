@@ -5,6 +5,8 @@ import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
 import 'package:senticket_front/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:senticket_front/provider/user_provider.dart';
 
 class LogOutBody extends StatefulWidget {
   const LogOutBody({super.key});
@@ -14,6 +16,8 @@ class LogOutBody extends StatefulWidget {
 }
 
 class _LogOutBodyState extends State<LogOutBody> {
+  bool _isLoggingOut = false;
+
   Future<void> _showAlertDialog() async {
     return showDialog<void>(
       context: context,
@@ -31,30 +35,52 @@ class _LogOutBodyState extends State<LogOutBody> {
           actions: <Widget>[
             TextButton(
               child: const Text('ANNULER'),
-              onPressed: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (context) => const Home())),
-              //() {  Navigator.of(context).pop();},
-            ),
+              onPressed: () =>
+             // Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Home()))
+              () {  Navigator.of(context).pop(); }),
             TextButton(
               child: const Text('OUI'),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const CoverPage()),
-              ),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Fermer le dialog
+
+                setState(() => _isLoggingOut = true);
+
+                // VRAI LOGOUT : supprime le token JWT
+                // et réinitialise l'état utilisateur
+                final userProvider = Provider.of<UserProvider>(
+                  context,
+                  listen: false,
+                );
+                await userProvider.logout();
+
+                if (!context.mounted) return;
+
+                // Retour à la page de couverture
+                // pushAndRemoveUntil vide la pile de navigation
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const CoverPage()),
+                      (route) => false,
+                );
+              },
             ),
+            /*TextButton(
+              child: const Text('OUI'),
+              onPressed: () =>
+               Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CoverPage())),
+            ),*/
           ],
         );
       },
     );
   }
 
-  Widget logoutBtn() {
+  Widget _logoutBtn() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25),
       height: 100,
       width: 170,
       child: ElevatedButton(
-        onPressed: _showAlertDialog,
+        onPressed: _isLoggingOut ? null : _showAlertDialog,
         style: ElevatedButton.styleFrom(
           backgroundColor: kPrimaryColor,
           shape: const BeveledRectangleBorder(
@@ -66,7 +92,12 @@ class _LogOutBodyState extends State<LogOutBody> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: const Text('Se déconnecter'),
+        child: _isLoggingOut
+            ? const CircularProgressIndicator(color: kPrimaryColor)
+            : const Text(
+          'Se déconnecter',
+          style: TextStyle(color: kSecondColor),
+        ),
       ),
     );
   }
@@ -82,7 +113,7 @@ class _LogOutBodyState extends State<LogOutBody> {
           children: <Widget>[
             const PageIconTemplate(iconData: Icons.logout),
             const SizeboxTemplate(),
-            logoutBtn(),
+            _logoutBtn(),
           ],
         ),
       ),

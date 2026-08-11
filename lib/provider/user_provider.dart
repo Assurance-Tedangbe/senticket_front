@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart'; // Import les bases de Flutter, dont C
 import 'package:senticket_front/model/role_model.dart';
 import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/services/user_service.dart';
+import 'package:senticket_front/services/token_storage_service.dart';
 
 class UserProvider with ChangeNotifier {
   //Creates a class that can notify its listeners of changes
@@ -450,6 +451,9 @@ class UserProvider with ChangeNotifier {
       // Appel au service de connexion
       final user = await _service.login(_loginUsername, _loginPassword);
 
+      // Récupérer le token sauvegardé par le service
+      _authToken = await TokenStorageService.instance.getToken();
+
       // Vérification du rôle
       final roleName = user.role.name.toUpperCase();
       if (roleName != 'ETUDIANT' &&
@@ -798,7 +802,27 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  /*   Future<void> logout() async {
+  // Ajouter la méthode logout complète
+  Future<void> logout() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Appeler le serveur pour informer de la déconnexion
+      await _service.logout();
+    } finally {
+      // Nettoyer l'état local Flutter
+      _currentUser = null;
+      _authToken = null;
+      _error = '';
+      _isLoading = false;
+      notifyListeners();
+      print('Déconnexion complète — état réinitialisé');
+    }
+  }
+}
+
+/*   Future<void> logout() async {
     // 1. Appeler l'API de déconnexion (optionnel)
     try {
       await _service.logout();
@@ -814,7 +838,6 @@ class UserProvider with ChangeNotifier {
     await prefs.remove('token');
     notifyListeners();
   } */
-}
 
 /*  Future<void> logout() async {
     try {
