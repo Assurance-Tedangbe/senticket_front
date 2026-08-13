@@ -4,22 +4,26 @@ import '../services/token_storage_service.dart';
 
 /// Intercepteur HTTP JWT pour Flutter.
 /// Équivalent du TokenInterceptor Angular ou du Dio interceptor.
-///
 /// Fonctionnement :
 ///   - Hérite de http.BaseClient (remplace http.Client)
 ///   - Surcharge send() qui est appelé pour TOUTE requête HTTP
-///   - Lit le token depuis TokenStorageService
-///   - Ajoute Authorization: Bearer <token> si token présent
-///   - Gère les 401 automatiquement (token expiré → nettoyage)
+///     → Lit le token depuis TokenStorageService
+///     → Ajoute Authorization: Bearer <token> si token présent
+///     → Gère les 401 automatiquement (token expiré → nettoyage)
 ///
 /// Si pas de token (inscription, login) : aucun header ajouté.
 /// Les endpoints publics fonctionnent normalement.
+///
+/// Utilisation dans les services :
+///   final _client = AuthHttpClient(onUnauthorized: () { ... });
+///   final response = await _client.get(Uri.parse(...));
 class AuthHttpClient extends http.BaseClient {
   final http.Client _inner;
   final TokenStorageService _tokenStorage;
 
   // Callback appelé quand le serveur retourne 401 (token expiré/invalide)
-  // Flutter ne peut pas naviguer depuis ici directement, donc on utilise un callback
+  // Flutter ne peut pas naviguer depuis ici directement,
+  // donc le caller décide quoi faire (rediriger vers login, etc.)
   final void Function()? onUnauthorized;
 
   AuthHttpClient({
@@ -27,7 +31,7 @@ class AuthHttpClient extends http.BaseClient {
     TokenStorageService? tokenStorage,
     this.onUnauthorized,
   })  : _inner = inner ?? http.Client(),
-        _tokenStorage = tokenStorage ?? TokenStorageService.instance;
+        _tokenStorage = tokenStorage ?? TokenStorageService();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {

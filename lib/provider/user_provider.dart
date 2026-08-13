@@ -9,6 +9,9 @@ class UserProvider with ChangeNotifier {
 
   final UserApiService _service;
 
+  // Ajoute dans la classe
+  final _tokenStorage = TokenStorageService();
+
   // Main state
   List<User> _users = []; // Empty list to store all users
   User? _currentUser; // Currently selected user (can be null)
@@ -431,6 +434,9 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // submitLogin — sauvegarde le token
+  // Le token est maintenant sauvegardé directement dans user_service.login()
+  // _currentUser est toujours mis à jour ici comme avant
   Future<bool> submitLogin() async {
     print('1. loginUsername: $_loginUsername');
     print('3. isLoginFormValid: $isLoginFormValid');
@@ -451,8 +457,8 @@ class UserProvider with ChangeNotifier {
       // Appel au service de connexion
       final user = await _service.login(_loginUsername, _loginPassword);
 
-      // Récupérer le token sauvegardé par le service
-      _authToken = await TokenStorageService.instance.getToken();
+      /*// Récupérer le token sauvegardé par le service
+      _authToken = await TokenStorageService.instance.getToken();*/
 
       // Vérification du rôle
       final roleName = user.role.name.toUpperCase();
@@ -464,25 +470,25 @@ class UserProvider with ChangeNotifier {
         notifyListeners();
         return false;
       }
-
       _currentUser = user;
+      // ✅ Récupérer le token depuis le stockage (sauvegardé dans UserApiService.login())
+      _authToken = await _tokenStorage.getToken();
+
       _isLoggingIn = false;
       _error = '';
       notifyListeners();
 
-      print('✅ Connexion réussie: ${user.username}');
+      print('✅ Connexion réussie: ${user.username} — Token: ${_authToken != null ? "présent" : "absent"}');
       print('ID: ${user.userId}');
       print('Rôle name: ${user.role.name}');
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();
-
       return true;
     } catch (e) {
       _isLoggingIn = false;
       _error = 'Erreur de connexion: ${e.toString()}';
       notifyListeners();
-
       print(' Erreur de connexion: $e');
       return false;
     }
@@ -802,57 +808,33 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  // Ajouter la méthode logout complète
   Future<void> logout() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Appeler le serveur pour informer de la déconnexion
+      // Appel serveur optionnel (JWT est stateless — juste pour traçabilité)
       await _service.logout();
+    } catch (e) {
+      // L'appel serveur a échoué mais on déconnecte quand même localement
+      print('[UserProvider] Erreur appel logout serveur: $e');
+      // TokenStorageService.clearAll() est appelé dans le catch de _service.logout()
+      // donc le token est déjà effacé même en cas d'erreur réseau
     } finally {
-      // Nettoyer l'état local Flutter
+      // Toujours exécuté — nettoyage garanti quoi qu'il arrive
       _currentUser = null;
       _authToken = null;
+      _users.clear();
+     // _cachedUsers = [];
       _error = '';
       _isLoading = false;
       notifyListeners();
-      print('Déconnexion complète — état réinitialisé');
+      print('✅ Déconnexion complète — état réinitialisé');
     }
   }
+
 }
-
-/*   Future<void> logout() async {
-    // 1. Appeler l'API de déconnexion (optionnel)
-    try {
-      await _service.logout();
-    } catch (e) {
-      print('Erreur logout API: $e');
-    }
-
-    // 2. Nettoyer les données locales
-    _currentUser = null;
-    _authToken = null;
-    // Supprimer le token des SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-    notifyListeners();
-  } */
-
-/*  Future<void> logout() async {
-    try {
-      // Optionnel: Appeler l'API pour invalider le token
-      // await _service.logout();
-    } catch (e) {
-      print('Erreur lors de la déconnexion: $e');
-    } finally {
-      _currentUser = null;
-      _authToken = null;
-      resetLoginForm();
-      notifyListeners();
-    }
-  }
-
+/*
   // ******************* Update password *****************
   Future<bool> updateUserPassword(int userId, String newPassword) async {
     _isUpdatingPassword = true;

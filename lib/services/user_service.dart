@@ -25,6 +25,8 @@ class UserApiService {
     'Accept': 'application/json',        // Tells the server "I want to receive JSON"
   };
 
+  final _tokenStorage = TokenStorageService();
+
   // CACHE SIMPLE INTÉGRÉ
   List<User> _cachedUsers = []; // Cache des utilisateurs
   DateTime? _lastFetchTime; // Dernière récupération
@@ -85,7 +87,7 @@ class UserApiService {
     }
   }
 
-  // ****************** LOGIN (public — génère le token)(POST /api/auth/login) **********************
+  // ****************** LOGIN (public — génère & sauvegarde le token)(POST /api/auth/login) **********************
   Future<User> login(String username, String password) async {
     try {
       print('Connexion pour: $username');
@@ -121,10 +123,12 @@ class UserApiService {
           // Vous pourriez stocker le token pour les futures requêtes
           // _saveToken(token);
 
-          // SAUVEGARDER LE TOKEN — c'est ici que tout se joue
+          //  // ✅ SAUVEGARDER LE TOKEN — c'est le cœur du système JWT
           // Toutes les requêtes suivantes l'auront automatiquement
-          await TokenStorageService.instance.saveToken(token);
-          await TokenStorageService.instance.saveUserInfo(
+          /*await TokenStorageService.instance.saveToken(token);
+          await TokenStorageService.instance.saveUserInfo*/
+          await _tokenStorage.saveToken(token);
+          await _tokenStorage.saveUserSession(
             userId: user.userId?.toString() ?? '',
             username: user.username,
             role: user.role.name,
@@ -234,7 +238,9 @@ class UserApiService {
       print('Erreur logout serveur (ignorée): $e');
     } finally {
       // Le vrai logout : supprimer le token localement
-      await TokenStorageService.instance.clearAll();
+      await _tokenStorage.clearAll() /*TokenStorageService.instance.clearAll()*/;
+      _cachedUsers.clear();
+      _lastFetchTime = null;
       print('Token supprimé — utilisateur déconnecté');
     }
   }

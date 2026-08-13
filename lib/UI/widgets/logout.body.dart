@@ -41,22 +41,18 @@ class _LogOutBodyState extends State<LogOutBody> {
             TextButton(
               child: const Text('OUI'),
               onPressed: () async {
-                Navigator.of(context).pop(); // Fermer le dialog
+                /*Navigator.of(context).pop(); // Fermer le dialog
 
-                setState(() => _isLoggingOut = true);
+                setState(() => _isLoggingOut = true);*/
 
-                // VRAI LOGOUT : supprime le token JWT
-                // et réinitialise l'état utilisateur
-                final userProvider = Provider.of<UserProvider>(
-                  context,
-                  listen: false,
-                );
+                // *** LOGOUT COMPLET : token effacé + state réinitialisé ***
+                final userProvider = Provider.of<UserProvider>(context, listen: false);
                 await userProvider.logout();
 
                 if (!context.mounted) return;
 
-                // Retour à la page de couverture
-                // pushAndRemoveUntil vide la pile de navigation
+                // Retour à la page de couverture avec pushAndRemoveUntil qui vide la pile de navigation
+                // Navigation vers la page de couverture en effaçant tout l'historique
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const CoverPage()),
                       (route) => false,
