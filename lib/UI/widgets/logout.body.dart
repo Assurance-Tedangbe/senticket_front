@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/coverPage.dart';
-import 'package:senticket_front/UI/pages/home.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
 import 'package:senticket_front/constants.dart';
-import 'package:provider/provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
 class LogOutBody extends StatefulWidget {
@@ -16,85 +15,61 @@ class LogOutBody extends StatefulWidget {
 }
 
 class _LogOutBodyState extends State<LogOutBody> {
+
+  // ✅ De la version 2 : indicateur de chargement pendant le logout
   bool _isLoggingOut = false;
 
-  Future<void> _showAlertDialog() async {
-    return showDialog<void>(
+  // ✅ De la version 1 : séparation propre — dialog retourne bool
+  Future<bool> _showConfirmDialog() async {
+    final result = await showDialog<bool>(
       context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Déconnexion'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Etes-vous sûr de vouloir vous déconnecter'),
-              ],
-            ),
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Déconnexion'),
+        content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+        actions: [
+          TextButton(
+            // ✅ Bug corrigé de la version 2
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('ANNULER'),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('ANNULER'),
-              onPressed: () =>
-             // Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Home()))
-              () {  Navigator.of(context).pop(); }),
-            TextButton(
-              child: const Text('OUI'),
-              onPressed: () async {
-                /*Navigator.of(context).pop(); // Fermer le dialog
-
-                setState(() => _isLoggingOut = true);*/
-
-                // *** LOGOUT COMPLET : token effacé + state réinitialisé ***
-                final userProvider = Provider.of<UserProvider>(context, listen: false);
-                await userProvider.logout();
-
-                if (!context.mounted) return;
-
-                // Retour à la page de couverture avec pushAndRemoveUntil qui vide la pile de navigation
-                // Navigation vers la page de couverture en effaçant tout l'historique
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const CoverPage()),
-                      (route) => false,
-                );
-              },
-            ),
-            /*TextButton(
-              child: const Text('OUI'),
-              onPressed: () =>
-               Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CoverPage())),
-            ),*/
-          ],
-        );
-      },
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('OUI',
+                style: TextStyle(color: kPrimaryColor)),
+          ),
+        ],
+      ),
     );
+    return result ?? false;
   }
 
-  Widget _logoutBtn() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 25),
-      height: 100,
-      width: 170,
-      child: ElevatedButton(
-        onPressed: _isLoggingOut ? null : _showAlertDialog,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: kPrimaryColor,
-          shape: const BeveledRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-          ),
-          textStyle: const TextStyle(
-            color: kSecondColor,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        child: _isLoggingOut
-            ? const CircularProgressIndicator(color: kPrimaryColor)
-            : const Text(
-          'Se déconnecter',
-          style: TextStyle(color: kSecondColor),
-        ),
-      ),
+  // ✅ De la version 1 : logique de logout séparée du dialog
+  Future<void> _handleLogout() async {
+    final confirmed = await _showConfirmDialog();
+    if (!confirmed) return;
+
+    // ✅ De la version 2 : indicateur de chargement
+    setState(() => _isLoggingOut = true);
+
+    try {
+      final userProvider = Provider.of<UserProvider>(
+        context,
+        listen: false,
+      );
+      await userProvider.logout();
+    } finally {
+      if (mounted) {
+        setState(() => _isLoggingOut = false);
+      }
+    }
+
+    if (!mounted) return;
+
+    // Supprime tout l'historique — impossible de revenir en arrière
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const CoverPage()),
+          (_) => false,
     );
   }
 
@@ -106,10 +81,33 @@ class _LogOutBodyState extends State<LogOutBody> {
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 120),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
             const PageIconTemplate(iconData: Icons.logout),
             const SizeboxTemplate(),
-            _logoutBtn(),
+            SizedBox(
+              height: 100,
+              width: 170,
+              child: ElevatedButton(
+                // Désactivé pendant le logout
+                onPressed: _isLoggingOut ? null : _handleLogout,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                ),
+                // ✅ De la version 2 : spinner pendant le logout
+                child: _isLoggingOut
+                    ? const CircularProgressIndicator(
+                  color: kSecondColor,
+                  strokeWidth: 2,
+                )
+                    : const Text(
+                  'Se déconnecter',
+                  style: TextStyle(color: kSecondColor, fontSize: 16),
+                ),
+              ),
+            ),
           ],
         ),
       ),

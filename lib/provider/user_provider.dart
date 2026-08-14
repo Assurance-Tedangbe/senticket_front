@@ -811,9 +811,12 @@ class UserProvider with ChangeNotifier {
   Future<void> logout() async {
     _isLoading = true;
     notifyListeners();
-
     try {
       // Appel serveur optionnel (JWT est stateless — juste pour traçabilité)
+      // Appeler le serveur pour l'informer de la déconnexion
+      // Appelle service.logout() qui :
+      //   1. Informe le serveur (POST /api/auth/logout)
+      //   2. Efface le token de flutter_secure_storage
       await _service.logout();
     } catch (e) {
       // L'appel serveur a échoué mais on déconnecte quand même localement
@@ -832,7 +835,6 @@ class UserProvider with ChangeNotifier {
       print('✅ Déconnexion complète — état réinitialisé');
     }
   }
-
 }
 /*
   // ******************* Update password *****************
