@@ -15,6 +15,8 @@ import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../../navigation/navigation_service.dart';
+
 /*
   Widget principal qui organise tous les champs du formulaire de connexion.
   StatefulWidget pour gérer les TextEditingController.
@@ -38,7 +40,14 @@ class _LoginBodyState extends State<LoginBody> {
     super.dispose();
   }
 
+  // login.body.dart — simplifié
   void _onLoginSuccess() {
+    final role = Provider.of<UserProvider>(context, listen: false)
+        .currentUser?.role.name;
+    NavigationService.goToRoleInterface(role);
+  }
+
+ /* void _onLoginSuccess() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.currentUser;
     if (user != null) {
@@ -74,7 +83,7 @@ class _LoginBodyState extends State<LoginBody> {
       );
       return;
     }
-  }
+  }*/
 
   void _toggleRememberMe(bool? value) {
     if (value != null) {

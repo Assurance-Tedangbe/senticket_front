@@ -6,6 +6,8 @@ import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
 import 'package:senticket_front/services/token_storage_service.dart';
 
+import '../navigation/navigation_service.dart';
+
 /*- Service combiné qui gère :
   - Appels HTTP vers l'API Spring Boot: handles all communication with the API
   - Cache simple des données
@@ -16,8 +18,17 @@ class UserApiService {
   final authUrl =
       '${NetworkConfig.baseUrl}/api/auth'; // URL pour l'authentification
 
-  // Client authentifié pour les routes protégées
-  final AuthHttpClient _authClient = AuthHttpClient();
+  // ✅ onUnauthorized branché sur NavigationService.goToLogin()
+  // Quand le backend retourne 401 (token expiré/invalide) :
+  //   1. AuthHttpClient efface le token local
+  //   2. Appelle ce callback
+  //   3. NavigationService redirige vers /login sans BuildContext
+  final AuthHttpClient _authClient = AuthHttpClient(
+    onUnauthorized: () => NavigationService.goToLogin(),
+  );
+
+  /*// Client authentifié pour les routes protégées
+  final AuthHttpClient _authClient = AuthHttpClient();*/
 
   // Configure HTTP headers for all requests (sans Authorization — le client l'ajoute automatiquement)
   static const Map<String, String> _jsonHeaders = {
@@ -226,19 +237,22 @@ class UserApiService {
     }
   }
 
-  // ************ LOGOUT **************
+  // ************ LOGOUT — protégé + nettoyage local **************
   Future<void> logout() async {
     try {
       // Informer le serveur (token ajouté automatiquement par _authClient)
+      // Si 401 → onUnauthorized → goToLogin() (peu probable ici mais géré)
       await _authClient.post(
         Uri.parse('$authUrl/logout'),
         headers: _jsonHeaders,
       );
     } catch (e) {
-      print('Erreur logout serveur (ignorée): $e');
+      // Échec serveur ignoré — le vrai logout est local
+      print('[UserApiService] Erreur logout serveur (ignorée): $e');
     } finally {
       // Le vrai logout : supprimer le token localement
-      await _tokenStorage.clearAll() /*TokenStorageService.instance.clearAll()*/;
+      // Nettoyage local garanti quoi qu'il arrive
+      await _tokenStorage.clearAll() /* TokenStorageService.instance.clearAll() */;
       _cachedUsers.clear();
       _lastFetchTime = null;
       print('Token supprimé — utilisateur déconnecté');
@@ -257,14 +271,14 @@ class UserApiService {
 
     // Returns the cache if valid and not forced
     if (!forceRefresh && cacheValide && _cachedUsers.isNotEmpty) {
-      print("Retourne ${_cachedUsers.length} utilisateurs depuis le cache");
-
+      print('Cache valide: ${_cachedUsers.length} utilisateurs');
       return _cachedUsers;
     }
 
     try {
       print("Retrieving users from the API");
       // _authClient ajoute Authorization: Bearer <token> automatiquement
+      // Si token expiré → 401 → onUnauthorized → goToLogin()
       final response = await _authClient.get(
         Uri.parse(baseUrl),
         headers: _jsonHeaders,
@@ -330,12 +344,12 @@ class UserApiService {
       // Vérifie si l'utilisateur a été trouvé dans le cache
       // cachedUser.userId != -1 signifie qu'on a trouvé un utilisateur valide dans le cache
       if (cachedUser.userId != -1) {
-        print(" User found in cache");
+        print(" User $userId found in cache");
         // Retourne l'utilisateur du cache sans faire d'appel API
         return cachedUser;
       }
 
-      // Si l'utilisateur n'est pas dans le cache, on fait un appel API
+      // Si l'utilisateur n'est pas dans le cache, on fait un appel API protégé pour le récupérer depuis le serveur
       final response = await _authClient.get(
         Uri.parse('$baseUrl/$userId'),
         headers: _jsonHeaders, // Utilise les headers configurés (Content-Type, Accept, etc.)
@@ -415,10 +429,8 @@ class UserApiService {
 
         // Updates the cache
         final index = _cachedUsers.indexWhere((u) => u.userId == user.userId);
-        if (index != -1) {
-          _cachedUsers[index] = updatedUser;
-        }
-
+        if (index != -1) { _cachedUsers[index] = updatedUser;}
+        print('✅ User mis à jour: ${updatedUser.username}');
         return updatedUser;
       } else {
         throw Exception(
@@ -436,6 +448,7 @@ class UserApiService {
     try {
       print("Deleting user with ID: $userId");
 
+      // ✅ Appel protégé
       final response = await _authClient.delete(
         Uri.parse('$baseUrl/$userId'),
         headers: _jsonHeaders,
@@ -443,7 +456,6 @@ class UserApiService {
 
       if (response.statusCode == 204) {
         print("User deleted with ID: $userId");
-
         // Updates the cache
         _cachedUsers.removeWhere((user) => user.userId == userId);
       } else {
@@ -453,7 +465,6 @@ class UserApiService {
       }
     } catch (e) {
       print("Erreur suppression: $e");
-
       throw Exception('Erreur réseau: $e');
     }
   }
@@ -461,12 +472,12 @@ class UserApiService {
   // Basic validation of user data
   void validateUserData(User user) {
     if (user.username.length < 3) {throw Exception('Nom d\'utilisateur trop court (min 3 caractères)');}
-    if (user.username.length > 70) {throw Exception('Nom d\'utilisateur trop court (max 70 caractères)');}
+    if (user.username.length > 70) {throw Exception('Nom d\'utilisateur trop long (max 70 caractères)');}
     if (user.password.length < 6) {throw Exception('Mot de passe trop court (min 6 caractères)');}
     if (!user.email.contains('@')) {throw Exception('Email invalide');}
   }
 
-  // UPDATE PASSWORD (PUT /api/users/password/{userId})
+  // UPDATE PASSWORD (PUT /api/users/password/{userId}) (protegé)
   // without cahe
   Future<void> updatePassword(int userId, String newPassword) async {
     try {
@@ -477,13 +488,11 @@ class UserApiService {
           newPassword,
         ), // Sends only the new password (not the entire User object)"
       );
-
       if (response.statusCode != 200) {
         throw Exception(
           'Erreur mise à jour mot de passe: ${response.statusCode}',
         );
       }
-
       print("Password updated for user with ID: $userId");
     } catch (e) {
       throw Exception('Erreur réseau: $e');

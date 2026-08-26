@@ -494,6 +494,63 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+
+  // ****************** RESTORE SESSION (démarrage de l'app) ******************
+
+  /// Restaure la session utilisateur au démarrage de l'app.
+  /// Appelée par SenticketApp.initState() dans main.dart quand
+  /// un token JWT existe déjà en mémoire sécurisée.
+  /// Flux :
+  ///   1. Lit le username depuis TokenStorageService
+  ///   2. Appelle le backend GET /api/users/username/{username}
+  ///      avec le token existant (via AuthHttpClient automatiquement)
+  ///   3. Si succès → _currentUser est restauré, l'UI se reconstruit
+  ///   4. Si échec (token expiré/invalide) → logout() complet
+  ///      + NavigationService redirige vers /login
+  Future<void> restoreSession() async {
+    _isLoading = true;
+    notifyListeners(); // ← l'UI peut afficher un splash/spinner
+
+    try {
+      // 1. Lire le username stocké lors du dernier login
+      // main() a déjà vérifié isLoggedIn() donc le token existe,
+      // mais le username peut manquer si clearAll() partiel
+      final username = await _tokenStorage.getUsername();
+
+      if (username == null || username.isEmpty) {
+        // Pas de username en cache → session invalide
+        print('[UserProvider] Aucun username en cache — session ignorée');
+        await logout(); // nettoyage au cas où le token existerait sans username
+        return;
+      }
+
+      print('[UserProvider] Restauration de session pour: $username');
+
+      // 2. Recharger l'utilisateur complet depuis le backend
+      // AuthHttpClient ajoute automatiquement Authorization: Bearer <token>
+      // Si le token est expiré → 401 → AuthHttpClient tente le refresh
+      // Si refresh échoue → NavigationService.goToLogin()
+      final user = await _service.getUserByUsername(username);
+
+      // 3. Restaurer l'état en mémoire
+      _currentUser = user;
+      _authToken = await _tokenStorage.getToken();
+      _error = '';  // réinitialise les erreurs d'une session précédente
+
+      print('[UserProvider] ✅ Session restaurée: ${user.username} (${user.role.name})');
+
+    } catch (e) {
+      // 4. Token expiré, invalide, ou erreur réseau → déconnexion propre
+      // logout() vide _currentUser, _authToken, clearAll() le stockage
+      print('[UserProvider] Session invalide, nettoyage: $e');
+      await logout();
+    } finally {
+      // Toujours exécuté — même si logout() a été appelé dans le catch
+      _isLoading = false;
+      notifyListeners();   // ← l'UI se reconstruit avec le nouvel état
+    }
+  }
+
   // ****************** FOR CONSULT FORM **********************
 
   Future<bool> submitConsult() async {

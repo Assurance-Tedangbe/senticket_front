@@ -8,12 +8,12 @@ class CoverDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<dynamic> menus = [
-      {
+     /* {
         "title": "Accueil",
         "route": "/home",
         "leadingIcon": Icons.home,
         "trailingIcon": Icons.arrow_forward
-      },
+      },*/
       {
         "title": "Créer compte",
         "route": "/sign-up",

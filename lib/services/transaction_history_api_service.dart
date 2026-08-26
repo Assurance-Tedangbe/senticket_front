@@ -4,6 +4,8 @@ import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
 
+import '../navigation/navigation_service.dart';
+
 /// Service pour les appels API liés à l'historique des transactions
 /// Ce service est responsable de toutes les communications HTTP avec le backend
 /// pour récupérer l'historique des transactions.
@@ -13,7 +15,9 @@ class TransactionHistoryApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/transactions';
 
   // Remplacer http.Client() par AuthHttpClient
-  final AuthHttpClient _authClient = AuthHttpClient();
+  final AuthHttpClient _authClient = AuthHttpClient(
+      onUnauthorized: () => NavigationService.goToLogin()
+  );
 
   /// Headers HTTP communs à toutes les requêtes
   /// Indiquent que nous envoyons et attendons du JSON

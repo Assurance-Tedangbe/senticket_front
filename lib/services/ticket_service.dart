@@ -4,6 +4,8 @@ import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
 
+import '../navigation/navigation_service.dart';
+
 /* 
   - Service combiné qui gère :
   - Appels HTTP vers l'API Spring Boot pour les tickets
@@ -17,7 +19,9 @@ class TicketApiService {
   final transactionHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transactions';
 
   // Remplacer les headers statiques par le client authentifié
-  final AuthHttpClient _authClient = AuthHttpClient();
+  final AuthHttpClient _authClient = AuthHttpClient(
+      onUnauthorized: () => NavigationService.goToLogin()
+  );
 
   // Configure HTTP headers for all requests
   static const Map<String, String> _jsonHeaders = {

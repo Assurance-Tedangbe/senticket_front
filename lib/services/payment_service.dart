@@ -7,6 +7,8 @@ import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/payment_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
 
+import '../navigation/navigation_service.dart';
+
 
 // SERVICE HTTP PAIEMENT
 // Responsable de TOUTES les communications HTTP avec les
@@ -29,7 +31,9 @@ class PaymentApiService {
   static const Duration _timeout = Duration(seconds: 30);
 
   // Remplacer http.Client() par AuthHttpClient
-  final AuthHttpClient _authClient = AuthHttpClient();
+  final AuthHttpClient _authClient = AuthHttpClient(
+      onUnauthorized: () => NavigationService.goToLogin()
+  );
 
   // Headers HTTP communs à toutes les requêtes (application/json)
   static const Map<String, String> _headers = {

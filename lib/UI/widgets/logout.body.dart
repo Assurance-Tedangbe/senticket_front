@@ -31,7 +31,8 @@ class _LogOutBodyState extends State<LogOutBody> {
           TextButton(
             // ✅ Bug corrigé de la version 2
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('ANNULER'),
+            child: const Text('ANNULER',
+                style: TextStyle(color: kPrimaryColor)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -78,14 +79,14 @@ class _LogOutBodyState extends State<LogOutBody> {
     return Background(
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 120),
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const PageIconTemplate(iconData: Icons.logout),
             const SizeboxTemplate(),
             SizedBox(
-              height: 100,
+              height: 60,
               width: 170,
               child: ElevatedButton(
                 // Désactivé pendant le logout
