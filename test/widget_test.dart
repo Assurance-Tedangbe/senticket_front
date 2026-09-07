@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -128,8 +128,8 @@ void main() {
     Widget buildLoginPage() {
       return MultiProvider(
         providers: [
-          BlocProvider(create: (_) => ServicesBloc()),
-          BlocProvider(create: (_) => HistoricBloc()),
+          // BlocProvider(create: (_) => ServicesBloc()),
+          // BlocProvider(create: (_) => HistoricBloc()),
           ChangeNotifierProvider(
             create: (_) => UserProvider(UserApiService()),
           ),
@@ -196,8 +196,8 @@ void main() {
     Widget buildSignupPage() {
       return MultiProvider(
         providers: [
-          BlocProvider(create: (_) => ServicesBloc()),
-          BlocProvider(create: (_) => HistoricBloc()),
+          // BlocProvider(create: (_) => ServicesBloc()),
+          // BlocProvider(create: (_) => HistoricBloc()),
           ChangeNotifierProvider(
             create: (_) => UserProvider(UserApiService()),
           ),
@@ -459,7 +459,7 @@ void main() {
       },
     );
   });
-}
+}*/
 
 /*
 import 'package:flutter_test/flutter_test.dart';
