@@ -11,6 +11,8 @@ import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+import 'package:senticket_front/model/qr_code_model.dart';
+
 
 class DebitBody extends StatefulWidget {
   const DebitBody({super.key});
@@ -38,6 +40,92 @@ class _DebitBodyState extends State<DebitBody> {
     super.dispose();
   }
 
+  // ============ SCAN QR — ouvre le scanner et traite le résultat ============
+  Future<void> _scanQrForDebit() async {
+    final result = await Navigator.of(context).push<ScanResult>(
+      MaterialPageRoute(
+        builder: (_) => const ScanQR(operationType: ScanOperationType.debit),
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    final qrData = result.qrData;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Vérification que la cible est bien un ETUDIANT
+    if (qrData.role.toUpperCase() != 'ETUDIANT') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ce QR code ne correspond pas à un étudiant'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+      return;
+    }
+
+    // CAS 1 : QR ticket — débit direct sans passer par la sélection manuelle
+    if (qrData.isTicketQr && qrData.ticketId != null) {
+      _navigateToDebitWithTicket(qrData, userProvider);
+      return;
+    }
+
+    // CAS 2 : QR utilisateur — pré-remplir le champ username
+    _usernameController.text = qrData.username;
+    userProvider.setDebitUsername(qrData.username);
+
+    final success = await userProvider.searchUserByUsername(qrData.username);
+    if (!mounted) return;
+
+    if (success && userProvider.searchedUser != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Étudiant trouvé : ${qrData.username}'),
+          backgroundColor: validateBtnColor,
+        ),
+      );
+      // Naviguer directement vers DebitPage
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DebitPage(
+            studentUsername: qrData.username,
+            studentId: qrData.userId,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(userProvider.debitUsernameError ?? 'Étudiant non trouvé'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+    }
+  }
+
+  // Navigation vers DebitPage avec le ticket pré-sélectionné (QR ticket direct)
+  void _navigateToDebitWithTicket(QrCodeData qrData, UserProvider userProvider) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DebitPage(
+          studentUsername: qrData.username,
+          studentId: qrData.userId,
+          preSelectedTicketId: qrData.ticketId, // ticket pré-sélectionné
+        ),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Ticket #${qrData.ticketId} (Type ${qrData.ticketTypeLabel}) '
+              'pré-sélectionné pour ${qrData.username}',
+        ),
+        backgroundColor: validateBtnColor,
+      ),
+    );
+  }
+
+  // ============ VALIDATION MANUELLE (saisie username) ============
   Future<void> _validateStudent(UserProvider userProvider) async {
     if (_usernameController.text.isEmpty) {
       userProvider.setUsernameError(
@@ -50,6 +138,8 @@ class _DebitBodyState extends State<DebitBody> {
     final success = await userProvider.searchUserByUsername(
       _usernameController.text.trim(),
     );
+
+    if (!mounted) return;
 
     if (success && userProvider.searchedUser != null) {
       final searchedUser = userProvider.searchedUser!;
@@ -87,12 +177,12 @@ class _DebitBodyState extends State<DebitBody> {
     }
   }
 
-  void _onQRScanned(String username, UserProvider userProvider) {
+ /* void _onQRScanned(String username, UserProvider userProvider) {
     _usernameController.text = username;
     // Mettre à jour le provider avec le nom d'utilisateur scanné
     userProvider.setDebitUsername(username);
     _validateStudent(userProvider);
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -139,15 +229,55 @@ class _DebitBodyState extends State<DebitBody> {
         const InfoContainer(),
         const SizeboxHeightSession(),
 
-        ScanQR(
+        // ── Bouton scan QR principal (accès rapide) ──────────────────────
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _scanQrForDebit,
+            icon: const Icon(Icons.qr_code_scanner, size: 22),
+            label: const Text(
+              'Scanner le QR de l\'étudiant',
+              style: TextStyle(fontSize: 15),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryColor,
+              foregroundColor: kSecondColor,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ),
+        /*ScanQR(
           onScanned: (username) {
             _onQRScanned(username, userProvider);
           },
-        ),
+        ),*/
         const SizeboxHeightSession(),
-        // Section de saisie du nom d'utilisateur
+        // ── Séparateur OU ──────
+        Row(
+          children: [
+            const Expanded(child: Divider(color: greyBorderColor)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                'OU saisir manuellement',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: kThirdColor.withValues(alpha:0.6),
+                ),
+              ),
+            ),
+            const Expanded(child: Divider(color: greyBorderColor)),
+          ],
+        ),
+
+        const SizeboxHeightSession(),
+        // Section de saisie du nom d'utilisateur ou form de saisie manuelle
         Container(
           alignment: Alignment.center,
+          padding: const EdgeInsets.all(16),
           height: size.height * 0.3,
           width: size.width,
           decoration: BoxDecoration(
@@ -165,7 +295,7 @@ class _DebitBodyState extends State<DebitBody> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Consumer<UserProvider>(
+              /*Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
                   return DebitUsernameSection(
                     controller: _usernameController,
@@ -174,6 +304,34 @@ class _DebitBodyState extends State<DebitBody> {
                     },
                   );
                 },
+              ),*/
+              // Champ username + bouton scan QR secondaire
+              Row(
+                children: [
+                  Expanded(
+                    child: Consumer<UserProvider>(
+                      builder: (context, userProvider, child) {
+                        return DebitUsernameSection(
+                          controller: _usernameController,
+                          onChanged: (value) {
+                            userProvider.setDebitUsername(value);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Bouton scan QR secondaire (icône)
+                  IconButton(
+                    onPressed: _scanQrForDebit,
+                    icon: const Icon(
+                      Icons.qr_code_scanner,
+                      color: kPrimaryColor,
+                      size: 28,
+                    ),
+                    tooltip: 'Scanner le QR code',
+                  ),
+                ],
               ),
               const SizeboxTemplate(),
               Consumer<UserProvider>(

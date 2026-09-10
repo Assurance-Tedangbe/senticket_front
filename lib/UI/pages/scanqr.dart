@@ -1,5 +1,288 @@
-// UI/widgets/debitAccount/scan_qr.dart
 import 'package:flutter/material.dart';
+import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/model/qr_code_model.dart';
+import 'package:senticket_front/model/user_model.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
+import 'package:senticket_front/provider/user_provider.dart';
+
+/// Page de scan QR code générique.
+/// Redirige automatiquement vers l'opération adaptée selon :
+///   - le rôle de l'utilisateur connecté (PORTIER → débit, ETUDIANT → transfert)
+///   - le contenu du QR code scanné
+///
+/// Peut aussi être appelée avec un [operationType] explicite pour forcer
+/// l'opération depuis un bouton dédié.
+class ScanQR extends StatefulWidget {
+  final ScanOperationType? operationType;
+
+  const ScanQR({super.key, this.operationType});
+
+  @override
+  State<ScanQR> createState() => _ScanQRState();
+}
+
+enum ScanOperationType { debit, transfer }
+
+class _ScanQRState extends State<ScanQR> {
+  bool _hasScanned = false;
+  String? _errorMessage;
+  final MobileScannerController _controller = MobileScannerController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onDetect(BarcodeCapture capture) async {
+    // Éviter les scans multiples
+    if (_hasScanned) return;
+
+    final barcode = capture.barcodes.firstOrNull;
+    if (barcode?.rawValue == null) return;
+
+    setState(() => _hasScanned = true);
+    await _controller.stop();
+
+    final qrString = barcode!.rawValue!;
+    print('[ScanQR] QR scanné: $qrString');
+
+    // Parser les données du QR code
+    final qrData = QrCodeData.fromQrString(qrString);
+
+    if (!mounted) return;
+
+    if (qrData == null) {
+      _showError('QR code non reconnu. Assurez-vous de scanner un QR Senticket.');
+      return;
+    }
+
+    // Déterminer l'opération à effectuer
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.currentUser;
+
+    if (currentUser == null) {
+      _showError('Vous devez être connecté pour effectuer cette opération.');
+      return;
+    }
+
+    _handleScannedData(qrData, currentUser);
+  }
+
+  void _handleScannedData(QrCodeData qrData, User currentUser) {
+    final currentRole = currentUser.role.name.toUpperCase();
+    final scannedRole = qrData.role.toUpperCase();
+
+    // Déterminer l'opération selon les rôles
+    ScanOperationType? operation = widget.operationType;
+
+    if (operation == null) {
+      if (currentRole == 'PORTIER' && scannedRole == 'ETUDIANT') {
+        operation = ScanOperationType.debit;
+      } else if (currentRole == 'ETUDIANT' && scannedRole == 'ETUDIANT') {
+        operation = ScanOperationType.transfer;
+      } else {
+        _showError(
+          'Opération non autorisée. '
+              'Un $currentRole ne peut pas scanner un $scannedRole.',
+        );
+        return;
+      }
+    }
+
+    // Retourner les données scannées et l'opération à l'écran appelant
+    Navigator.of(context).pop(ScanResult(
+      qrData: qrData,
+      operation: operation,
+    ));
+  }
+
+  void _showError(String message) {
+    setState(() {
+      _hasScanned = false;
+      _errorMessage = message;
+    });
+    _controller.start();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scanner un QR code'),
+        backgroundColor: kPrimaryColor,
+        actions: [
+          // Bouton torche
+          IconButton(
+            icon: const Icon(Icons.flash_on, color: kSecondColor),
+            onPressed: () => _controller.toggleTorch(),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          // Vue caméra
+          MobileScanner(
+            controller: _controller,
+            onDetect: _onDetect,
+          ),
+
+          // Overlay avec viseur
+          _buildScanOverlay(),
+
+          // Message d'erreur
+          if (_errorMessage != null)
+            Positioned(
+              bottom: 100,
+              left: 24,
+              right: 24,
+              child: _buildErrorBanner(),
+            ),
+
+          // Instructions en bas
+          Positioned(
+            bottom: 40,
+            left: 24,
+            right: 24,
+            child: _buildInstructions(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScanOverlay() {
+    return CustomPaint(
+      painter: _ScannerOverlayPainter(),
+      child: const SizedBox.expand(),
+    );
+  }
+
+  Widget _buildErrorBanner() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: redErrorColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.white, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _errorMessage!,
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.white, size: 18),
+            onPressed: () => setState(() => _errorMessage = null),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstructions() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final role = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+
+    String instruction = 'Pointez la caméra vers un QR code Senticket';
+    if (role == 'PORTIER') {
+      instruction = 'Scannez le QR code de l\'étudiant pour débiter ses tickets';
+    } else if (role == 'ETUDIANT') {
+      instruction = 'Scannez le QR code du destinataire pour lui transférer des tickets';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        instruction,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          height: 1.4,
+        ),
+      ),
+    );
+  }
+}
+
+/// Résultat retourné par ScanQR à l'écran appelant via Navigator.pop()
+class ScanResult {
+  final QrCodeData qrData;
+  final ScanOperationType operation;
+
+  const ScanResult({required this.qrData, required this.operation});
+}
+
+/// Peintre personnalisé pour l'overlay de scan (viseur centré)
+class _ScannerOverlayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scanAreaSize = size.width * 0.65;
+    final left = (size.width - scanAreaSize) / 2;
+    final top = (size.height - scanAreaSize) / 2;
+    final scanRect = Rect.fromLTWH(left, top, scanAreaSize, scanAreaSize);
+
+    // Fond semi-transparent en dehors du viseur
+    final backgroundPaint = Paint()..color = Colors.black.withOpacity(0.55);
+    canvas.drawPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
+        Path()..addRRect(RRect.fromRectAndRadius(scanRect, const Radius.circular(12))),
+      ),
+      backgroundPaint,
+    );
+
+    // Bordure du viseur
+    final borderPaint = Paint()
+      ..color = kPrimaryColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(scanRect, const Radius.circular(12)),
+      borderPaint,
+    );
+
+    // Coins accentués
+    final cornerPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+
+    const cornerLength = 24.0;
+    final corners = [
+      [Offset(left, top + cornerLength), Offset(left, top), Offset(left + cornerLength, top)],
+      [Offset(left + scanAreaSize - cornerLength, top), Offset(left + scanAreaSize, top), Offset(left + scanAreaSize, top + cornerLength)],
+      [Offset(left + scanAreaSize, top + scanAreaSize - cornerLength), Offset(left + scanAreaSize, top + scanAreaSize), Offset(left + scanAreaSize - cornerLength, top + scanAreaSize)],
+      [Offset(left + cornerLength, top + scanAreaSize), Offset(left, top + scanAreaSize), Offset(left, top + scanAreaSize - cornerLength)],
+    ];
+
+    for (final corner in corners) {
+      final path = Path()
+        ..moveTo(corner[0].dx, corner[0].dy)
+        ..lineTo(corner[1].dx, corner[1].dy)
+        ..lineTo(corner[2].dx, corner[2].dy);
+      canvas.drawPath(path, cornerPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+
+/*import 'package:flutter/material.dart';
 import 'package:senticket_front/constants.dart';
 
 class ScanQR extends StatefulWidget {
@@ -80,176 +363,4 @@ class _ScanQRState extends State<ScanQR> {
       ),
     );
   }
-}
-
-/* import 'package:flutter/material.dart';
-import 'package:senticket_front/constants.dart';
-
-class ScanQR extends StatefulWidget {
-  const ScanQR({super.key});
-
-  @override
-  State<ScanQR> createState() => _ScanQRState();
-}
-
-class _ScanQRState extends State<ScanQR> {
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      width: size.width / 1.15,
-      height: 95,
-      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-      child: ElevatedButton(
-        onPressed: () => print('scan'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: kPrimaryColor,
-          textStyle: const TextStyle(
-            color: kThirdColor,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        child: const Text('Scanner code QR'),
-      ),
-    );
-  }
-} */
-
-/* old
-// UI/widgets/debitAccount/scan_qr.dart
-import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-
-class ScanQR extends StatefulWidget {
-  final Function(String)? onScanComplete;
-  
-  const ScanQR({super.key, this.onScanComplete});
-
-  @override
-  State<ScanQR> createState() => _ScanQRState();
-}
-
-class _ScanQRState extends State<ScanQR> {
-  MobileScannerController cameraController = MobileScannerController();
-  bool _isScanning = false;
-
-  @override
-  void dispose() {
-    cameraController.dispose();
-    super.dispose();
-  }
-
-  void _handleBarcode(BarcodeCapture barcodes) {
-    if (_isScanning || widget.onScanComplete == null) return;
-    
-    final barcode = barcodes.barcodes.firstOrNull;
-    if (barcode != null && barcode.rawValue != null) {
-      setState(() => _isScanning = true);
-      
-      // Extract username from QR code
-      final username = _extractUsername(barcode.rawValue!);
-      
-      // Delay to show success
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() => _isScanning = false);
-          widget.onScanComplete!(username);
-          Navigator.pop(context); // Close scanner
-        }
-      });
-    }
-  }
-
-  String _extractUsername(String qrData) {
-    // Implement your QR code format parsing here
-    // For example, if QR contains JSON: {"username": "student123"}
-    try {
-      final data = jsonDecode(qrData);
-      return data['username'] ?? qrData;
-    } catch (e) {
-      return qrData; // Assume QR contains username directly
-    }
-  }
-
-  void _openScanner() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.8,
-        child: Column(
-          children: [
-            AppBar(
-              title: const Text('Scan QR Code'),
-              actions: [
-                IconButton(
-                  icon: ValueListenableBuilder(
-                    valueListenable: cameraController.torchState,
-                    builder: (context, state, child) {
-                      switch (state) {
-                        case TorchState.off:
-                          return const Icon(Icons.flash_off, color: Colors.grey);
-                        case TorchState.on:
-                          return const Icon(Icons.flash_on, color: Colors.yellow);
-                      }
-                    },
-                  ),
-                  onPressed: () => cameraController.toggleTorch(),
-                ),
-                IconButton(
-                  icon: ValueListenableBuilder(
-                    valueListenable: cameraController.cameraFacingState,
-                    builder: (context, state, child) {
-                      switch (state) {
-                        case CameraFacing.front:
-                          return const Icon(Icons.camera_front);
-                        case CameraFacing.back:
-                          return const Icon(Icons.camera_rear);
-                      }
-                    },
-                  ),
-                  onPressed: () => cameraController.switchCamera(),
-                ),
-              ],
-            ),
-            Expanded(
-              child: MobileScanner(
-                controller: cameraController,
-                onDetect: _handleBarcode,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ElevatedButton.icon(
-        onPressed: _openScanner,
-        icon: const Icon(Icons.qr_code_scanner),
-        label: const Text('Scanner code QR'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: kPrimaryColor,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
 }*/
-
-/*
-dependencies:
-  provider: ^6.1.1
-  mobile_scanner: ^3.3.0
-  http: ^1.1.0
-*/

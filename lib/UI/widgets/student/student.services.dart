@@ -8,6 +8,7 @@ import 'package:senticket_front/UI/widgets/cancelTrsf/PopupCancelTransferById.da
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/pages/qr_display_page.dart';
 
 
 class StudentServices extends StatelessWidget {
@@ -23,6 +24,7 @@ class StudentServices extends StatelessWidget {
           children: [Homebloctitle(text: "Mes services")],
         ),
         const SizeboxHeightSession(),
+        // ── Ligne 1 ────────────────────────────────────────────────────
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -62,6 +64,8 @@ class StudentServices extends StatelessWidget {
         const SizeboxHeightSession(),
         const SizeboxHeightSession(),
         const SizeboxHeightSession(),
+
+        // ── Ligne 2 ────────────────────────────────────────────────────
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -75,13 +79,13 @@ class StudentServices extends StatelessWidget {
               servicename: "Annuler transfert",
               imagepath: "images/annuler_transaction.JPG",
             ),
+
+            // ← Mon QR code (remplace l'ancien Scan QR générique)
             ContainerTemplate(
-              press: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => const ScanQR()));
-              },
-              servicename: "Scan QR",
+              press: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const QrDisplayPage()),
+              ),
+              servicename: "Mon QR code",
               imagepath: "images/scan.JPG",
             ),
             ContainerTemplate(

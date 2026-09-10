@@ -21,6 +21,7 @@ class PorterServices extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // ── Débiter compte (saisie manuelle) ──────────────────────
             ContainerTemplate(
               press: () {
                 Navigator.of(context).push(
@@ -33,23 +34,31 @@ class PorterServices extends StatelessWidget {
             const SizeboxTemplate(),
             const SizeboxTemplate(),
             const SizeboxTemplate(),
-            const SizeboxTemplate(),
+
+            // ── Scanner & Débiter (QR code direct) ────────────────────
+            // Scanne le QR utilisateur ou ticket de l'étudiant
+            // → navigue vers DebitAccount pré-rempli
             ContainerTemplate(
-              press: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => const ScanQR()));
+              press: () async {
+                final result = await Navigator.of(context).push<ScanResult>(
+                  MaterialPageRoute(
+                    builder: (_) => const ScanQR(
+                      operationType: ScanOperationType.debit,
+                    ),
+                  ),
+                );
+                if (result != null && context.mounted) {
+                  // Naviguer vers DebitAccount
+                  // Le résultat du scan est traité dans DebitBody._scanQrForDebit()
+                  // via le bouton scan intégré — ici on ouvre simplement DebitAccount
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const DebitAccount()),
+                  );
+                }
               },
-              servicename: "Scan QR",
+              servicename: "Scanner & Débiter",
               imagepath: "images/scan.JPG",
             ),
-            /*   ContainerTemplate(
-            press: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const Historic()));
-            },
-            servicename: "Historique",
-            imagepath: "images/historic.JPG"), */
           ],
         ),
       ],

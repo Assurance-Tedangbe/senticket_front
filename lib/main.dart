@@ -28,6 +28,7 @@ import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/navigation/navigation_service.dart';
+import 'UI/pages/qr_display_page.dart';
 import 'UI/pages/splash_screen.dart';
 
 
@@ -85,7 +86,7 @@ class SenticketApp extends StatelessWidget {
         '/ticket':           (_) => const BuyTicket(),
         '/transfert-ticket': (_) => const TransfertTicket(),
         '/consult-account':  (_) => const ConsultAccount(),
-        '/scanQR':           (_) => const ScanQR(),
+        //'/scanQR':           (_) => const ScanQR(),
         '/update-profile':   (_) => const UpdateProfile(),
         '/admin':            (_) => const AdminInterface(),
         '/manage-students':  (_) => const ManageStudent(),
@@ -94,6 +95,8 @@ class SenticketApp extends StatelessWidget {
         '/porter':           (_) => const PorterInterface(),
         '/debit-account':    (_) => const DebitAccount(),
         '/settings':         (_) => const SettingsPage(),
+        '/qr-display': (_) => const QrDisplayPage(),
+        '/scan-qr':    (_) => const ScanQR(),
       },
     );
   }
