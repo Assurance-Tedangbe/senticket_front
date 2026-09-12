@@ -20,7 +20,7 @@ class QrDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Générer les données du QR code à partir de l'utilisateur connecté
-    final qrData = QrCodeData(
+    final qrData = QrCodeData.forUser(
       userId: user.userId!,
       username: user.username,
       role: user.role.name,
