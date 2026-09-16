@@ -70,7 +70,7 @@ class _ScanQRState extends State<ScanQR> {
     _handleScannedData(qrData, currentUser);
   }
 
-  void _handleScannedData(QrCodeData qrData, User currentUser) {
+  /*void _handleScannedData(QrCodeData qrData, User currentUser) {
     final currentRole = currentUser.role.name.toUpperCase();
     final scannedRole = qrData.role.toUpperCase();
 
@@ -96,6 +96,28 @@ class _ScanQRState extends State<ScanQR> {
       qrData: qrData,
       operation: operation,
     ));
+  }*/
+
+  void _handleScannedData(QrCodeData qrData, User currentUser) {
+    final currentRole = currentUser.role.name.toUpperCase();
+    final scannedRole = qrData.role.toUpperCase();
+
+    // Déterminer l'opération selon les rôles
+    ScanOperationType? operation = widget.operationType;
+
+    if (operation == null) {
+      if (currentRole == 'PORTIER' && scannedRole == 'ETUDIANT') {
+        operation = ScanOperationType.debit;
+      } else if (currentRole == 'ETUDIANT' && scannedRole == 'ETUDIANT') {
+        operation = ScanOperationType.transfer;
+      } else {
+        _showError('Opération non autorisée entre $currentRole et ${qrData.role}.');
+        return;
+      }
+    }
+
+    // Retourner les données scannées et l'opération à l'écran appelant
+    Navigator.of(context).pop(ScanResult(qrData: qrData, operation: operation));
   }
 
   void _showError(String message) {
@@ -219,6 +241,9 @@ class _ScanQRState extends State<ScanQR> {
 class ScanResult {
   final QrCodeData qrData;
   final ScanOperationType operation;
+
+  // true si le QR scanné est un QR ticket (débit direct sans sélection)
+  bool get isDirectTicket => qrData.isTicketQr;
 
   const ScanResult({required this.qrData, required this.operation});
 }

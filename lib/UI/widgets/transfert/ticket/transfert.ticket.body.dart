@@ -15,7 +15,7 @@ import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
-import '../../../pages/scanqr.dart';
+import '../../../pages/qrcode/scanqr.dart';
 import 'numberTicketsSection.dart';
 import 'senderPasswordTrsfTicket.dart';
 

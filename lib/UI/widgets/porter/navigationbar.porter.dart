@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/coverPage.dart';
 import 'package:senticket_front/UI/pages/debitAccount.dart';
-import 'package:senticket_front/UI/pages/scanqr.dart';
+import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 
 class NavigationBarPorter extends StatelessWidget {
   const NavigationBarPorter({super.key});
