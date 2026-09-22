@@ -482,7 +482,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
             // ← Bouton scan QR destinataire
             IconButton(
               onPressed: _scanQrForTransfer,
-              icon: const Icon(Icons.qr_code_scanner, color: kPrimaryColor, size: 28),
+              icon: const Icon(Icons.qr_code_scanner, color: kPrimaryColor, size: 32),
               tooltip: 'Scanner le QR du destinataire',
             ),
           ],

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/buyTicket.dart';
 import 'package:senticket_front/UI/pages/consultAccount.dart';
 import 'package:senticket_front/UI/pages/historic.dart';
-import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 import 'package:senticket_front/UI/pages/transfert.ticket.dart';
 import 'package:senticket_front/UI/widgets/cancelTrsf/PopupCancelTransferById.dart';
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
@@ -88,15 +87,7 @@ class StudentServices extends StatelessWidget {
               servicename: "Mon QR code",
               imagepath: "images/scan.JPG",
             ),
-            // Mes tickets achetés avec QR par ticket
             ContainerTemplate(
-              press: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const MyTicketsPage()),
-              ),
-              servicename: "Mes tickets",
-              imagepath: "images/ticket.JPG",
-            ),
-            /*ContainerTemplate(
               press: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const Historic()),
@@ -104,7 +95,23 @@ class StudentServices extends StatelessWidget {
               },
               servicename: "Historique",
               imagepath: "images/historic.JPG",
-            ),*/
+            ),
+
+            // Ligne 3 ─────────────────────────────── "Mes tickets achetés avec QR par ticket"
+            const SizeboxHeightSession(),
+            const SizeboxHeightSession(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ContainerTemplate(
+                  press: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const MyTicketsPage()),
+                  ),
+                  servicename: "Mes tickets",
+                  imagepath: "images/ticket.JPG",
+                ),
+              ],
+            ),
           ],
         ),
       ],

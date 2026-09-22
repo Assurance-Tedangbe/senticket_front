@@ -15,8 +15,9 @@ import 'package:senticket_front/provider/user_provider.dart';
 /// l'opération depuis un bouton dédié.
 class ScanQR extends StatefulWidget {
   final ScanOperationType? operationType;
+  final bool expectTicketQr; // ← nouveau
 
-  const ScanQR({super.key, this.operationType});
+  const ScanQR({super.key, this.operationType, this.expectTicketQr = false});
 
   @override
   State<ScanQR> createState() => _ScanQRState();
@@ -207,7 +208,42 @@ class _ScanQRState extends State<ScanQR> {
     );
   }
 
+  // Dans _buildInstructions() de ScanQR
+
   Widget _buildInstructions() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final role = userProvider.currentUser?.role.name.toUpperCase() ?? '';
+
+    // Déterminer le message selon le contexte
+    String instruction;
+
+    if (widget.operationType == ScanOperationType.debit) {
+      // Distinguer QR étudiant vs QR ticket selon l'appelant
+      // On passe un paramètre supplémentaire pour le distinguer
+      instruction = widget.expectTicketQr
+          ? 'Scannez le QR code du ticket pour le débiter directement'
+          : 'Scannez le QR code de l\'étudiant pour débiter son compte';
+    } else if (widget.operationType == ScanOperationType.transfer) {
+      instruction = 'Scannez le QR code pour transférer les tickets';
+    } else {
+      instruction = 'Pointez la caméra vers un QR code Senticket';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        instruction,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4),
+      ),
+    );
+  }
+
+/*  Widget _buildInstructions() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final role = userProvider.currentUser?.role.name.toUpperCase() ?? '';
 
@@ -221,7 +257,7 @@ class _ScanQRState extends State<ScanQR> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -234,7 +270,7 @@ class _ScanQRState extends State<ScanQR> {
         ),
       ),
     );
-  }
+  }*/
 }
 
 /// Résultat retourné par ScanQR à l'écran appelant via Navigator.pop()
@@ -258,7 +294,7 @@ class _ScannerOverlayPainter extends CustomPainter {
     final scanRect = Rect.fromLTWH(left, top, scanAreaSize, scanAreaSize);
 
     // Fond semi-transparent en dehors du viseur
-    final backgroundPaint = Paint()..color = Colors.black.withOpacity(0.55);
+    final backgroundPaint = Paint()..color = Colors.black.withValues(alpha: 0.55);
     canvas.drawPath(
       Path.combine(
         PathOperation.difference,
