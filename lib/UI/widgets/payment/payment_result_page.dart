@@ -168,12 +168,12 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: validateBtnColor.withValues(alpha: 0.1),
+              color: kPrimaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.check_circle,
-              color: validateBtnColor,
+              color: kPrimaryColor,
               size: 80,
             ),
           ),
@@ -183,7 +183,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: validateBtnColor,
+              color: kPrimaryColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -228,7 +228,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
                 style: TextStyle(fontSize: 16),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: validateBtnColor,
+                backgroundColor: kPrimaryColor,
                 foregroundColor: kSecondColor,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(

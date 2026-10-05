@@ -30,6 +30,10 @@ class TicketProvider with ChangeNotifier {
   List<Ticket> _tickets =
       []; // "Liste vide pour stocker tous les tickets chargés depuis l'API"
 
+  // Remplacer la liste unique par deux listes séparées
+  List<Ticket> _ticketsTypeA = [];
+  List<Ticket> _ticketsTypeB = [];
+
   Ticket?
   _currentTicket; // ticket currently selected (null if any ticket selected)"
 
@@ -81,6 +85,11 @@ class TicketProvider with ChangeNotifier {
   // Getters principaux
   List<Ticket> get tickets =>
       _tickets; // Retourne la liste complète des tickets
+
+  // Getters
+  List<Ticket> get ticketsTypeA => _ticketsTypeA;
+  List<Ticket> get ticketsTypeB => _ticketsTypeB;
+
   // Permet à d'autres classes de lire `_tickets` mais pas de le modifier
   Ticket? get currentTicket =>
       _currentTicket; // Retourne le ticket actuellement sélectionné (peut être null)
@@ -324,6 +333,46 @@ class TicketProvider with ChangeNotifier {
   Future<void> getPurchasedTicketsByUser({
     required int studentId,
     TicketType? type,
+    // required TicketType type,
+  }) async {
+    _isLoading = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      final tickets = await _service.getPurchasedTicketsByUser(
+        userId: studentId,
+        ticketType: type?.toBackend,
+        // type: type,
+      );
+
+      // ✅ Stocker dans la bonne liste selon le type
+      if (type == TicketType.a) {
+        _ticketsTypeA = tickets;
+      } else {
+        _ticketsTypeB = tickets;
+      }
+
+      _error = '';
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      print('[TicketProvider] getPurchasedTicketsByUser error: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+// Ajouter une méthode pour injecter depuis le cache (mode hors-ligne)
+  void setTicketsFromCache(List<Ticket> tickets) {
+    _ticketsTypeA = tickets.where((t) => t.type == TicketType.a).toList();
+    _ticketsTypeB = tickets.where((t) => t.type == TicketType.b).toList();
+    notifyListeners();
+  }
+
+ /* Future<void> getPurchasedTicketsByUser({
+    required int studentId,
+    TicketType? type,
   }) async {
     _isLoading = true;
     _isLoadingStudentTickets = true;
@@ -362,7 +411,7 @@ class TicketProvider with ChangeNotifier {
       _isLoadingStudentTickets = false;
       notifyListeners();
     }
-  }
+  }*/
 
   // Toggle ticket selection for debit
   void toggleTicketSelectionForDebit(int ticketId) {

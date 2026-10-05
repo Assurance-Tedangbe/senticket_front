@@ -7,7 +7,7 @@ import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
-import 'package:senticket_front/services/ticket_service.dart';
+
 
 /// Page affichant les tickets achetés (status=BOOKED) de l'étudiant connecté.
 /// Chaque ticket a un bouton QR → le portier peut scanner et débiter
@@ -84,7 +84,15 @@ class _MyTicketsPageState extends State<MyTicketsPage>
               child: CircularProgressIndicator(color: kPrimaryColor),
             );
           }
-          return TabBarView(
+          /// APRÈS — listes séparées
+          return
+            TabBarView(
+              controller: _tabController,
+              children: [
+                _buildTicketList(ticketProvider.ticketsTypeA, user, TicketType.a),
+                _buildTicketList(ticketProvider.ticketsTypeB, user, TicketType.b),
+              ],
+            ); /*TabBarView(
             controller: _tabController,
             children: [
               _buildTicketList(ticketProvider.studentTicketsForDebit
@@ -92,12 +100,13 @@ class _MyTicketsPageState extends State<MyTicketsPage>
               _buildTicketList(ticketProvider.studentTicketsForDebit
                   .where((t) => t.type == TicketType.b).toList(), user, TicketType.b),
             ],
-          );
+          );*/
         },
       ),
     );
   }
 
+  // AVANT — filtre sur une liste unique
   Widget _buildTicketList(List<Ticket> tickets, user, TicketType type) {
     if (tickets.isEmpty) {
       return Center(

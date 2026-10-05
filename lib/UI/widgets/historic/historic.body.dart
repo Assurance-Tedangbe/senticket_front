@@ -288,6 +288,7 @@ class _HistoricBodyState extends State<HistoricBody> {
       return _buildEmptyHistory(
         message: 'Veuillez vous connecter pour voir l\'historique',
         icon: Icons.lock_outline,
+        showLoginButton: true,
       );
     }
 
@@ -297,6 +298,7 @@ class _HistoricBodyState extends State<HistoricBody> {
         message: 'Aucun historique trouvé',
         icon: Icons.history,
         subtitle: 'Les transactions que vous effectuerez apparaîtront ici',
+        showLoginButton: false,
       );
     }
 
@@ -492,6 +494,7 @@ class _HistoricBodyState extends State<HistoricBody> {
     required String message,
     required IconData icon,
     String? subtitle,
+    bool showLoginButton = false,
   }) {
     return Center(
       child: Column(
@@ -517,6 +520,8 @@ class _HistoricBodyState extends State<HistoricBody> {
             ),
           ],
 
+          // ✅ Bouton uniquement si non authentifié
+          if (showLoginButton) ...[
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () {
@@ -531,7 +536,8 @@ class _HistoricBodyState extends State<HistoricBody> {
               backgroundColor: kPrimaryColor,
               foregroundColor: kSecondColor,
             ),
-          ),
+           ),
+          ]
         ],
       ),
     );

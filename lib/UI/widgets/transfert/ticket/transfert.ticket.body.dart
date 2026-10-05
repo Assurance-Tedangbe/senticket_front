@@ -115,11 +115,14 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
   }
 
   bool _isFormValid() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     // Vérifier que tous les champs sont remplis
     final recipientNotEmpty = _recipientController.text.isNotEmpty;
     final typeSelected = _selectedTicketType != null;
     final numberNotEmpty = _numberController.text.isNotEmpty;
     final passwordNotEmpty = _passwordController.text.isNotEmpty;
+    final recipientFound = userProvider.searchedUser != null;
 
     // Vérifier que le nombre est valide (si présent)
     bool isNumberValid = true;
@@ -129,6 +132,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     }
 
     return recipientNotEmpty &&
+        recipientFound &&
         typeSelected &&
         numberNotEmpty &&
         isNumberValid &&
@@ -473,7 +477,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
               child: RecipientUsernameTrsfTicket(
                 controller: _recipientController,
                 onChanged: (value) {
-                  userProvider.setDebitUsername(value);
+                  userProvider.setTransferRecipientUsername(value);
                   setState(() {});
                 },
               ),

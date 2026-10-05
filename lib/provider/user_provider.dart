@@ -797,7 +797,16 @@ class UserProvider with ChangeNotifier {
         '🔍 Recherche de l\'utilisateur : $username',
       );
 
+      // ✅ Vérifier que ce chemin est correct
       final user = await _service.getUserByUsername(username);
+
+      // ✅ Vérifier que le rôle de l'étudiant est bien ETUDIANT
+      if (user.role.name.toUpperCase() != 'ETUDIANT') {
+        _debitUsernameError = 'L\'utilisateur n\'est pas un étudiant';
+        _isSearchingUser = false;
+        notifyListeners();
+        return false;
+      }
 
       _searchedUser = user;
       _isSearchingUser = false;
@@ -807,8 +816,10 @@ class UserProvider with ChangeNotifier {
       print('Utilisateur trouvé: ${user.username} (Rôle: ${user.role.name})');
       return true;
     } catch (e) {
+      print('[UserProvider] searchUserByUsername error: $e');
       _isSearchingUser = false;
       _searchedUser = null;
+     // _debitUsernameError = ErrorHandler.fromException(e);
       _debitUsernameError = 'Utilisateur non trouvé ';
       notifyListeners();
       print('Erreur lors de la recherche: $e');
