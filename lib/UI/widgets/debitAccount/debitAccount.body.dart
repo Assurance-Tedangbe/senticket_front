@@ -41,9 +41,9 @@ class _DebitBodyState extends State<DebitBody> {
   Future<void> _scanQrForDebit({bool scanTicket = false}) async {
     final result = await Navigator.of(context).push<ScanResult>(
       MaterialPageRoute(
-        builder: (_) => const ScanQR(
+        builder: (_) => ScanQR(
           operationType: ScanOperationType.debit,
-          expectTicketQr: true, // ← message adapté
+          expectTicketQr: scanTicket,
           ),
       ),
     );
@@ -241,7 +241,7 @@ class _DebitBodyState extends State<DebitBody> {
           subtitle: 'Sélectionner les tickets après scan',
           tooltip: 'Scannez le QR personnel de l\'étudiant. '
               'Vous pourrez ensuite débiter son compte.',
-          icon: Icons.person_search,
+          icon: Icons.qr_code,
           color: kPrimaryColor,
           onPressed: () => _scanQrForDebit(scanTicket: false),
         ),
@@ -256,7 +256,7 @@ class _DebitBodyState extends State<DebitBody> {
               'l\'application de l\'étudiant. '
               'Le débit s\'effectue immédiatement',
           icon: Icons.qr_code_scanner,
-          color: cyanColor,
+          color: kPrimaryColor,
           onPressed: () => _scanQrForDebit(scanTicket: true),
         ),
 

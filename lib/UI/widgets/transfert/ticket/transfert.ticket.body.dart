@@ -117,6 +117,31 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
   bool _isFormValid() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
+    final recipientNotEmpty = _recipientController.text.isNotEmpty;
+    // ✅ On vérifie searchedUser uniquement si le champ est rempli
+    // Pour ne pas bloquer si l'utilisateur saisit manuellement
+    final recipientValid = recipientNotEmpty &&
+        (userProvider.searchedUser != null ||
+            userProvider.searchedUser?.username == _recipientController.text);
+    final typeSelected = _selectedTicketType != null;
+    final numberNotEmpty = _numberController.text.isNotEmpty;
+    final passwordNotEmpty = _passwordController.text.isNotEmpty;
+
+    bool isNumberValid = true;
+    if (numberNotEmpty) {
+      final number = int.tryParse(_numberController.text.trim());
+      isNumberValid = number != null && number > 0;
+    }
+
+    return recipientNotEmpty &&
+        typeSelected &&
+        numberNotEmpty &&
+        isNumberValid &&
+        passwordNotEmpty;
+  }
+  /*bool _isFormValid() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     // Vérifier que tous les champs sont remplis
     final recipientNotEmpty = _recipientController.text.isNotEmpty;
     final typeSelected = _selectedTicketType != null;
@@ -137,7 +162,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         numberNotEmpty &&
         isNumberValid &&
         passwordNotEmpty;
-  }
+  }*/
 
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {

@@ -819,8 +819,23 @@ class UserProvider with ChangeNotifier {
       print('[UserProvider] searchUserByUsername error: $e');
       _isSearchingUser = false;
       _searchedUser = null;
+
+      // Message adapté selon le type d'erreur
+      final msg = e.toString().replaceFirst('Exception: ', '').trim();
+      if (msg.contains('403') || msg.contains('refusé') || msg.contains('Forbidden')) {
+        _debitUsernameError = 'Accès refusé — contactez l\'administrateur';
+      } else if (msg.contains('404') || msg.contains('non trouvé')) {
+        _debitUsernameError = 'Aucun utilisateur trouvé avec ce nom';
+      } else if (msg.contains('401') || msg.contains('expirée')) {
+        _debitUsernameError = 'Session expirée — reconnectez-vous';
+      } else if (msg.contains('SocketException') || msg.contains('réseau')) {
+        _debitUsernameError = 'Pas de connexion internet';
+      } else {
+        _debitUsernameError = 'Utilisateur non trouvé';
+      }
+
      // _debitUsernameError = ErrorHandler.fromException(e);
-      _debitUsernameError = 'Utilisateur non trouvé ';
+    //  _debitUsernameError = 'Utilisateur non trouvé ';
       notifyListeners();
       print('Erreur lors de la recherche: $e');
       return false;
