@@ -31,6 +31,8 @@ import 'package:senticket_front/navigation/navigation_service.dart';
 import 'UI/pages/qrcode/qr_display_page.dart';
 import 'UI/pages/splash_screen.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+RouteObserver<ModalRoute<void>>();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,6 +77,7 @@ class SenticketApp extends StatelessWidget {
       theme: ThemeData(primaryColor: kPrimaryColor),
       // permet de naviguer depuis AuthHttpClient (gestion 401) sans BuildContext
       navigatorKey: NavigationService.navigatorKey,
+      navigatorObservers: [routeObserver],
       home: const SplashScreen(), // ← toujours SplashScreen au démarrage
       routes: {
         '/cover':            (_) => const CoverPage(),

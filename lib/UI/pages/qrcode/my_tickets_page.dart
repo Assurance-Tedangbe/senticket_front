@@ -138,7 +138,7 @@ class _MyTicketsPageState extends State<MyTicketsPage>
 
   Widget _buildTicketCard(Ticket ticket, user) {
     final isTypeA = ticket.type == TicketType.a;
-    final color = isTypeA ? kPrimaryColor : cyanColor;
+    final color = isTypeA ? kPrimaryColor : kPrimaryColor;
     final label = isTypeA ? 'Type A — Petit-déjeuner' : 'Type B — Déj./Dîner';
     final price = isTypeA ? '100 FCFA' : '150 FCFA';
 

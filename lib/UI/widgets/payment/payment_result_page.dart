@@ -5,6 +5,8 @@ import 'package:senticket_front/enums/payment_state.dart';
 import 'package:senticket_front/provider/payment_provider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 
+import '../../../provider/user_provider.dart';
+
 //****************** PAGE DE RÉSULTAT DU PAIEMENT ******************
 //
 // Affichée après la fermeture du WebView PayDunya.
@@ -70,14 +72,19 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
     try {
       // Accède au TicketProvider pour forcer le rechargement du cache
       // Le backend a déjà attribué les tickets via le webhook
-      final ticketProvider = Provider.of<TicketProvider>(
-        context,
-        listen: false,
-      );
+      final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Recharger les tickets disponibles (pour BuyTicket)
       await ticketProvider.loadAllTickets(forceRefresh: true);
-      print('[PaymentResult] Tickets rechargés après paiement réussi');
+      // Recharger les statistiques (pour StudentInterface)
+      final userId = userProvider.currentUser?.userId;
+      if (userId != null) {
+        await ticketProvider.loadTicketStatistics(userId: userId);
+      }
+      print('[PaymentResult] Tickets et statistiques rechargés après paiement réussi');
     } catch (e) {
-      print('[PaymentResult] Erreur rechargement tickets: $e');
+      print('[PaymentResult] Erreur rechargement: $e');
       // Ne pas faire échouer l'affichage du succès si le rechargement échoue
     }
   }
@@ -188,7 +195,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Vos tickets ont été ajoutés à votre compte.',
+            'Tickets ajoutés à votre compte.',
             style: TextStyle(fontSize: 16, color: greyBorderColor),
             textAlign: TextAlign.center,
           ),
