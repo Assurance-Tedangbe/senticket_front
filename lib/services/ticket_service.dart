@@ -262,12 +262,25 @@ class TicketApiService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         return TransactionHistoryDTO.fromJson(jsonData);
+      }
+      else if (response.statusCode == 400) {
+        final body = json.decode(response.body);
+        final message = body['message'] as String? ?? 'Données invalides';
+
+        // Message lisible selon le contenu
+        if (message.contains('Invalid password') || message.contains('password')) {
+          throw Exception('Mot de passe incorrect');
+        } else if (message.contains('enough tickets') || message.contains('Available')) {
+          throw Exception('Vous n\'avez pas assez de tickets de ce type');
+        } else {
+          throw Exception(message);
+        }
+      } else if (response.statusCode == 422) {
+        final body = json.decode(response.body);
+        throw Exception(body['message'] ?? 'Opération impossible');
       } else {
-        final errorBody = json.decode(response.body);
-        final errorMessage =
-            errorBody['message'] ??
-            'Erreur de transfert: ${response.statusCode}';
-        throw Exception(errorMessage);
+        // tout autre code HTTP (500, 403, etc.)
+        throw Exception('Erreur serveur: ${response.statusCode}');
       }
     } catch (e) {
       print("Erreur lors du transferTickets: $e");

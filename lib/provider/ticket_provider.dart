@@ -333,9 +333,9 @@ class TicketProvider with ChangeNotifier {
   Future<void> getPurchasedTicketsByUser({
     required int studentId,
     TicketType? type,
-    // required TicketType type,
   }) async {
     _isLoading = true;
+    _isLoadingStudentTickets = true;
     _error = '';
     notifyListeners();
 
@@ -343,15 +343,19 @@ class TicketProvider with ChangeNotifier {
       final tickets = await _service.getPurchasedTicketsByUser(
         userId: studentId,
         ticketType: type?.toBackend,
-        // type: type,
       );
 
-      // ✅ Stocker dans la bonne liste selon le type
+      // ✅ Stocker dans la bonne liste selon le type (pour MyTicketsPage)
       if (type == TicketType.a) {
         _ticketsTypeA = tickets;
-      } else {
+      } else if (type == TicketType.b) {
         _ticketsTypeB = tickets;
       }
+
+      // ✅ Mettre aussi à jour studentTicketsForDebit (pour DebitPage)
+      _studentTicketsForDebit = tickets;
+      // Réinitialiser les sélections quand on change de type
+      _selectedTicketIdsForDebit = [];
 
       _error = '';
     } catch (e) {
@@ -359,59 +363,17 @@ class TicketProvider with ChangeNotifier {
       print('[TicketProvider] getPurchasedTicketsByUser error: $e');
     } finally {
       _isLoading = false;
+      _isLoadingStudentTickets = false;
       notifyListeners();
     }
   }
 
-// Ajouter une méthode pour injecter depuis le cache (mode hors-ligne)
+  // Ajouter une méthode pour injecter depuis le cache (mode hors-ligne)
   void setTicketsFromCache(List<Ticket> tickets) {
     _ticketsTypeA = tickets.where((t) => t.type == TicketType.a).toList();
     _ticketsTypeB = tickets.where((t) => t.type == TicketType.b).toList();
     notifyListeners();
   }
-
- /* Future<void> getPurchasedTicketsByUser({
-    required int studentId,
-    TicketType? type,
-  }) async {
-    _isLoading = true;
-    _isLoadingStudentTickets = true;
-    _error = '';
-    _selectedTicketTypeForDebit = type;
-    notifyListeners();
-
-    try {
-      _studentTicketsForDebit = await _service.getPurchasedTicketsByUser(
-        userId: studentId,
-        booked: true,
-        ticketStatus: 'BOOKED',
-        ticketType: type?.toBackend,
-      );
-
-      // Filter only booked and BOOKED status tickets
-      _studentTicketsForDebit = _studentTicketsForDebit
-          .where(
-            (ticket) => ticket.booked && ticket.status == TicketStatus.booked,
-          )
-          .toList();
-
-      // Reset selection
-      _selectedTicketIdsForDebit.clear();
-      _studentTicketsForDebit = _studentTicketsForDebit
-          .map((ticket) => ticket.copyWith(isSelected: false))
-          .toList();
-
-      _error = '';
-      print("Tickets trouvés pour débit: ${_studentTicketsForDebit.length}");
-    } catch (e) {
-      _error = 'Erreur lors du chargement des tickets: $e';
-      _studentTicketsForDebit.clear();
-    } finally {
-      _isLoading = false;
-      _isLoadingStudentTickets = false;
-      notifyListeners();
-    }
-  }*/
 
   // Toggle ticket selection for debit
   void toggleTicketSelectionForDebit(int ticketId) {

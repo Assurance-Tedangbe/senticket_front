@@ -42,6 +42,8 @@ class AuthHttpClient extends http.BaseClient {
     if (token != null && token.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $token';
     }
+    request.headers['Content-Type'] ??= 'application/json';
+    request.headers['Accept'] ??= 'application/json';
 
     // Envoyer la requête
     final response = await _inner.send(request);
@@ -49,9 +51,24 @@ class AuthHttpClient extends http.BaseClient {
     // Gérer le 401 : token expiré ou invalide
     if (response.statusCode == 401) {
       print('[AuthHttpClient] 401 reçu — token invalide ou expiré');
-      await _tokenStorage.clearAll();
-      onUnauthorized?.call();
+      // ✅ Vérifier si le token existe encore avant de rediriger
+      // Un 401 sur /api/tickets/** vient d'une exception métier mal gérée,
+      // pas forcément d'un token expiré
+      final currentToken = await _tokenStorage.getToken();
+
+      if (currentToken == null || currentToken.isEmpty) {
+        // Vrai 401 : token absent ou effacé → redirection login
+        await _tokenStorage.clearAll();
+        onUnauthorized?.call();
+      } else {
+        // Token encore présent → erreur métier backend, pas d'expiration
+        // Ne pas rediriger, laisser le service gérer l'erreur
+        print('[AuthHttpClient] Token encore présent — erreur métier, pas de redirection');
+      }
     }
+     /* await _tokenStorage.clearAll();
+      onUnauthorized?.call();
+    }*/
 
     return response;
   }

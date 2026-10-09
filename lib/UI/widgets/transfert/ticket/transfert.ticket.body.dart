@@ -81,7 +81,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     if (qrData.userId == userProvider.currentUser?.userId) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vous ne pouvez pas vous transférer des tickets à vous-même'),
+          content: Text('Transfert non valide'),
           backgroundColor: redErrorColor,
         ),
       );
