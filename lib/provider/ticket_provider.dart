@@ -30,6 +30,10 @@ class TicketProvider with ChangeNotifier {
   List<Ticket> _tickets =
       []; // "Liste vide pour stocker tous les tickets chargés depuis l'API"
 
+  // Remplacer la liste unique par deux listes séparées
+  List<Ticket> _ticketsTypeA = [];
+  List<Ticket> _ticketsTypeB = [];
+
   Ticket?
   _currentTicket; // ticket currently selected (null if any ticket selected)"
 
@@ -81,6 +85,11 @@ class TicketProvider with ChangeNotifier {
   // Getters principaux
   List<Ticket> get tickets =>
       _tickets; // Retourne la liste complète des tickets
+
+  // Getters
+  List<Ticket> get ticketsTypeA => _ticketsTypeA;
+  List<Ticket> get ticketsTypeB => _ticketsTypeB;
+
   // Permet à d'autres classes de lire `_tickets` mais pas de le modifier
   Ticket? get currentTicket =>
       _currentTicket; // Retourne le ticket actuellement sélectionné (peut être null)
@@ -328,40 +337,42 @@ class TicketProvider with ChangeNotifier {
     _isLoading = true;
     _isLoadingStudentTickets = true;
     _error = '';
-    _selectedTicketTypeForDebit = type;
     notifyListeners();
 
     try {
-      _studentTicketsForDebit = await _service.getPurchasedTicketsByUser(
+      final tickets = await _service.getPurchasedTicketsByUser(
         userId: studentId,
-        booked: true,
-        ticketStatus: 'BOOKED',
         ticketType: type?.toBackend,
       );
 
-      // Filter only booked and BOOKED status tickets
-      _studentTicketsForDebit = _studentTicketsForDebit
-          .where(
-            (ticket) => ticket.booked && ticket.status == TicketStatus.booked,
-          )
-          .toList();
+      // ✅ Stocker dans la bonne liste selon le type (pour MyTicketsPage)
+      if (type == TicketType.a) {
+        _ticketsTypeA = tickets;
+      } else if (type == TicketType.b) {
+        _ticketsTypeB = tickets;
+      }
 
-      // Reset selection
-      _selectedTicketIdsForDebit.clear();
-      _studentTicketsForDebit = _studentTicketsForDebit
-          .map((ticket) => ticket.copyWith(isSelected: false))
-          .toList();
+      // ✅ Mettre aussi à jour studentTicketsForDebit (pour DebitPage)
+      _studentTicketsForDebit = tickets;
+      // Réinitialiser les sélections quand on change de type
+      _selectedTicketIdsForDebit = [];
 
       _error = '';
-      print("Tickets trouvés pour débit: ${_studentTicketsForDebit.length}");
     } catch (e) {
-      _error = 'Erreur lors du chargement des tickets: $e';
-      _studentTicketsForDebit.clear();
+      _error = e.toString().replaceFirst('Exception: ', '');
+      print('[TicketProvider] getPurchasedTicketsByUser error: $e');
     } finally {
       _isLoading = false;
       _isLoadingStudentTickets = false;
       notifyListeners();
     }
+  }
+
+  // Ajouter une méthode pour injecter depuis le cache (mode hors-ligne)
+  void setTicketsFromCache(List<Ticket> tickets) {
+    _ticketsTypeA = tickets.where((t) => t.type == TicketType.a).toList();
+    _ticketsTypeB = tickets.where((t) => t.type == TicketType.b).toList();
+    notifyListeners();
   }
 
   // Toggle ticket selection for debit

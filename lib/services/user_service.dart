@@ -391,6 +391,7 @@ class UserApiService {
         headers: _jsonHeaders,
       );
 
+      print('[UserApiService] getUserByUsername: ${response.statusCode}');
       print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
@@ -400,8 +401,12 @@ class UserApiService {
           "Utilisateur trouvé: ${userData['username']} (Rôle: ${userData['role']?['name']})",
         );
         return User.fromJson(userData);
+      }  else if (response.statusCode == 403) {
+        throw Exception('Accès refusé — rôle insuffisant');
       } else if (response.statusCode == 404) {
         throw Exception('Utilisateur non trouvé');
+      } else if (response.statusCode == 401) {
+        throw Exception('Session expirée — veuillez vous reconnecter');
       } else {
         throw Exception(
           'Erreur récupération utilisateur(serveur): ${response.statusCode}',

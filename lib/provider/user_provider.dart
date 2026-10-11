@@ -797,7 +797,16 @@ class UserProvider with ChangeNotifier {
         '🔍 Recherche de l\'utilisateur : $username',
       );
 
+      // ✅ Vérifier que ce chemin est correct
       final user = await _service.getUserByUsername(username);
+
+      // ✅ Vérifier que le rôle de l'étudiant est bien ETUDIANT
+      if (user.role.name.toUpperCase() != 'ETUDIANT') {
+        _debitUsernameError = 'L\'utilisateur n\'est pas un étudiant';
+        _isSearchingUser = false;
+        notifyListeners();
+        return false;
+      }
 
       _searchedUser = user;
       _isSearchingUser = false;
@@ -807,9 +816,26 @@ class UserProvider with ChangeNotifier {
       print('Utilisateur trouvé: ${user.username} (Rôle: ${user.role.name})');
       return true;
     } catch (e) {
+      print('[UserProvider] searchUserByUsername error: $e');
       _isSearchingUser = false;
       _searchedUser = null;
-      _debitUsernameError = 'Utilisateur non trouvé ';
+
+      // Message adapté selon le type d'erreur
+      final msg = e.toString().replaceFirst('Exception: ', '').trim();
+      if (msg.contains('403') || msg.contains('refusé') || msg.contains('Forbidden')) {
+        _debitUsernameError = 'Accès refusé — contactez l\'administrateur';
+      } else if (msg.contains('404') || msg.contains('non trouvé')) {
+        _debitUsernameError = 'Aucun utilisateur trouvé avec ce nom';
+      } else if (msg.contains('401') || msg.contains('expirée')) {
+        _debitUsernameError = 'Session expirée — reconnectez-vous';
+      } else if (msg.contains('SocketException') || msg.contains('réseau')) {
+        _debitUsernameError = 'Pas de connexion internet';
+      } else {
+        _debitUsernameError = 'Utilisateur non trouvé';
+      }
+
+     // _debitUsernameError = ErrorHandler.fromException(e);
+    //  _debitUsernameError = 'Utilisateur non trouvé ';
       notifyListeners();
       print('Erreur lors de la recherche: $e');
       return false;

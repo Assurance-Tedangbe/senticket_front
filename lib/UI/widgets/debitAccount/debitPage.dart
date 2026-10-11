@@ -11,11 +11,13 @@ import 'package:senticket_front/provider/user_provider.dart';
 class DebitPage extends StatefulWidget {
   final String studentUsername;
   final int studentId;
+  final int? preSelectedTicketId; // ← nouveau paramètre optionnel
 
   const DebitPage({
     super.key,
     required this.studentUsername,
     required this.studentId,
+    this.preSelectedTicketId, // ← optionnel
   });
 
   @override

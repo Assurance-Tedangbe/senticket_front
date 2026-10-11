@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/provider/ticket_provider.dart';
-import 'package:senticket_front/provider/user_provider.dart';
 
 class TransfertTicketBtn extends StatelessWidget {
   final VoidCallback? onPressed;

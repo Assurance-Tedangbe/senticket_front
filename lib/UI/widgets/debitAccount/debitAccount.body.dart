@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/login.dart';
-import 'package:senticket_front/UI/pages/scanqr.dart';
+import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/DebitUsernameSection.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/debitPage.dart';
 import 'package:senticket_front/UI/widgets/debitAccount/accessDebitPageBtn.dart';
-import 'package:senticket_front/UI/widgets/debitAccount/infoContainer.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+import 'package:senticket_front/model/qr_code_model.dart';
+
 
 class DebitBody extends StatefulWidget {
   const DebitBody({super.key});
@@ -38,6 +37,96 @@ class _DebitBodyState extends State<DebitBody> {
     super.dispose();
   }
 
+  // ============ SCAN QR — ouvre le scanner et traite le résultat ============
+  Future<void> _scanQrForDebit({bool scanTicket = false}) async {
+    final result = await Navigator.of(context).push<ScanResult>(
+      MaterialPageRoute(
+        builder: (_) => ScanQR(
+          operationType: ScanOperationType.debit,
+          expectTicketQr: scanTicket,
+          ),
+      ),
+    );
+
+    if (result == null || !mounted) return;
+    final qrData = result.qrData;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Vérification que la cible est bien un ETUDIANT
+    if (qrData.role.toUpperCase() != 'ETUDIANT') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ce QR code ne correspond pas à un étudiant'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+      return;
+    }
+
+    // CAS 1: QR ticket → débit direct d'un ticket précis
+    if (result.isDirectTicket && qrData.ticketId != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DebitPage(
+            studentUsername: qrData.username,
+            studentId: qrData.userId,
+            preSelectedTicketId: qrData.ticketId,
+          ),
+        ),
+      );
+      return;
+    }
+
+    // CAS 2: QR utilisateur → sélection manuelle
+    _usernameController.text = qrData.username;
+    userProvider.setDebitUsername(qrData.username);
+
+    final success = await userProvider.searchUserByUsername(qrData.username);
+    if (!mounted) return;
+
+    if (success && userProvider.searchedUser != null) {
+      // Naviguer directement vers DebitPage
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DebitPage(
+            studentUsername: qrData.username,
+            studentId: qrData.userId,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(userProvider.debitUsernameError ?? 'Étudiant non trouvé'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+    }
+  }
+
+  // Navigation vers DebitPage avec le ticket pré-sélectionné (QR ticket direct)
+  void _navigateToDebitWithTicket(QrCodeData qrData, UserProvider userProvider) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DebitPage(
+          studentUsername: qrData.username,
+          studentId: qrData.userId,
+          preSelectedTicketId: qrData.ticketId, // ticket pré-sélectionné
+        ),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Ticket #${qrData.ticketId} (Type ${qrData.ticketTypeLabel}) '
+              'pré-sélectionné pour ${qrData.username}',
+        ),
+        backgroundColor: validateBtnColor,
+      ),
+    );
+  }
+
+  // ============ VALIDATION MANUELLE (saisie username) ============
   Future<void> _validateStudent(UserProvider userProvider) async {
     if (_usernameController.text.isEmpty) {
       userProvider.setUsernameError(
@@ -50,6 +139,8 @@ class _DebitBodyState extends State<DebitBody> {
     final success = await userProvider.searchUserByUsername(
       _usernameController.text.trim(),
     );
+
+    if (!mounted) return;
 
     if (success && userProvider.searchedUser != null) {
       final searchedUser = userProvider.searchedUser!;
@@ -85,13 +176,6 @@ class _DebitBodyState extends State<DebitBody> {
         ),
       );
     }
-  }
-
-  void _onQRScanned(String username, UserProvider userProvider) {
-    _usernameController.text = username;
-    // Mettre à jour le provider avec le nom d'utilisateur scanné
-    userProvider.setDebitUsername(username);
-    _validateStudent(userProvider);
   }
 
   @override
@@ -132,64 +216,152 @@ class _DebitBodyState extends State<DebitBody> {
   }
 
   Widget _buildDebitInterface(BuildContext context, UserProvider userProvider) {
-    Size size = MediaQuery.of(context).size;
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const InfoContainer(),
-        const SizeboxHeightSession(),
 
-        ScanQR(
-          onScanned: (username) {
-            _onQRScanned(username, userProvider);
-          },
-        ),
-        const SizeboxHeightSession(),
-        // Section de saisie du nom d'utilisateur
-        Container(
-          alignment: Alignment.center,
-          height: size.height * 0.3,
-          width: size.width,
-          decoration: BoxDecoration(
-            color: textContainerColor,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: const [
-              BoxShadow(
-                color: boxshadowColor,
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
-            border: Border.all(color: kPrimaryColor, width: 1),
+        // ── Section 1 : Scan QR ──────────────────────────────────────
+        // Titre de section discret — remplace le paragraphe explicatif
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Via QR code',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: greyBorderColor,
+              letterSpacing: 0.5,
+            ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  return DebitUsernameSection(
-                    controller: _usernameController,
-                    onChanged: (value) {
-                      userProvider.setDebitUsername(value);
-                    },
-                  );
-                },
-              ),
-              const SizeboxTemplate(),
-              Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  return AccessDebitPageBtn(
-                    onPressed: () => _validateStudent(userProvider),
-                    isLoading: userProvider.isSearchingUser,
-                    isFormValid: userProvider.isDebitFormValid,
-                  );
-                },
-              ),
-            ],
+        ),
+
+        // Bouton QR étudiant
+        _buildScanButton(
+          label: 'QR étudiant',
+          subtitle: 'Sélectionner les tickets après scan',
+          tooltip: 'Scannez le QR personnel de l\'étudiant. '
+              'Vous pourrez ensuite débiter son compte.',
+          icon: Icons.qr_code,
+          color: kPrimaryColor,
+          onPressed: () => _scanQrForDebit(scanTicket: false),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Bouton QR ticket
+        _buildScanButton(
+          label: 'QR ticket',
+          subtitle: 'Débit immédiat d\'un ticket précis',
+          tooltip: 'Scannez le QR d\'un ticket affiché sur '
+              'l\'application de l\'étudiant. '
+              'Le débit s\'effectue immédiatement',
+          icon: Icons.qr_code_scanner,
+          color: kPrimaryColor,
+          onPressed: () => _scanQrForDebit(scanTicket: true),
+        ),
+
+        const SizedBox(height: 24),
+
+        // ── Section 2 : Saisie manuelle ──────────────────────────────
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Par username',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: greyBorderColor,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+
+        Consumer<UserProvider>(
+          builder: (context, userProvider, _) => DebitUsernameSection(
+            controller: _usernameController,
+            onChanged: (value) => userProvider.setDebitUsername(value),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Consumer<UserProvider>(
+          builder: (context, userProvider, _) => AccessDebitPageBtn(
+            onPressed: () => _validateStudent(userProvider),
+            isLoading: userProvider.isSearchingUser,
+            isFormValid: userProvider.isDebitFormValid,
           ),
         ),
       ],
     );
+  }
+
+// Widget bouton scan réutilisable avec titre + sous-titre
+  Widget _buildScanButton({
+    required String label,
+    required String subtitle,
+    required String tooltip,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Tooltip(
+        message: tooltip,
+        preferBelow: false,
+        decoration: BoxDecoration(
+          color: kThirdColor.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        textStyle: const TextStyle(color: Colors.white, fontSize: 12),
+        child:
+        InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color, width: 1.5),
+          color: color.withValues(alpha: 0.05),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      color: color,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: kThirdColor.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: color, size: 14),
+          ],
+        ),
+      ),
+    ),
+  );
   }
 
   Widget _buildNotPorterWarning() {

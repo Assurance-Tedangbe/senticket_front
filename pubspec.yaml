@@ -44,6 +44,8 @@ dependencies:
   flutter_keyboard_visibility: ^6.0.0
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
+  qr_flutter: ^4.1.0        # Génération/affichage du QR code
+  mobile_scanner: ^5.2.3    # Scan de QR code (caméra)
   
   # Pour ouvrir l'URL de paiement dans le navigateur
   url_launcher: ^6.2.1
@@ -57,7 +59,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

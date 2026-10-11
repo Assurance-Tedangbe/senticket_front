@@ -12,7 +12,7 @@ import 'package:senticket_front/UI/pages/transfert.ticket.dart';
 import 'package:senticket_front/UI/widgets/admin/agent.mgmt.dart/manage.agent.dart';
 import 'package:senticket_front/UI/widgets/admin/porter.mgmt.dart/manage.porter.dart';
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/manage.student.dart';
-import 'package:senticket_front/UI/pages/scanqr.dart';
+import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 import 'package:senticket_front/UI/pages/settings.dart';
 import 'package:senticket_front/UI/pages/signup.dart';
 import 'package:senticket_front/UI/pages/studentInterface.dart';
@@ -28,8 +28,11 @@ import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/navigation/navigation_service.dart';
+import 'UI/pages/qrcode/qr_display_page.dart';
 import 'UI/pages/splash_screen.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+RouteObserver<ModalRoute<void>>();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,6 +77,7 @@ class SenticketApp extends StatelessWidget {
       theme: ThemeData(primaryColor: kPrimaryColor),
       // permet de naviguer depuis AuthHttpClient (gestion 401) sans BuildContext
       navigatorKey: NavigationService.navigatorKey,
+      navigatorObservers: [routeObserver],
       home: const SplashScreen(), // ← toujours SplashScreen au démarrage
       routes: {
         '/cover':            (_) => const CoverPage(),
@@ -85,7 +89,7 @@ class SenticketApp extends StatelessWidget {
         '/ticket':           (_) => const BuyTicket(),
         '/transfert-ticket': (_) => const TransfertTicket(),
         '/consult-account':  (_) => const ConsultAccount(),
-        '/scanQR':           (_) => const ScanQR(),
+        //'/scanQR':           (_) => const ScanQR(),
         '/update-profile':   (_) => const UpdateProfile(),
         '/admin':            (_) => const AdminInterface(),
         '/manage-students':  (_) => const ManageStudent(),
@@ -94,6 +98,8 @@ class SenticketApp extends StatelessWidget {
         '/porter':           (_) => const PorterInterface(),
         '/debit-account':    (_) => const DebitAccount(),
         '/settings':         (_) => const SettingsPage(),
+        '/qr-display': (_) => const QrDisplayPage(),
+        '/scan-qr':    (_) => const ScanQR(),
       },
     );
   }

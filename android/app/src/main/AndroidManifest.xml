@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- ACCESS_WIFI_STATE: Permet de vérifier l'état WiFi -->
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:label="senticket_front"
         android:name="${applicationName}"

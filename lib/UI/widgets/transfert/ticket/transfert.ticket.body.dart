@@ -15,6 +15,7 @@ import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
+import '../../../pages/qrcode/scanqr.dart';
 import 'numberTicketsSection.dart';
 import 'senderPasswordTrsfTicket.dart';
 
@@ -52,14 +53,80 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     super.dispose();
   }
 
+  // ============ SCAN QR — pré-remplit le champ destinataire ============
+  Future<void> _scanQrForTransfer() async {
+    final result = await Navigator.of(context).push<ScanResult>(
+      MaterialPageRoute(
+        builder: (_) => const ScanQR(operationType: ScanOperationType.transfer),
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    final qrData = result.qrData;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Vérification que le destinataire est bien un ETUDIANT
+    if (qrData.role.toUpperCase() != 'ETUDIANT') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ce QR code ne correspond pas à un étudiant'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+      return;
+    }
+
+    // Vérification qu'on ne se transfère pas à soi-même
+    if (qrData.userId == userProvider.currentUser?.userId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Transfert non valide'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+      return;
+    }
+
+    // Pré-remplir le champ destinataire
+    _recipientController.text = qrData.username;
+    userProvider.setTransferRecipientUsername(qrData.username);
+
+    // Rechercher le destinataire automatiquement
+    final success = await userProvider.searchUserByUsername(qrData.username);
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Destinataire trouvé : ${qrData.username}'),
+          backgroundColor: validateBtnColor,
+        ),
+      );
+      setState(() {}); // Rebuild pour mettre à jour l'état du bouton
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(userProvider.debitUsernameError ?? 'Destinataire non trouvé'),
+          backgroundColor: redErrorColor,
+        ),
+      );
+    }
+  }
+
   bool _isFormValid() {
-    // Vérifier que tous les champs sont remplis
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     final recipientNotEmpty = _recipientController.text.isNotEmpty;
+    // ✅ On vérifie searchedUser uniquement si le champ est rempli
+    // Pour ne pas bloquer si l'utilisateur saisit manuellement
+    final recipientValid = recipientNotEmpty &&
+        (userProvider.searchedUser != null ||
+            userProvider.searchedUser?.username == _recipientController.text);
     final typeSelected = _selectedTicketType != null;
     final numberNotEmpty = _numberController.text.isNotEmpty;
     final passwordNotEmpty = _passwordController.text.isNotEmpty;
 
-    // Vérifier que le nombre est valide (si présent)
     bool isNumberValid = true;
     if (numberNotEmpty) {
       final number = int.tryParse(_numberController.text.trim());
@@ -72,6 +139,30 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         isNumberValid &&
         passwordNotEmpty;
   }
+  /*bool _isFormValid() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Vérifier que tous les champs sont remplis
+    final recipientNotEmpty = _recipientController.text.isNotEmpty;
+    final typeSelected = _selectedTicketType != null;
+    final numberNotEmpty = _numberController.text.isNotEmpty;
+    final passwordNotEmpty = _passwordController.text.isNotEmpty;
+    final recipientFound = userProvider.searchedUser != null;
+
+    // Vérifier que le nombre est valide (si présent)
+    bool isNumberValid = true;
+    if (numberNotEmpty) {
+      final number = int.tryParse(_numberController.text.trim());
+      isNumberValid = number != null && number > 0;
+    }
+
+    return recipientNotEmpty &&
+        recipientFound &&
+        typeSelected &&
+        numberNotEmpty &&
+        isNumberValid &&
+        passwordNotEmpty;
+  }*/
 
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {
@@ -94,6 +185,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       }
     } else {
       // L'erreur est déjà gérée dans le provider
+      if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(userProvider.debitUsernameError ?? 'Erreur inconnue'),
@@ -102,42 +194,15 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         ),
       );
     }
-  }
-
-  Future<void> _validateSenderPassword(UserProvider userProvider) async {
-    if (_passwordController.text.isEmpty) {
-      userProvider.setSenderPasswordError('Veuillez entrer votre mot de passe');
-      return;
-    }
-  }
-
-  Future<void> _validateNumberTickets(TicketProvider ticketProvider) async {
-    final numberText = _numberController.text.trim();
-    if (numberText.isEmpty) {
-      ticketProvider.setNumberOfTicketsError(
-        'Veuillez entrer le nombre de tickets',
-      );
-      return;
-    }
-  }
-
-  Future<void> _numberTicketsIsValid(TicketProvider ticketProvider) async {
-    final numberText = _numberController.text.trim();
-    final number = int.tryParse(numberText);
-    if (number == null || number <= 0) {
-      ticketProvider.setNumberOfTicketsIsInvalid(
-        'Le nombre doit être un entier positif',
-      );
-      return;
     }
   }
 
   Future<void> _onTransferPressed() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-
     // Vérifier que l'utilisateur courant est connecté et étudiant
     final currentUser = userProvider.currentUser;
+
     if (currentUser == null || currentUser.role.name != 'ETUDIANT') {
       await _validateRecipientUsername(userProvider);
       return;
@@ -172,6 +237,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       return;
     }
 
+    // Valider la positivité du nombre
     final number = int.tryParse(numberText);
     if (number == null || number <= 0) {
       await _numberTicketsIsValid(ticketProvider);
@@ -217,6 +283,8 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     );
 
     final history = await ticketProvider.transferTickets(request);
+    if (!mounted) return;
+
     if (history != null) {
       // Stocker l'historique pour pouvoir l'annuler plus tard
       setState(() {
@@ -283,11 +351,38 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     );
   }
 
+  Future<void> _validateSenderPassword(UserProvider userProvider) async {
+    if (_passwordController.text.isEmpty) {
+      userProvider.setSenderPasswordError('Veuillez entrer votre mot de passe');
+      return;
+    }
+  }
+
+  Future<void> _validateNumberTickets(TicketProvider ticketProvider) async {
+    final numberText = _numberController.text.trim();
+    if (numberText.isEmpty) {
+      ticketProvider.setNumberOfTicketsError(
+        'Veuillez entrer le nombre de tickets',
+      );
+      return;
+    }
+  }
+
+  Future<void> _numberTicketsIsValid(TicketProvider ticketProvider) async {
+    final numberText = _numberController.text.trim();
+    final number = int.tryParse(numberText);
+    if (number == null || number <= 0) {
+      ticketProvider.setNumberOfTicketsIsInvalid(
+        'Le nombre doit être un entier positif',
+      );
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final ticketProvider = Provider.of<TicketProvider>(context);
-
     final isLoggedIn = userProvider.currentUser != null;
     final isStudent = isLoggedIn
         ? userProvider.currentUser!.role.name == 'ETUDIANT'
@@ -399,13 +494,35 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       children: [
         const Icon(Icons.send_rounded, color: kPrimaryColor, size: 70),
         const SizeboxHeight(),
-        RecipientUsernameTrsfTicket(
+
+        // Champ destinataire + bouton scan QR
+        Row(
+          children: [
+            Expanded(
+              child: RecipientUsernameTrsfTicket(
+                controller: _recipientController,
+                onChanged: (value) {
+                  userProvider.setTransferRecipientUsername(value);
+                  setState(() {});
+                },
+              ),
+            ),
+            const SizedBox(width: 8),
+            // ← Bouton scan QR destinataire
+            IconButton(
+              onPressed: _scanQrForTransfer,
+              icon: const Icon(Icons.qr_code_scanner, color: kPrimaryColor, size: 32),
+              tooltip: 'Scanner le QR du destinataire',
+            ),
+          ],
+        ),
+        /*RecipientUsernameTrsfTicket(
           controller: _recipientController,
           onChanged: (value) {
             userProvider.setDebitUsername(value);
             setState(() {}); // Rebuild pour mettre à jour l'état du bouton
           },
-        ),
+        ),*/
         const SizeboxHeightSession(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
