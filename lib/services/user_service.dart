@@ -6,6 +6,7 @@ import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
 import 'package:senticket_front/services/token_storage_service.dart';
 
+import '../core/utils/error_handler.dart';
 import '../navigation/navigation_service.dart';
 
 /*- Service combiné qui gère :
@@ -231,10 +232,14 @@ class UserApiService {
       } else {
         throw Exception('Erreur de connexion: ${response.statusCode}');
       }
-    } catch (e) {
+    }
+    catch (e) {
+      throw Exception(ErrorHandler.fromException(e));
+    }
+    /* catch (e) {
       print('Erreur lors de la connexion: $e');
       rethrow;
-    }
+    }*/
   }
 
   // ************ LOGOUT — protégé + nettoyage local **************
@@ -287,9 +292,7 @@ class UserApiService {
       if (response.statusCode == 200) {
         // the JSON response → a list of User objects
 
-        final List<dynamic> jsonList = json.decode(
-          response.body,
-        ); // JSON string  → List of Dart objects
+        final List<dynamic> jsonList = json.decode(response.body,); // JSON string  → List of Dart objects
 
         _cachedUsers = jsonList
             .map((json) => User.fromJson(json))
@@ -301,9 +304,11 @@ class UserApiService {
 
         return _cachedUsers;
       } else {
-        throw Exception(
+        final errorMsg = ErrorHandler.fromResponse(response);
+        throw Exception(errorMsg);
+        /*throw Exception(
           'Erreur récupération utilisateurs: ${response.statusCode}',
-        );
+        );*/
       }
     } catch (e) {
       print("Erreur récupération: $e");
@@ -314,7 +319,9 @@ class UserApiService {
         return _cachedUsers;
       }
 
-      throw Exception('Erreur réseau: $e');
+      // ← AJOUTER ICI — remplace 'Erreur réseau: $e'
+      throw Exception(ErrorHandler.fromException(e));
+    //  throw Exception('Erreur réseau: $e');
     }
   }
 
