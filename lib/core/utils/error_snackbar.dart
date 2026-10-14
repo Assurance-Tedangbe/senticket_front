@@ -55,7 +55,7 @@ class ErrorSnackbar {
             ),
           ],
         ),
-        backgroundColor: validateBtnColor,
+        backgroundColor: kPrimaryColor,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
