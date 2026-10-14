@@ -13,12 +13,12 @@ class ErrorSnackbar {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const Icon(Icons.error_outline, color: kSecondColor, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(color: kSecondColor, fontSize: 14),
               ),
             ),
           ],
@@ -30,7 +30,7 @@ class ErrorSnackbar {
         margin: const EdgeInsets.all(12),
         action: SnackBarAction(
           label: 'OK',
-          textColor: Colors.white,
+          textColor: kSecondColor,
           onPressed: () =>
               ScaffoldMessenger.of(context).hideCurrentSnackBar(),
         ),
@@ -45,12 +45,12 @@ class ErrorSnackbar {
         content: Row(
           children: [
             const Icon(Icons.check_circle_outline,
-                color: Colors.white, size: 20),
+                color: kSecondColor, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(color: kSecondColor, fontSize: 14),
               ),
             ),
           ],

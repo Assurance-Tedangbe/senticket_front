@@ -493,14 +493,33 @@ class UserApiService {
   // without cahe
   Future<void> updatePassword(int userId, String newPassword) async {
     try {
+      print('[UserApiService] updatePassword pour userId: $userId');
+
       final response = await _authClient.put(
         Uri.parse('$baseUrl/password/$userId'),
         headers: _jsonHeaders,
         body: json.encode(
           newPassword,
-        ), // Sends only the new password (not the entire User object)"
+        ), // Sends only the new password (not the entire User object)" // backend attend un String JSON
       );
-      if (response.statusCode != 200) {
+      print('[UserApiService] updatePassword status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print('[UserApiService] Mot de passe mis à jour pour userId: $userId');
+        return;
+      }
+
+      // Utiliser ErrorHandler pour un message lisible
+      final errorMsg = ErrorHandler.fromResponse(response);
+      throw Exception(errorMsg);
+
+    } catch (e) {
+      print('[UserApiService] updatePassword error: $e');
+      // Ne pas rewrapper si c'est déjà une exception lisible
+      if (e.toString().startsWith('Exception: ')) rethrow;
+      throw Exception(ErrorHandler.fromException(e));
+    }
+     /* if (response.statusCode != 200) {
         throw Exception(
           'Erreur mise à jour mot de passe: ${response.statusCode}',
         );
@@ -508,6 +527,6 @@ class UserApiService {
       print("Password updated for user with ID: $userId");
     } catch (e) {
       throw Exception('Erreur réseau: $e');
-    }
+    }*/
   }
 }
