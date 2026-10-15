@@ -4,6 +4,8 @@ import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:senticket_front/services/token_storage_service.dart';
 
+import '../core/utils/error_handler.dart';
+
 class UserProvider with ChangeNotifier {
   //Creates a class that can notify its listeners of changes
 
@@ -487,7 +489,7 @@ class UserProvider with ChangeNotifier {
       return true;
     } catch (e) {
       _isLoggingIn = false;
-      _error = 'Erreur de connexion: ${e.toString()}';
+      _error = ErrorHandler.fromException(e);
       notifyListeners();
       print(' Erreur de connexion: $e');
       return false;
