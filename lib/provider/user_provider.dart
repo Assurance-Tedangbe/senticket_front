@@ -25,8 +25,7 @@ class UserProvider with ChangeNotifier {
   bool _isUpdatingUser = false;
   bool _isDeletingUser = false;
   bool _isLoggingIn = false;
-  /*   bool _isUpdatingPassword = false;
-  bool _isAddRoleToUser = false; */
+  bool _isUpdatingPassword = false;
 
   // State for signup form
   String _firstName = '';
@@ -81,9 +80,7 @@ class UserProvider with ChangeNotifier {
   bool get isUpdatingUser => _isUpdatingUser;
   bool get isDeletingUser => _isDeletingUser;
   bool get isLoggingIn => _isLoggingIn;
-  /*   bool get isUpdatingPassword => _isUpdatingPassword;
-  bool get isAddRoleToUser => _isAddRoleToUser;
-  bool get isRemoveRoleFromUser => _isRemoveRoleFromUser; */
+  bool get isUpdatingPassword => _isUpdatingPassword;
 
   // Signup Getters
   String get firstName => _firstName;
@@ -920,29 +917,42 @@ class UserProvider with ChangeNotifier {
       print('✅ Déconnexion complète — état réinitialisé');
     }
   }
-}
-/*
-  // ******************* Update password *****************
-  Future<bool> updateUserPassword(int userId, String newPassword) async {
-    _isUpdatingPassword = true;
-    _isLoading = true;
-    notifyListeners();
-    try {
-      await _service.updatePassword(
-        userId,
-        newPassword,
-      );
-      _error = '';
-      print(" User password updated successfully: $newPassword");
-      return true;
-    } catch (e) {
-      _error = 'Error updating user password: ${e.toString()}';
-      print("Error updatePassword: $e");
+// ******************* FOR CHANGE PASSWORD *****************
+
+  /// Changement de mot de passe de l'utilisateur connecté.
+  /// Appelée depuis ProfilePage._changePassword()
+  /// @param userId    ID de l'utilisateur connecté
+  /// @param newPassword  Nouveau mot de passe en clair (hashé côté backend)
+  /// @returns true si succès, false si erreur (message dans _error)
+  Future<bool> updateUserPassword({
+    required int userId,
+    required String newPassword,
+  }) async {
+    if (newPassword.length < 6) {
+      _error = 'Le mot de passe doit contenir au moins 6 caractères';
+      notifyListeners();
       return false;
+    }
+
+    _isUpdatingPassword = true;
+    _error = '';
+    notifyListeners();
+
+    try {
+      await _service.updatePassword(userId, newPassword);
+
+      _error = '';
+      print('[UserProvider] ✅ Mot de passe mis à jour pour userId: $userId');
+      return true;
+
+    } catch (e) {
+      print('[UserProvider] updateUserPassword error: $e');
+      _error = e.toString().replaceFirst('Exception: ', '').trim();
+      return false;
+
     } finally {
       _isUpdatingPassword = false;
-      _isLoading = false;
       notifyListeners();
     }
   }
-  */
+}
