@@ -529,4 +529,25 @@ class UserApiService {
       throw Exception('Erreur réseau: $e');
     }*/
   }
+
+  /// Envoie le token FCM au backend pour activer les notifications push
+  Future<void> updateFcmToken(String fcmToken) async {
+    try {
+      final userId = await _tokenStorage.getUserId();
+      if (userId == null) return;
+
+      final response = await _authClient.put(
+        Uri.parse('$baseUrl/$userId/fcm-token'),
+        headers: _jsonHeaders,
+        body: json.encode({'fcmToken': fcmToken}),
+      );
+
+      if (response.statusCode != 200) {
+        print('[UserApiService] updateFcmToken: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('[UserApiService] updateFcmToken error: $e');
+      // Ne pas faire échouer l'initialisation si cette requête échoue
+    }
+  }
 }

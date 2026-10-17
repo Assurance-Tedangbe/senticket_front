@@ -43,7 +43,10 @@ class TokenStorageService {
     }
   }
 
-  Future<String?> getUserId() async => _storage.read(key: _userIdKey);
+ // Future<String?> getUserId() async => _storage.read(key: _userIdKey);
+  Future<String?> getUserId() async {
+    return await _storage.read(key: 'userId');
+  }
   Future<String?> getRole() async => _storage.read(key: _roleKey);
   Future<String?> getUsername() async => _storage.read(key: _usernameKey);
 

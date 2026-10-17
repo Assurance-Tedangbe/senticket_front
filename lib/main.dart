@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/pages/adminInterface.dart';
 import 'package:senticket_front/UI/pages/buyTicket.dart';
@@ -22,6 +23,7 @@ import 'package:senticket_front/provider/payment_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+import 'package:senticket_front/services/notification_service.dart';
 import 'package:senticket_front/services/payment_service.dart';
 import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
@@ -35,9 +37,11 @@ import 'UI/pages/splash_screen.dart';
 final RouteObserver<ModalRoute<void>> routeObserver =
 RouteObserver<ModalRoute<void>>();
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // ensureInitialized pour que flutter_secure_storage fonctionne correctement sur Android
+  await Firebase.initializeApp();
+  await NotificationService.initialize();
   runApp(const MyApp());
 }
 
