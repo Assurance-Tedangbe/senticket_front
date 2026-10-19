@@ -42,11 +42,11 @@ class PortierDrawer extends StatelessWidget {
                 // ✅ Lien profil
                 ListTile(
                   leading: const Icon(Icons.person, color: kPrimaryColor),
-                  title: const Text('Mon profil'),
+                  title: const Text('Mon profil', style: TextStyle(fontSize: 22)),
                   trailing: const Icon(
                     Icons.arrow_forward,
                     color: kPrimaryColor,
-                    size: 16,
+                    size: 25,
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -85,33 +85,3 @@ class PortierDrawer extends StatelessWidget {
     );
   }
 }
-
-    /*return Drawer(
-      child: Column(
-        children: [
-          const HomeDrawerHeader(),
-          Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return PortierDrawerItem(
-                      title: menus[index]['title'],
-                      leadingIcon: menus[index]['leadingIcon'],
-                      trailingIcon: menus[index]['trailingIcon'],
-                      onAction: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, menus[index]['route']);
-                      });
-                },
-                separatorBuilder: (context, index) {
-                  return const Divider(
-                    height: 5,
-                  );
-                },
-                itemCount: menus.length),
-          ),
-        ],
-      ),
-    );
-  }
-}
-*/

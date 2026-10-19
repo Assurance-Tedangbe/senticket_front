@@ -36,11 +36,11 @@ class AdminDrawer extends StatelessWidget {
                 // ✅ Lien profil
                 ListTile(
                   leading: const Icon(Icons.person, color: kPrimaryColor),
-                  title: const Text('Mon profil'),
+                  title: const Text('Mon profil', style: TextStyle(fontSize: 22)),
                   trailing: const Icon(
                     Icons.arrow_forward,
                     color: kPrimaryColor,
-                    size: 16,
+                    size: 25,
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -79,32 +79,3 @@ class AdminDrawer extends StatelessWidget {
     );
   }
 }
-  /*  return Drawer(
-      child: Column(
-        children: [
-          const HomeDrawerHeader(),
-          Expanded(
-            child: ListView.separated(
-              itemBuilder: (context, index) {
-                return AdminDrawerItem(
-                  title: menus[index]['title'],
-                  leadingIcon: menus[index]['leadingIcon'],
-                  trailingIcon: menus[index]['trailingIcon'],
-                  onAction: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, menus[index]['route']);
-                  },
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const Divider(height: 5);
-              },
-              itemCount: menus.length,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-*/

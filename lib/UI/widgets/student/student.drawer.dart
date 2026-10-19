@@ -35,12 +35,6 @@ class StudentDrawer extends StatelessWidget {
         "leadingIcon": Icons.visibility,
         "trailingIcon": Icons.arrow_forward,
       },
-      /*{
-        "title": "Mise à jour profil",
-        "route": "/update-profile",
-        "leadingIcon": Icons.update,
-        "trailingIcon": Icons.arrow_forward,
-      },*/
       {
         "title": "Se déconnecter",
         "route": "/log-out",
@@ -60,11 +54,11 @@ class StudentDrawer extends StatelessWidget {
                 // ✅ Lien profil — en haut de la liste, avant les autres items
                 ListTile(
                   leading: const Icon(Icons.person, color: kPrimaryColor),
-                  title: const Text('Mon profil'),
+                  title: const Text('Mon profil', style: TextStyle(fontSize: 22)),
                   trailing: const Icon(
                     Icons.arrow_forward,
                     color: kPrimaryColor,
-                    size: 16,
+                    size: 25,
                   ),
                   onTap: () {
                     Navigator.pop(context); // ferme le drawer
@@ -103,31 +97,3 @@ class StudentDrawer extends StatelessWidget {
     );
   }
 }
-/*    return Drawer(
-      child: Column(
-        children: [
-          const HomeDrawerHeader(),
-          Expanded(
-            child: ListView.separated(
-              itemBuilder: (context, index) {
-                return StudentDrawerItem(
-                  title: menus[index]['title'],
-                  leadingIcon: menus[index]['leadingIcon'],
-                  trailingIcon: menus[index]['trailingIcon'],
-                  onAction: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, menus[index]['route']);
-                  },
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const Divider(height: 5);
-              },
-              itemCount: menus.length,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}*/
