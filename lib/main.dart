@@ -23,7 +23,6 @@ import 'package:senticket_front/provider/payment_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
-import 'package:senticket_front/services/notification_service.dart';
 import 'package:senticket_front/services/payment_service.dart';
 import 'package:senticket_front/services/role_service.dart';
 import 'package:senticket_front/services/ticket_service.dart';
@@ -40,8 +39,9 @@ RouteObserver<ModalRoute<void>>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // ensureInitialized pour que flutter_secure_storage fonctionne correctement sur Android
+  // ✅ Initialiser Firebase
   await Firebase.initializeApp();
-  await NotificationService.initialize();
+  //await NotificationService.initialize();
   runApp(const MyApp());
 }
 
@@ -158,45 +158,9 @@ class RootView extends StatelessWidget {
       theme: ThemeData(primaryColor: kPrimaryColor),
       routes: {
         "/cover": (context) => const CoverPage(),
-        "/home": (context) => const RootV(),
-        "/login": (context) => const LoginPage(),
-        "/sign-up": (context) => const SignUpPage(),
-        "/admin": (context) => const AdminInterface(),
-        "/manage-students": (context) => const ManageStudent(),
-        "/manage-agents": (context) => const ManageAgent(),
-        "/manage-porters": (context) => const ManagePorter(),
-        "/scanQR": (context) => const ScanQR(),
-        "/student": (context) => const StudentInterface(),
-        "/ticket": (context) => const BuyTicket(),
-        "/transfert-ticket": (context) => const TransfertTicket(),
-        "/consult-account": (context) => const ConsultAccount(),
-        "/update-profile": (context) => const UpdateProfile(),
-        "/porter": (context) => const PorterInterface(),
-        "/debit-account": (context) => const DebitAccount(),
-        "/settings": (context) => const SettingsPage(),
-        "/log-out": (context) => const LogOut(),
       },
       initialRoute: "/cover",
     );
   }
 }*/
 
-/* 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        // Fournit le Service combiné (Service + Repository)
-        Provider(create: (context) => UserService()),
-        
-        // Fournit le Provider avec dépendance vers le Service
-        ChangeNotifierProvider(
-          create: (context) => UserProvider(context.read<UserService>()),
-        ),
-      ],
-      child: MaterialApp(
-    );
-  }
-}
- */

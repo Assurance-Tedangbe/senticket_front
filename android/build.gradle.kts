@@ -1,3 +1,11 @@
+// Le bloc plugins DOIT être en premier dans le fichier
+plugins {
+    id("com.android.application") apply false
+    id("org.jetbrains.kotlin.android") apply false
+    // ✅ Google Services
+    id("com.google.gms.google-services") version "4.4.0" apply false
+}
+
 allprojects {
     repositories {
         google()
@@ -21,10 +29,4 @@ subprojects {
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
-}
-buildscript {
-    dependencies {
-        // ← ajouter cette ligne
-        classpath 'com.google.gms:google-services:4.4.0'
-    }
 }

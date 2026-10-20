@@ -5,6 +5,7 @@ import 'package:senticket_front/services/user_service.dart';
 import 'package:senticket_front/services/token_storage_service.dart';
 
 import '../core/utils/error_handler.dart';
+import '../services/notification_service.dart';
 
 class UserProvider with ChangeNotifier {
   //Creates a class that can notify its listeners of changes
@@ -481,6 +482,13 @@ class UserProvider with ChangeNotifier {
       print('ID: ${user.userId}');
       print('Rôle name: ${user.role.name}');
 
+      // ✅ AJOUTER — initialiser les notifications après login réussi
+      // Le userId est maintenant disponible dans TokenStorageService
+      NotificationService.initialize().catchError((e) {
+        print('[UserProvider] Notifications non initialisées: $e');
+        // Ne jamais faire échouer le login à cause des notifications
+      });
+
       // Réinitialise le formulaire de connexion
       resetLoginForm();
       return true;
@@ -492,7 +500,6 @@ class UserProvider with ChangeNotifier {
       return false;
     }
   }
-
 
   // ****************** RESTORE SESSION (démarrage de l'app) ******************
 
@@ -537,6 +544,11 @@ class UserProvider with ChangeNotifier {
       _error = '';  // réinitialise les erreurs d'une session précédente
 
       print('[UserProvider] ✅ Session restaurée: ${user.username} (${user.role.name})');
+
+      // ✅ AJOUTER — réinitialiser les notifications à la restauration de session
+      NotificationService.initialize().catchError((e) {
+        print('[UserProvider] Notifications non initialisées: $e');
+      });
 
     } catch (e) {
       // 4. Token expiré, invalide, ou erreur réseau → déconnexion propre
