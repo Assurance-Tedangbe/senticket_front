@@ -60,11 +60,11 @@ class StudentDrawer extends StatelessWidget {
                 // ✅ Lien profil — en haut de la liste, avant les autres items
                 ListTile(
                   leading: const Icon(Icons.person, color: kPrimaryColor),
-                  title: const Text('Mon profil'),
+                  title: const Text('Mon profil', style: TextStyle(fontSize: 22)),
                   trailing: const Icon(
                     Icons.arrow_forward,
                     color: kPrimaryColor,
-                    size: 16,
+                    size: 22,
                   ),
                   onTap: () {
                     Navigator.pop(context); // ferme le drawer

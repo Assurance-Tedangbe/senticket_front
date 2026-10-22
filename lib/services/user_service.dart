@@ -141,7 +141,7 @@ class UserApiService {
           await TokenStorageService.instance.saveUserInfo*/
           await _tokenStorage.saveToken(token);
           await _tokenStorage.saveUserSession(
-            userId: user.userId?.toString() ?? '',
+            userId: user.userId?.toString() ?? '',  // ← ne doit pas être vide
             username: user.username,
             role: user.role.name,
           );
