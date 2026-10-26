@@ -24,7 +24,10 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
   @override
   void initState() {
     super.initState();
-    _loadStatistics();
+    // ✅ Attendre que le premier frame soit rendu avant de charger
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadStatistics();
+    });
   }
 
   /// Charge les statistiques pour l'utilisateur connecté
