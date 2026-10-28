@@ -16,7 +16,6 @@ class TokenStorageService {
   static const _usernameKey = 'username';
 
   // ============ ÉCRITURE ============
-
   Future<void> saveToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
   }
@@ -27,25 +26,31 @@ class TokenStorageService {
     required String username,
     required String role,
   }) async {
-    await _storage.write(key: _userIdKey, value: userId);
+    print('[TokenStorage] Sauvegarde — userId: $userId, username: $username');
+    await _storage.write(key: _userIdKey, value: userId); // ← clé exacte
     await _storage.write(key: _usernameKey, value: username);
     await _storage.write(key: _roleKey, value: role);
   }
 
   // ============ LECTURE ============
-
-  // ✅ Version 2 : try/catch évite les crashes sur certains appareils Android
   Future<String?> getToken() async {
+    return await _storage.read(key: 'jwt_token');
+  }
+  // ✅ Version 2 : try/catch évite les crashes sur certains appareils Android
+  /*Future<String?> getToken() async {
     try {
       return await _storage.read(key: _tokenKey);
     } catch (_) {
       return null;
     }
-  }
+  }*/
 
  // Future<String?> getUserId() async => _storage.read(key: _userIdKey);
   Future<String?> getUserId() async {
-    return await _storage.read(key: 'userId');
+    final id = await _storage.read(key: _userIdKey);  // ← même clé
+    print('[TokenStorage] getUserId: $id');
+    return id;
+   // return await _storage.read(key: 'userId');
   }
   Future<String?> getRole() async => _storage.read(key: _roleKey);
   Future<String?> getUsername() async => _storage.read(key: _usernameKey);
@@ -60,7 +65,6 @@ class TokenStorageService {
   Future<bool> isLoggedIn() => hasToken();
 
   // ============ SUPPRESSION ============
-
   Future<void> clearAll() async {
     await _storage.deleteAll();
   }

@@ -15,9 +15,17 @@ class NotificationService {
   static final _authClient = AuthHttpClient(
     onUnauthorized: () => NavigationService.goToLogin(),
   );
-  static final _tokenStorage = TokenStorageService();
+  // static final _tokenStorage = TokenStorageService();
 
-  static Future<void> initialize() async {
+  // ✅ Prend l'userId en paramètre — plus de dépendance au timing du stockage
+  static Future<void> initialize(String userId) async {
+    print('[NotificationService] ▶ initialize() — userId: $userId');
+
+    if (userId.isEmpty) {
+      print('[NotificationService] ⚠️ userId vide — abandon');
+      return;
+    }
+
     // Demander la permission à l'utilisateur
     final settings = await _messaging.requestPermission(
       alert: true, badge: true, sound: true,
@@ -49,22 +57,25 @@ class NotificationService {
     // Récupérer le FCM token et l'envoyer au backend
     final token = await _messaging.getToken();
     print('[NotificationService] FCM Token: $token');
-    if (token != null) await _saveFcmToken(token);
 
-    // Rafraîchir le token si Firebase le régénère
-    _messaging.onTokenRefresh.listen(_saveFcmToken);
+    if (token != null) {
+      await _saveFcmToken(userId, token);  // ← userId passé directement
+    }
+
+    // Rafraîchir si Firebase régénère le token
+    _messaging.onTokenRefresh.listen((newToken) {
+      _saveFcmToken(userId, newToken);
+    });
+
+    print('[NotificationService] ✅ initialize() terminé');
   }
 
   /// Envoie le FCM token au backend — directement via HTTP,
   /// sans passer par UserApiService pour éviter les dépendances circulaires
-  static Future<void> _saveFcmToken(String token) async {
+  /// ✅ userId passé en paramètre — plus de lecture depuis stockage
+  static Future<void> _saveFcmToken(String userId, String token) async {
     try {
-      // Récupérer l'userId depuis le stockage local
-      final userId = await _tokenStorage.getUserId();
-      if (userId == null || userId.isEmpty) {
-        print('[NotificationService] userId absent — token non envoyé');
-        return;
-      }
+      print('[NotificationService] _saveFcmToken — userId: $userId');
 
       final url = Uri.parse(
           '${NetworkConfig.baseUrl}/api/users/$userId/fcm-token');
@@ -81,11 +92,11 @@ class NotificationService {
       if (response.statusCode == 200) {
         print('[NotificationService] ✅ FCM token sauvegardé pour userId: $userId');
       } else {
-        print('[NotificationService] Erreur sauvegarde token: ${response.statusCode}');
+        print('[NotificationService] ❌ Erreur ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       // Ne jamais faire échouer l'initialisation
-      print('[NotificationService] Erreur _saveFcmToken: $e');
+      print('[NotificationService] ❌ _saveFcmToken error: $e');
     }
   }
 

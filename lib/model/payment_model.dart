@@ -14,7 +14,7 @@ import 'package:senticket_front/enums/payment_status.dart';
 //   countB           : Nombre de tickets Type B à régénérer
 class PaymentInitiationDTO {
   final int userId;
-  final List<int> selectedTicketIds;
+  final List<int> selectedTicketIds;   // ✅ SUPPRIMÉ : selectedTicketIds
   final double totalAmount;
   final int countA;
   final int countB;

@@ -146,6 +146,10 @@ class UserApiService {
             role: user.role.name,
           );
 
+          // ← AJOUTER
+          final savedId = await _tokenStorage.getUserId();
+          print('[UserApiService] userId sauvegardé: $savedId');
+
           print('Connexion réussie avec token, Token sauvegardé pour: ${user.username} (${user.role.name})');
           return user;
         }

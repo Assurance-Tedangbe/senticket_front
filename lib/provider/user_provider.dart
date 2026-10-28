@@ -473,7 +473,6 @@ class UserProvider with ChangeNotifier {
       _currentUser = user;
       // ✅ Récupérer le token depuis le stockage (sauvegardé dans UserApiService.login())
       _authToken = await _tokenStorage.getToken();
-
       _isLoggingIn = false;
       _error = '';
       notifyListeners();
@@ -482,12 +481,15 @@ class UserProvider with ChangeNotifier {
       print('ID: ${user.userId}');
       print('Rôle name: ${user.role.name}');
 
-      // ✅ AJOUTER — initialiser les notifications après login réussi
-      // Le userId est maintenant disponible dans TokenStorageService
-      NotificationService.initialize().catchError((e) {
-        print('[UserProvider] Notifications non initialisées: $e');
-        // Ne jamais faire échouer le login à cause des notifications
-      });
+      // ✅ Passer l'userId directement — plus de problème de timing
+      final userId = user.userId?.toString() ?? '';
+      if (userId.isNotEmpty) {
+        NotificationService.initialize(userId).catchError((e) {
+          print('[UserProvider] Notifications: $e');
+        });
+      } else {
+        print('[UserProvider] ⚠️ userId null — notifications non initialisées');
+      }
 
       // Réinitialise le formulaire de connexion
       resetLoginForm();
@@ -545,10 +547,13 @@ class UserProvider with ChangeNotifier {
 
       print('[UserProvider] ✅ Session restaurée: ${user.username} (${user.role.name})');
 
-      // ✅ AJOUTER — réinitialiser les notifications à la restauration de session
-      NotificationService.initialize().catchError((e) {
-        print('[UserProvider] Notifications non initialisées: $e');
-      });
+      // ✅ Même approche pour la restauration de session
+      final userId = user.userId?.toString() ?? '';
+      if (userId.isNotEmpty) {
+        NotificationService.initialize(userId).catchError((e) {
+          print('[UserProvider] Notifications restore: $e');
+        });
+      }
 
     } catch (e) {
       // 4. Token expiré, invalide, ou erreur réseau → déconnexion propre

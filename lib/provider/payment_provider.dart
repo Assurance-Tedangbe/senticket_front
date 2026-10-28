@@ -68,7 +68,7 @@ class PaymentProvider with ChangeNotifier {
   // @param countB            Nombre de tickets Type B à regenérer (pour le backend)
   Future<void> initiatePayment({
     required int userId,
-    required List<int> selectedTicketIds,
+    required List<int> selectedTicketIds,     // ✅ Plus de selectedTicketIds
     required double totalAmount,
     required int countA,
     required int countB,
@@ -82,13 +82,14 @@ class PaymentProvider with ChangeNotifier {
       // Construction de la requête d'initiation
       final request = PaymentInitiationDTO(
         userId: userId,
-        selectedTicketIds: selectedTicketIds,
+        selectedTicketIds: selectedTicketIds,      // ✅ Plus de selectedTicketIds
         totalAmount: totalAmount,
         countA: countA,
         countB: countB,
       );
 
       print('[PaymentProvider] Initiation paiement: $request');
+      print('[PaymentProvider] Initiation — countA: $countA, countB: $countB');
 
       // Appel HTTP vers le backend Spring Boot
       _paymentResponse = await _service.initiatePayment(request);
