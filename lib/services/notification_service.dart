@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:senticket_front/services/token_storage_service.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
 import 'package:senticket_front/navigation/navigation_service.dart';
 import 'package:senticket_front/config/network_config.dart';

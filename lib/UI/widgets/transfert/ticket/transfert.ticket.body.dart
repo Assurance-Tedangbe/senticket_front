@@ -78,6 +78,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     }
 
     // Vérification qu'on ne se transfère pas à soi-même
+    // ✅ DÉJÀ PRÉSENT — vérification soi-même par ID
     if (qrData.userId == userProvider.currentUser?.userId) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -219,6 +220,31 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       return;
     }
 
+    // ✅ AJOUTER — vérification avant l'appel API
+    // Comparer par username ET par ID
+    final recipientUsername = _recipientController.text.trim();
+    if (recipientUsername == currentUser.username) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vous ne pouvez pas transférer des tickets à vous-même'),
+          backgroundColor: redErrorColor,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+    // Vérification supplémentaire par ID si l'utilisateur a déjà été recherché
+    if (userProvider.searchedUser != null &&
+        userProvider.searchedUser!.userId == currentUser.userId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vous ne pouvez pas transférer des tickets à vous-même'),
+          backgroundColor: redErrorColor,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
     // Valider le type sélectionné
     if (_selectedTicketType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
