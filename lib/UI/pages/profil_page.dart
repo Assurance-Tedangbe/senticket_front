@@ -452,7 +452,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _changePassword,
               style: ElevatedButton.styleFrom(
-                backgroundColor: redErrorColor,
+                backgroundColor: kPrimaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -460,7 +460,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: const Text(
                 'Changer le mot de passe',
-                style: TextStyle(color: Colors.white, fontSize: 15),
+                style: TextStyle(color: kSecondColor, fontSize: 15),
               ),
             ),
           ),
