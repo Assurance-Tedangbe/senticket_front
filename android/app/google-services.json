@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "947357574716",
+    "project_id": "senticket-61726",
+    "storage_bucket": "senticket-61726.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947357574716:android:2021eb3fb9d46036024539",
+        "android_client_info": {
+          "package_name": "com.example.senticket_front"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD_Zv06eyZ-qC1skIVHTHCP-d7Acn8P8s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

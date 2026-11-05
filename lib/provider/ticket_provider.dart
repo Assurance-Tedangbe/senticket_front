@@ -603,68 +603,44 @@ class TicketProvider with ChangeNotifier {
     _error = '';
     notifyListeners();
   }
+
+  // ==================== ACHAT — NOUVEAU SYSTÈME ====================
+
+  int _countA = 0; // Nombre de tickets Type A à acheter
+  int _countB = 0; // Nombre de tickets Type B à acheter
+
+  int get countA => _countA;
+  int get countB => _countB;
+  double get totalAmount => _countA * 100.0 + _countB * 150.0;
+  bool get hasSelection => (_countA + _countB) > 0;
+
+  void incrementA() {
+    _countA++;
+    notifyListeners();
+  }
+
+  void decrementA() {
+    if (_countA > 0) {
+      _countA--;
+      notifyListeners();
+    }
+  }
+
+  void incrementB() {
+    _countB++;
+    notifyListeners();
+  }
+
+  void decrementB() {
+    if (_countB > 0) {
+      _countB--;
+      notifyListeners();
+    }
+  }
+
+  void resetSelection() {
+    _countA = 0;
+    _countB = 0;
+    notifyListeners();
+  }
 }
-
-  /*
-  // retourne void car le résultat est stocké dans _currentTicket
-  Future<void> loadTicketById(int ticketId) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-
-    try {
-      _currentTicket = await _service.getTicketById(
-        ticketId,
-      ); // "demande un ticket spécifique par son id à l'API et le stocke dans _currentTicket"
-      _error = '';
-      print("Ticket chargé par ID: $ticketId");
-    } catch (e) {
-      _error = 'Erreur chargement ticket: ${e.toString()}';
-      print("Erreur loadTicketById: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> loadTicketsByStatus(TicketStatus ticketStatus) async {
-    _isLoading = true;
-    _error = '';
-    notifyListeners();
-    try {
-      _tickets = await _service.getTicketsByStatus(ticketStatus);
-      _error = '';
-      print(
-        "Tickets chargés par statut $ticketStatus: ${_tickets.length} tickets",
-      );
-    } catch (e) {
-      _error = 'Erreur chargement tickets par statut: ${e.toString()}';
-      print("Erreur loadTicketsByStatus: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // FILTRAGE DES TICKETS PAR STATUT
-  List<Ticket> filterTicketsByStatus(TicketStatus status) {
-    return _service.filterTicketsByStatus(status);
-  }
-
-   // 💰 CALCUL DU REVENU TOTAL
-  double getTotalRevenue() {
-    return _tickets.fold(0.0, (sum, ticket) => sum + ticket.ticketPrice);
-  }
-  // OBTENTION DE LA COULEUR D'UN STATUT
-  Color getStatusColor(TicketStatus status) {
-    return status.displayColor;
-  }
-  // OBTENTION DE LA COULEUR D'UN TYPE
-  Color getTypeColor(TicketType type) {
-    return type.displayColor;
-  }
-  // OBTENTION DU LIBELLÉ FRANÇAIS D'UN STATUT
-  String getStatusDisplayName(TicketStatus status) {
-    return status.frenchLabel; // "Disponible", "Réservé", "Utilisé"
-  }
-*/

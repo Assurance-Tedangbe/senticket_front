@@ -1,3 +1,11 @@
+// Le bloc plugins DOIT être en premier dans le fichier
+plugins {
+    id("com.android.application") apply false
+    id("org.jetbrains.kotlin.android") apply false
+    // ✅ Google Services
+    id("com.google.gms.google-services") version "4.4.0" apply false
+}
+
 allprojects {
     repositories {
         google()

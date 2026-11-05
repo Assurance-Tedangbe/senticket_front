@@ -58,7 +58,7 @@ class StudentDrawer extends StatelessWidget {
                   trailing: const Icon(
                     Icons.arrow_forward,
                     color: kPrimaryColor,
-                    size: 25,
+                    size: 22,
                   ),
                   onTap: () {
                     Navigator.pop(context); // ferme le drawer
