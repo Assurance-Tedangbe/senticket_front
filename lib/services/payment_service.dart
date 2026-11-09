@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/payment_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';

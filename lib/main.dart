@@ -1,23 +1,21 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/pages/adminInterface.dart';
-import 'package:senticket_front/UI/pages/buyTicket.dart';
-import 'package:senticket_front/UI/pages/consultAccount.dart';
-import 'package:senticket_front/UI/pages/debitAccount.dart';
-import 'package:senticket_front/UI/pages/coverPage.dart';
-import 'package:senticket_front/UI/pages/rootView.dart';
+import 'package:senticket_front/UI/pages/admin_interface.dart';
+import 'package:senticket_front/UI/pages/buy_ticket.dart';
+import 'package:senticket_front/UI/pages/consult_account.dart';
+import 'package:senticket_front/UI/pages/debit_account.dart';
+import 'package:senticket_front/UI/pages/root_view.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/pages/logout.dart';
-import 'package:senticket_front/UI/pages/porterInterface.dart';
+import 'package:senticket_front/UI/pages/porter_interface.dart';
 import 'package:senticket_front/UI/pages/transfert.ticket.dart';
-import 'package:senticket_front/UI/widgets/admin/agent.mgmt.dart/manage.agent.dart';
 import 'package:senticket_front/UI/widgets/admin/porter.mgmt.dart/manage.porter.dart';
 import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/manage.student.dart';
 import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 import 'package:senticket_front/UI/pages/settings.dart';
 import 'package:senticket_front/UI/pages/signup.dart';
-import 'package:senticket_front/UI/pages/studentInterface.dart';
-import 'package:senticket_front/UI/pages/updateProfile.dart';
+import 'package:senticket_front/UI/pages/student.interface.dart';
+import 'package:senticket_front/UI/pages/update.profile.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/payment_provider.dart';
 import 'package:senticket_front/provider/role_privider.dart';
@@ -29,6 +27,7 @@ import 'package:senticket_front/services/ticket_service.dart';
 import 'package:senticket_front/services/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/navigation/navigation_service.dart';
+import 'UI/pages/cover_page.dart';
 import 'UI/pages/profil_page.dart';
 import 'UI/pages/qrcode/qr_display_page.dart';
 import 'UI/pages/splash_screen.dart';
@@ -97,7 +96,6 @@ class SenticketApp extends StatelessWidget {
         '/update-profile':   (_) => const UpdateProfile(),
         '/admin':            (_) => const AdminInterface(),
         '/manage-students':  (_) => const ManageStudent(),
-        '/manage-agents':    (_) => const ManageAgent(),
         '/manage-porters':   (_) => const ManagePorter(),
         '/porter':           (_) => const PorterInterface(),
         '/debit-account':    (_) => const DebitAccount(),

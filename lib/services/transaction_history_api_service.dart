@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
-
 import '../navigation/navigation_service.dart';
+import 'package:http/http.dart' as http;
+import 'package:senticket_front/core/utils/api_exception.dart';
+import 'package:senticket_front/core/utils/error_handler.dart';
 
 /// Service pour les appels API liés à l'historique des transactions
 /// Ce service est responsable de toutes les communications HTTP avec le backend
@@ -26,6 +27,40 @@ class TransactionHistoryApiService {
     'Accept': 'application/json',
   };
 
+  static String _day(DateTime d) => d.toIso8601String().split('T')[0];
+
+  Map<String, String> _params({
+    required String type,
+    required int page,
+    required int size,
+    DateTime? start,
+    DateTime? end,
+  }) =>
+      {
+        'transactionType': type,
+        'page': '$page',
+        'size': '$size',
+        if (start != null) 'startDate': _day(start),
+        if (end != null) 'endDate': _day(end),
+      };
+
+  Future<TransactionHistoryResponseDTO> _fetch(Uri uri) async {
+    try {
+      final http.Response response =
+      await _authClient.get(uri, headers: headers);
+      if (response.statusCode == 200) {
+        return TransactionHistoryResponseDTO.fromJson(
+            json.decode(response.body));
+      }
+      throw ApiException(ErrorHandler.fromResponse(response) ??
+          "Impossible de charger l'historique");
+    } catch (e) {
+      print('Erreur historique: $e');
+      throw ApiException.from(e);
+    }
+  }
+
+  /// Historique global (ADMIN)
   /// MÉTHODE PRINCIPALE : RÉCUPÉRATION DE L'HISTORIQUE AVEC FILTRES
   /// Récupère l'historique des transactions avec filtres
   /// @param transactionType - Type de transaction ("ALL", "PURCHASE", "DEBIT", "TRANSFER")
@@ -40,59 +75,17 @@ class TransactionHistoryApiService {
     DateTime? endDate,
     int page = 0,
     int size = 20,
-  }) async {
-    try {
-      print("========== RÉCUPÉRATION HISTORIQUE ==========");
-      print("Type: $transactionType");
-      print("Page: $page, Size: $size");
-      if (startDate != null) print("Date début: $startDate");
-      if (endDate != null) print("Date fin: $endDate");
+  }) =>
+      _fetch(Uri.parse(baseUrl).replace(
+        queryParameters: _params(
+            type: transactionType,
+            page: page,
+            size: size,
+            start: startDate,
+            end: endDate),
+      ));
 
-      // Construire les paramètres de la requête
-      final params = <String, String>{
-        'transactionType': transactionType,
-        'page': page.toString(),
-        'size': size.toString(),
-      };
-
-      // Ajout des dates si elles sont fournies (format YYYY-MM-DD)
-      if (startDate != null) {
-        params['startDate'] = startDate.toIso8601String().split('T')[0];
-      }
-      if (endDate != null) {
-        params['endDate'] = endDate.toIso8601String().split('T')[0];
-      }
-
-      // Construction de l'URI complète avec les paramètres
-      final uri = Uri.parse(baseUrl).replace(queryParameters: params);
-
-      print("URL: $uri");
-
-      // Envoyer la requête GET
-      final response = await _authClient.get(uri, headers: headers);
-
-      print("Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        // Succès : décodage du JSON et conversion en DTO
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        print("========== FIN RÉCUPÉRATION HISTORIQUE ==========");
-        return TransactionHistoryResponseDTO.fromJson(jsonData);
-      } else {
-        // Erreur : extraction du message d'erreur
-        final errorBody = json.decode(response.body);
-        final errorMessage =
-            errorBody['message'] ??
-            'Erreur récupération historique: ${response.statusCode}';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      print("Erreur getTransactionHistory: $e");
-      rethrow;
-    }
-  }
-
+  /// Historique d'un utilisateur
   /// Récupère l'historique des transactions pour un utilisateur spécifique
   /// @param userId - ID de l'utilisateur
   /// @param transactionType - Type de transaction
@@ -108,53 +101,16 @@ class TransactionHistoryApiService {
     DateTime? endDate,
     int page = 0,
     int size = 20,
-  }) async {
-    try {
-      print("========== RÉCUPÉRATION HISTORIQUE POUR UTILISATEUR ==========");
-      print("User ID: $userId");
-      print("Type: $transactionType");
-      print("Page: $page, Size: $size");
-
-      // Construction des paramètres incluant l'ID utilisateur
-      final params = <String, String>{
-        'userId': userId.toString(),
-        'transactionType': transactionType,
-        'page': page.toString(),
-        'size': size.toString(),
-      };
-
-      // Ajout des dates si fournies
-      if (startDate != null) {
-        params['startDate'] = startDate.toIso8601String().split('T')[0];
-      }
-      if (endDate != null) {
-        params['endDate'] = endDate.toIso8601String().split('T')[0];
-      }
-
-      // Construction de l'URI
-      final uri = Uri.parse('$baseUrl/user').replace(queryParameters: params);
-
-      print("URL: $uri");
-
-      // Envoi de la requête GET
-      final response = await _authClient.get(uri, headers: headers);
-
-      print("Status code: ${response.statusCode}");
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        print("========== FIN RÉCUPÉRATION HISTORIQUE ==========");
-        return TransactionHistoryResponseDTO.fromJson(jsonData);
-      } else {
-        final errorBody = json.decode(response.body);
-        final errorMessage =
-            errorBody['message'] ??
-            'Erreur récupération historique: ${response.statusCode}';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      print("Erreur getTransactionHistoryForUser: $e");
-      rethrow;
-    }
-  }
+  }) =>
+      _fetch(Uri.parse('$baseUrl/user').replace(
+        queryParameters: {
+          'userId': '$userId',
+          ..._params(
+              type: transactionType,
+              page: page,
+              size: size,
+              start: startDate,
+              end: endDate),
+        },
+      ));
 }

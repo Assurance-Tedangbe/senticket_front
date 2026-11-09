@@ -1,19 +1,16 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';
-
 import '../navigation/navigation_service.dart';
+import 'package:http/http.dart' as http;
+import 'package:senticket_front/core/utils/api_exception.dart';
+import 'package:senticket_front/core/utils/error_handler.dart';
 
-/* 
-  - Service combiné qui gère :
-  - Appels HTTP vers l'API Spring Boot pour les tickets
-  - Cache simple des données
-  - Logique métier légère
-  - Transformation des données 
-    ticket_service.dart: role(Communication API): utilise forApi, fromApi, toBackend, fromBackend
-*/
+
+/// Appels API des tickets. Plus de cache ni d'achat direct :
+/// les tickets sont créés par le backend à la confirmation du paiement.
+/// ticket_service.dart: role(Communication API): utilise forApi, fromApi, toBackend, fromBackend
 class TicketApiService {
   final baseUrl = '${NetworkConfig.baseUrl}/api/tickets';
   final transactionHistoryBaseUrl = '${NetworkConfig.baseUrl}/api/transactions';
@@ -29,126 +26,9 @@ class TicketApiService {
     'Accept': 'application/json', // Indique au serveur "Je veux recevoir du JSON"
   };
 
-  // CACHE SIMPLE INTÉGRÉ
-  List<Ticket> _cachedTickets = []; // Cache des tickets
-  DateTime? _lastFetchTime; // Dernière récupération
-  static const Duration cacheDuration = Duration(minutes: 5); // Durée de cache
-
-  // ******************** FOR GET ALL TICKETS OPERATION ************************
-
-  // READ ALL TICKETS (GET /api/tickets). Using cache
-  Future<List<Ticket>> getAllTickets({bool forceRefresh = false}) async {
-    // "Vérifie si le cache est encore valide"
-    final now = DateTime.now();
-
-    final cacheValide =
-        _lastFetchTime != null &&
-        now.difference(_lastFetchTime!) < cacheDuration;
-
-    // "Retourne le cache si valide et pas de force refresh"
-    if (!forceRefresh && cacheValide && _cachedTickets.isNotEmpty) {
-      print("Retourne ${_cachedTickets.length} tickets depuis le cache");
-
-      return _cachedTickets;
-    }
-
-    try {
-      print("Récupération des tickets depuis l'API");
-
-      final response = await _authClient.get(Uri.parse(baseUrl), headers: _jsonHeaders);
-
-      if (response.statusCode == 200) {
-        // "Convertit la réponse JSON → liste d'objets Ticket"
-        print("JSON reçu : ${response.body}"); // <- Ajoutez ceci
-
-        final List<dynamic> jsonList = json.decode(
-          response.body,
-        ); // "JSON string → Liste d'objets Dart"
-
-        // ICI - La conversion se fait dans Ticket.fromJson()
-        _cachedTickets = jsonList
-            .map((json) => Ticket.fromJson(json))
-            .toList(); // "Transforme chaque objet JSON → objet Ticket"
-
-        _lastFetchTime = DateTime.now(); // "Mise à jour du timestamp"
-
-        print("${_cachedTickets.length} tickets récupérés");
-
-        return _cachedTickets;
-      } else {
-        throw Exception('Erreur récupération tickets: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Erreur récupération tickets: $e");
-
-      // Fallback: retourne le cache même expiré si pas de réseau
-      if (_cachedTickets.isNotEmpty) {
-        print("Retourne cache expiré en fallback");
-        return _cachedTickets;
-      }
-
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  // ******************** FOR PURCHASE TICKETS OPERATION ************************
-
-  // PURCHASE TICKETS (PUT /api/tickets/purchase)
-  Future<List<Ticket>> purchaseTickets(
-    PurchaseTicketsRequestDTO purchaseTicketsRequestDTO,
-  ) async {
-    try {
-      print(
-        "Achat de tickets par: ${purchaseTicketsRequestDTO.purchaseUserDTO.username}",
-      );
-      print("URL: $baseUrl/purchase");
-      print(
-        "PurchaseUserDTO: ${purchaseTicketsRequestDTO.purchaseUserDTO.toJson()}",
-      );
-      print(
-        "Ticket IDs count: ${purchaseTicketsRequestDTO.selectedTicketIds.length}",
-      );
-      print("Ticket IDs: ${purchaseTicketsRequestDTO.selectedTicketIds}");
-
-      final response = await _authClient.put(
-        Uri.parse('$baseUrl/purchase'),
-        headers: _jsonHeaders,
-        body: json.encode(({
-          'purchaseUserDTO': {
-            'userId': purchaseTicketsRequestDTO.purchaseUserDTO.userId,
-            'username': purchaseTicketsRequestDTO.purchaseUserDTO.username,
-          },
-          'selectedTicketIds': purchaseTicketsRequestDTO.selectedTicketIds,
-        })),
-      );
-
-      print("Status code: ${response.statusCode}");
-      print("Response headers: ${response.headers}");
-      print("Response body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-
-        // ICI - La conversion se fait dans Ticket.fromJson()
-        final purchasedTickets = jsonList
-            .map((json) => Ticket.fromJson(json))
-            .toList();
-
-        print("Tickets achetés: ${purchasedTickets.length}");
-
-        // Met à jour le cache
-        _cachedTickets.addAll(purchasedTickets);
-
-        return purchasedTickets;
-      } else {
-        throw Exception('Erreur achat tickets: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Erreur lors de l\'achat des tickets: $e");
-
-      throw Exception('Erreur réseau: $e');
-    }
-  }
+  /// Lève une ApiException au message lisible
+  Never _fail(http.Response r, String fallback) =>
+      throw ApiException(ErrorHandler.fromResponse(r) ?? fallback);
 
   // ******************** FOR DEBITACCOUNT OPERATION ************************
 
@@ -159,7 +39,7 @@ class TicketApiService {
   ) async {
     try {
       print(
-        "Debiter le compte de l'utilisateur ID: ${debitAccountRequestDTO.debitStudentDTO.debitStudentId}",
+        "debitAccount de l'utilisateur ID: ${debitAccountRequestDTO.debitStudentDTO.debitStudentId}",
       );
 
       final response = await _authClient.put(
@@ -170,73 +50,47 @@ class TicketApiService {
 
       print("Status code débit: ${response.statusCode}");
       print("Response body débit: ${response.body}");
-      /*       if (response.statusCode != 200) {
-        throw Exception('Erreur débit compte: ${response.statusCode}');
-      }
 
-      print("Compte ${debitAccountRequestDTO.debitStudentDTO.username} débité");
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    } */
       if (response.statusCode == 200) {
         print("Débit effectué avec succès");
         return;
       } else {
-        final errorBody = json.decode(response.body);
+        _fail(response, 'Le débit a échoué');
+        /*final errorBody = json.decode(response.body);
         final errorMessage =
             errorBody['message'] ?? 'Erreur de débit: ${response.statusCode}';
-        throw Exception(errorMessage);
+        throw Exception(errorMessage);*/
       }
     } catch (e) {
-      print("Erreur lors du débit: $e");
-      throw Exception('Erreur réseau: $e');
+      print("Erreur debitAccount: $e");
+      throw ApiException.from(e);
     }
   }
 
+  // ── Tickets BOOKED d'un étudiant, par type ─────────────────────
   Future<List<Ticket>> getPurchasedTicketsByUser({
     required int userId,
-    bool? booked,
-    String? ticketStatus,
-    String? ticketType,
+    required String ticketType,
   }) async {
     try {
-      print(
-        "Récupération des tickets de type: $ticketType achetés par l'utilisateur: $userId",
-      );
-
-      // Build query parameters
-      final params = <String, String>{'userId': userId.toString()};
-
-      if (booked != null) {
-        params['booked'] = booked.toString();
-      }
-
-      if (ticketStatus != null) {
-        params['status'] = ticketStatus;
-      }
-
-      if (ticketType != null) {
-        params['ticketType'] = ticketType;
-      }
-      final uri = Uri.parse(
-        '$baseUrl/user/$userId/purchased',
-      ).replace(queryParameters: params);
+      final uri = Uri.parse('$baseUrl/user/$userId/purchased')
+          .replace(queryParameters: {'ticketType': ticketType});
       final response = await _authClient.get(uri, headers: _jsonHeaders);
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        final tickets = jsonList.map((json) => Ticket.fromJson(json)).toList();
-
-        print("${tickets.length} tickets trouvés pour l'utilisateur $userId");
-        return tickets;
-      } else {
-        throw Exception(
+        final List<dynamic> list = json.decode(response.body);
+        return list.map((j) => Ticket.fromJson(j)).toList();
+      }
+      else {
+        _fail(response, 'Impossible de charger les tickets');
+        /*throw Exception(
           'Erreur récupération tickets utilisateur: ${response.statusCode}',
-        );
+        );*/
       }
     } catch (e) {
-      print("Erreur récupération tickets utilisateur: $e");
-      throw Exception('Erreur réseau: $e');
+      print('Erreur getPurchasedTicketsByUser: $e');
+      throw ApiException.from(e);
+      //rethrow;
     }
   }
 
@@ -245,19 +99,13 @@ class TicketApiService {
     TransfertTicketRequestDTO request,
   ) async {
     try {
-      print("************ TRANSFERT DE TICKETS **************");
-      print("Expéditeur ID: ${request.senderDTO.senderId}");
-      print("Destinataire: ${request.recipentDTO.recipientUsername}");
-      print("Type: ${request.ticketType}");
-      print("Nbr tickets: ${request.numberOfTicketsToTransfer}");
+      print("TRANSFERT DE TICKETS: ${request.numberOfTicketsToTransfer} tickets de Type: ${request.ticketType} de ${request.senderDTO.senderId} vers: ${request.recipentDTO.recipientUsername}");
 
       final response = await _authClient.put(
         Uri.parse('$baseUrl/transferTickets'),
         headers: _jsonHeaders,
         body: json.encode(request.toJson()),
       );
-      print("Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -280,11 +128,13 @@ class TicketApiService {
         throw Exception(body['message'] ?? 'Opération impossible');
       } else {
         // tout autre code HTTP (500, 403, etc.)
-        throw Exception('Erreur serveur: ${response.statusCode}');
+        _fail(response, 'Le transfert a échoué');
+        //throw Exception('Erreur serveur: ${response.statusCode}');
       }
     } catch (e) {
-      print("Erreur lors du transferTickets: $e");
-      rethrow;
+      print("Erreur transferTickets: $e");
+      throw ApiException.from(e);
+      //rethrow;
     }
   }
 
@@ -297,19 +147,19 @@ class TicketApiService {
         Uri.parse('$transactionHistoryBaseUrl/$transactionId'),
         headers: _jsonHeaders,
       );
-      print("Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         return TransactionHistoryDTO.fromJson(json.decode(response.body));
       } else {
-        throw Exception(
+        _fail(response, 'Transaction introuvable');
+        /*throw Exception(
           'Erreur récupération historique transaction: ${response.statusCode}',
-        );
+        );*/
       }
     } catch (e) {
       print("Erreur getTransactionHistoryById: $e");
-      rethrow;
+      throw ApiException.from(e);
+      //rethrow;
     }
   }
 
@@ -318,8 +168,7 @@ class TicketApiService {
   // CANCEL TRANSFER TICKETS (PUT /api/tickets/cancelTransferTickets)
   Future<void> cancelTransfer(CancelTransferTicketsRequestDTO request) async {
     try {
-      print("************** ANNULATION TRANSFERT **************");
-      print("Transaction ID: ${request.cancelTransferDTO.transactionId}");
+      print("ANNULATION TRANSFERT pour la transaction ID: ${request.cancelTransferDTO.transactionId}");
 
       final response = await _authClient.put(
         Uri.parse('$baseUrl/cancelTransfer'),
@@ -330,14 +179,16 @@ class TicketApiService {
         print("Annulation du transfert réussie");
         return;
       } else {
-        final errorBody = json.decode(response.body);
+        _fail(response, "L'annulation a échoué");
+        /*final errorBody = json.decode(response.body);
         final errorMessage =
             errorBody['message'] ?? 'Erreur annulation: ${response.statusCode}';
-        throw Exception(errorMessage);
+        throw Exception(errorMessage);*/
       }
     } catch (e) {
-      print("Erreur annulation: $e");
-      rethrow;
+      print("Erreur cancelTransfer: $e");
+      throw ApiException.from(e);
+      //rethrow;
     }
   }
 
@@ -348,115 +199,31 @@ class TicketApiService {
   /// @return TicketStatisticsDTO contenant toutes les statistiques
   Future<TicketStatisticsDTO> getTicketStatistics({int? userId}) async {
     try {
-      print("************** RÉCUPÉRATION STATISTIQUES **************");
-      print("User ID: $userId");
+      print("************** RÉCUPÉRATION STATISTIQUES pour l'user ID: $userId");
 
       // Construire l'URL avec paramètre optionnel
       // Si userId est null, on récupère les statistiques globales
-      final uri = userId != null
-          ? Uri.parse('$baseUrl/statistics?userId=$userId')
-          : Uri.parse('$baseUrl/statistics');
+      final uri = Uri.parse('$baseUrl/statistics').replace(
+        queryParameters: userId != null ? {'userId': '$userId'} : null, );
 
       final response = await _authClient.get(uri, headers: _jsonHeaders);
-
-      print("Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         return TicketStatisticsDTO.fromJson(jsonData);
       } else {
-        final errorBody = json.decode(response.body);
+        _fail(response, 'Impossible de charger les statistiques');
+        /*final errorBody = json.decode(response.body);
         final errorMessage =
             errorBody['message'] ??
             'Erreur récupération statistiques: ${response.statusCode}';
-        throw Exception(errorMessage);
+        throw Exception(errorMessage);*/
       }
     } catch (e) {
       print("Erreur getTicketStatistics: $e");
-      rethrow;
+      throw ApiException.from(e);
+      //rethrow;
     }
   }
 }
 
-/*
-  Future<Ticket> getTicketById(int ticketId) async {
-    try {
-      print("Récupération du ticket via son id: $ticketId");
-
-      // Recherche d'abord dans le cache local pour éviter un appel API inutile
-      final cachedTicket = _cachedTickets.firstWhere(
-        // Condition de recherche : cherche un ticket avec l'ID correspondant
-        (ticket) => ticket.ticketId == ticketId,
-
-        // Si aucun ticket n'est trouvé dans le cache, retourne un ticket "vide" avec ticketId = -1
-        orElse: () => Ticket(
-          ticketId:
-              -1, // Marqueur "non trouvé" - valeur spéciale pour indiquer l'absence
-          ticketType: TicketType.a,
-          ticketPrice: 0.0,
-          paymentCode: '',
-          booked: false,
-          ticketStatus: TicketStatus.available,
-          ticketCreationDate: DateTime.now(),
-          ticketDescription: '',
-          purchaseUserDTO: PurchaseUserDTO(userId: 0, username: ''),
-          isSelected: false,
-        ),
-      );
-
-      // Vérifie si le ticket a été trouvé dans le cache
-      // cachedTicket.ticketId != -1 signifie qu'on a trouvé un ticket valide dans le cache
-      if (cachedTicket.ticketId != -1) {
-        print("Ticket trouvé dans le cache");
-        return cachedTicket;
-      }
-
-      // Si le ticket n'est pas dans le cache, on fait un appel API
-      final response = await http.get(
-        Uri.parse('$baseUrl/$ticketId'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        // ICI - La conversion se fait dans Ticket.fromJson()
-        final ticket = Ticket.fromJson(json.decode(response.body));
-
-        print("Ticket récupéré: ${ticket.ticketId}");
-
-        return ticket;
-      } else if (response.statusCode == 404) {
-        throw Exception('Ticket non trouvé');
-      } else {
-        throw Exception('Erreur récupération ticket: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Erreur récupération par ID: $e");
-
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-
-  Future<List<Ticket>> getTicketsByStatus(TicketStatus ticketStatus) async {
-    try {
-      print("Récupération du ticket via son statut: $ticketStatus");
-
-      final response = await http.get(
-        // CORRECTION : Utiliser forApi pour l'URL
-        Uri.parse('$baseUrl/ticketStatus/${ticketStatus.forApi}'), // ← ICI
-        headers: headers,
-      );
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        // ✅ Conversion correcte utilisant fromJson qui appelle lui-même fromApi
-        return jsonList.map((json) => Ticket.fromJson(json)).toList();
-      } else {
-        throw Exception(
-          'Erreur récupération tickets par statut: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }
-  }
-*/

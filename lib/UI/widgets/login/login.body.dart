@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/pages/adminInterface.dart';
-import 'package:senticket_front/UI/pages/login.dart';
-import 'package:senticket_front/UI/pages/porterInterface.dart';
-import 'package:senticket_front/UI/pages/studentInterface.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/login/checksignup.btn.dart';
-import 'package:senticket_front/UI/widgets/login/forgotPwdBtn.dart';
+import 'package:senticket_front/UI/widgets/login/forgot.pwd.btn.dart';
 import 'package:senticket_front/UI/widgets/login/login.btn.dart';
 import 'package:senticket_front/UI/widgets/login/login.username.dart';
 import 'package:senticket_front/UI/widgets/login/login.passwordsection.dart';
 import 'package:senticket_front/UI/widgets/login/rememberme.dart';
-import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
-import 'package:senticket_front/constants.dart';
+import 'package:senticket_front/UI/widgets/updateUser/page_icon_template.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
-
 import '../../../navigation/navigation_service.dart';
 
 /*
@@ -46,44 +40,6 @@ class _LoginBodyState extends State<LoginBody> {
         .currentUser?.role.name;
     NavigationService.goToRoleInterface(role);
   }
-
- /* void _onLoginSuccess() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.currentUser;
-    if (user != null) {
-      final roleName = user.role.name.toUpperCase();
-      Widget destination;
-      if (roleName == 'ETUDIANT') {
-        destination = const StudentInterface();
-      } else if (roleName == 'ADMIN') {
-        destination = const AdminInterface();
-      } else if (roleName == 'PORTIER') {
-        destination = const PorterInterface();
-      } else {
-        // Rôle non autorisé (ne devrait pas arriver car la validation a déjà eu lieu)
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-        return;
-      }
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (context) => destination));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Erreur lors de la récupération des informations utilisateur',
-          ),
-          backgroundColor: redErrorColor,
-        ),
-      );
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-      return;
-    }
-  }*/
 
   void _toggleRememberMe(bool? value) {
     if (value != null) {

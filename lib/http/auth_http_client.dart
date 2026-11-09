@@ -8,7 +8,7 @@ import '../services/token_storage_service.dart';
 ///   - Hérite de http.BaseClient (remplace http.Client)
 ///   - Surcharge send() qui est appelé pour TOUTE requête HTTP
 ///     → Lit le token depuis TokenStorageService
-///     → Ajoute Authorization: Bearer <token> si token présent
+///     → Ajoute Authorization: Bearer token si token présent
 ///     → Gère les 401 automatiquement (token expiré → nettoyage)
 ///
 /// Si pas de token (inscription, login) : aucun header ajouté.

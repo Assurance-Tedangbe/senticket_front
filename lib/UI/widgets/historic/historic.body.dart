@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/login.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/transaction_type.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
 import 'package:senticket_front/provider/transaction_history_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
-/// WIDGET PRINCIPAL DE LA PAGE D'HISTORIQUE
-/// Ce widget gère l'affichage de la liste des transactions avec :
-/// - Filtre par type de transaction (dropdown)
-/// - Filtre par dates (date de début et date de fin)
-/// - Chargement infini (scroll)
-/// - Affichage des détails d'une transaction (dialogue)
+/// Liste de l'historique des transactions, selon le rôle :
+///  - ETUDIANT : ses achats, débits et transferts
+///  - PORTIER  : uniquement les débits qu'il a effectués
+///  - ADMIN    : toutes les transactions
+/// Filtres : type et dates. Chargement infini au scroll.
 class HistoricBody extends StatefulWidget {
   const HistoricBody({super.key});
 
@@ -23,473 +22,336 @@ class HistoricBody extends StatefulWidget {
 }
 
 class _HistoricBodyState extends State<HistoricBody> {
-  // ==================== CONTRÔLEURS ====================
-  // Contrôleurs pour les champs de date (texte et sélecteur)
+  // ==================== ÉTATS ====================
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
-
-  // ==================== ÉTATS ====================
-  // Type de transaction sélectionné dans le dropdown
-  String _selectedTransactionType = 'ALL';
-
-  // Options pour le dropdown selon le rôle de l'utilisateur
-  List<Map<String, String>> _filterOptions = [];
-
-  // Scroll controller pour le chargement infini
   final ScrollController _scrollController = ScrollController();
 
-  // Stocker l'ID de l'utilisateur connecté pour les filtres backend
+  String _selectedTransactionType = 'ALL';
+  List<Map<String, String>> _filterOptions = [];
+
   int? _currentUserId;
-
-  /// Indique si l'utilisateur est authentifié
   bool _isAuthenticated = false;
-
-  /// Rôle de l'utilisateur connecté
   String _userRole = '';
+
+  static const _allTypes = [
+    {'value': 'ALL', 'label': 'Toutes les transactions'},
+    {'value': 'PURCHASE', 'label': 'Achats de tickets'},
+    {'value': 'DEBIT', 'label': 'Débits de compte'},
+    {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
+  ];
 
   // ==================== CYCLE DE VIE ====================
   @override
   void initState() {
     super.initState();
-    _checkAuthenticationAndLoad();
-  }
-
-  /// Vérifie l'authentification et charge les données si l'utilisateur est connecté
-  void _checkAuthenticationAndLoad() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final currentUser = userProvider.currentUser;
-
-    setState(() {
-      _isAuthenticated = currentUser != null;
-      if (_isAuthenticated) {
-        _userRole = currentUser!.role.name.toUpperCase();
-        _currentUserId = currentUser.userId;
-      }
-    });
-
+    _initFromCurrentUser();
+    _scrollController.addListener(_onScroll);
     if (_isAuthenticated) {
-      _setupFilterOptions(); // Configure les options selon le rôle
-      _setupScrollListener(); // Configure l'écouteur de scroll pour le chargement infini
-      _loadInitialTransactions(); // Charge les premières transactions
-    }
-  }
-
-  // ==================== MÉTHODES D'INITIALISATION ====================
-
-  /// Configure les options de filtre selon le rôle de l'utilisateur
-  /// Cette méthode détermine quelles options sont visibles dans le filtre
-  void _setupFilterOptions() {
-    // Réinitialiser les options
-    _filterOptions = [];
-
-    // Configurer les options selon le rôle
-    if (_userRole == 'ETUDIANT') {
-      // Étudiant: voit toutes ses propres transactions
-      _filterOptions = [
-        {'value': 'ALL', 'label': 'Toutes les transactions'},
-        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
-        {'value': 'DEBIT', 'label': 'Débits de compte'},
-        {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
-      ];
-    } else if (_userRole == 'PORTIER') {
-      // Portier: voit uniquement les débits qu'il a effectués
-      _filterOptions = [
-        {'value': 'DEBIT', 'label': 'Débits de compte'},
-      ];
-      _selectedTransactionType = 'DEBIT';
-    } else if (_userRole == 'ADMIN') {
-      // Admin: voit toutes les transactions de tous les utilisateurs
-      _filterOptions = [
-        {'value': 'ALL', 'label': 'Toutes les transactions'},
-        {'value': 'PURCHASE', 'label': 'Achats de tickets'},
-        {'value': 'DEBIT', 'label': 'Débits de compte'},
-        {'value': 'TRANSFER', 'label': 'Transferts de tickets'},
-      ];
-    }
-  }
-
-  /// Configure l'écouteur de scroll pour détecter quand l'utilisateur arrive en bas
-  ///  de la liste et déclencher le chargement de la page suivante (chargement infini)
-  void _setupScrollListener() {
-    _scrollController.addListener(() {
-      final provider = Provider.of<TransactionHistoryProvider>(
-        context,
-        listen: false,
-      );
-
-      // Détecter si l'utilisateur a scrollé jusqu'en bas (avec une marge de 200px)
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        if (!provider.isLoading && provider.hasMore) {
-          _loadMoreTransactions();
-        }
-      }
-    });
-  }
-
-  // ==================== CHARGEMENT DES DONNÉES ====================
-
-  /// Charge les premières transactions ou initiales (page 0)
-  Future<void> _loadInitialTransactions() async {
-    final provider = Provider.of<TransactionHistoryProvider>(
-      context,
-      listen: false,
-    );
-
-    if (_userRole == 'ETUDIANT') {
-      // Pour l'étudiant : charger ses propres transactions avec son ID
-      await provider.loadTransactionsForUser(
-        transactionType: _selectedTransactionType,
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        userId: _currentUserId,
-        reset: true,
-      );
-    } else if (_userRole == 'PORTIER') {
-      // Pour le portier : charger uniquement les débits qu'il a effectués
-      await provider.loadTransactionsForUser(
-        transactionType: 'DEBIT',
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        userId: _currentUserId,
-        reset: true,
-      );
-    } else if (_userRole == 'ADMIN') {
-      // Pour l'admin : charger toutes les transactions
-      await provider.loadTransactions(
-        transactionType: _selectedTransactionType,
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        reset: true,
-      );
-    }
-  }
-
-  /// Charge plus de transactions (page suivante) pour le scroll infini
-  Future<void> _loadMoreTransactions() async {
-    final provider = Provider.of<TransactionHistoryProvider>(
-      context,
-      listen: false,
-    );
-
-    if (_userRole == 'ETUDIANT') {
-      await provider.loadTransactionsForUser(
-        transactionType: _selectedTransactionType,
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        userId: _currentUserId,
-        reset: false,
-      );
-    } else if (_userRole == 'PORTIER') {
-      await provider.loadTransactionsForUser(
-        transactionType: 'DEBIT',
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        userId: _currentUserId,
-        reset: false,
-      );
-    } else if (_userRole == 'ADMIN') {
-      await provider.loadTransactions(
-        transactionType: _selectedTransactionType,
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        reset: false,
-      );
-    }
-  }
-  // ==================== MÉTHODES UTILITAIRES ====================
-
-  /// Récupère la date de début depuis le contrôleur
-  DateTime? _getStartDate() {
-    if (_startDateController.text.isNotEmpty) {
-      return DateTime.parse(_startDateController.text);
-    }
-    return null;
-  }
-
-  /// Récupère la date de fin depuis le contrôleur
-  DateTime? _getEndDate() {
-    if (_endDateController.text.isNotEmpty) {
-      return DateTime.parse(_endDateController.text);
-    }
-    return null;
-  }
-
-  /// Applique les filtres et recharge les transactions
-  Future<void> _applyFilters() async {
-    final provider = Provider.of<TransactionHistoryProvider>(
-      context,
-      listen: false,
-    );
-
-    if (_userRole == 'ETUDIANT') {
-      await provider.loadTransactionsForUser(
-        transactionType: _selectedTransactionType,
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        userId: _currentUserId,
-        reset: true,
-      );
-    } else if (_userRole == 'PORTIER') {
-      await provider.loadTransactionsForUser(
-        transactionType: 'DEBIT',
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        userId: _currentUserId,
-        reset: true,
-      );
-    } else if (_userRole == 'ADMIN') {
-      await provider.loadTransactions(
-        transactionType: _selectedTransactionType,
-        startDate: _getStartDate(),
-        endDate: _getEndDate(),
-        reset: true,
-      );
-    }
-  }
-
-  /// Affiche le sélecteur de date et met à jour le contrôleur
-  Future<void> _selectDate(TextEditingController controller) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
-
-    if (picked != null) {
-      setState(() {
-        controller.text = DateFormat('yyyy-MM-dd').format(picked);
+      // Après le premier build : évite notifyListeners() pendant la construction
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _fetch(reset: true);
       });
-      _applyFilters();
     }
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _startDateController.dispose();
     _endDateController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
+  /// Lit l'utilisateur connecté et prépare les filtres (sans setState : appelé dans initState)
+  void _initFromCurrentUser() {
+    final user = context.read<UserProvider>().currentUser;
+    _isAuthenticated = user != null;
+    if (user == null) return;
+
+    _userRole = user.role.name.toUpperCase();
+    _currentUserId = user.userId;
+
+    if (_userRole == 'PORTIER') {
+      _filterOptions = [
+        {'value': 'DEBIT', 'label': 'Débits de compte'},
+      ];
+      _selectedTransactionType = 'DEBIT';
+    } else {
+      // ETUDIANT et ADMIN
+      _filterOptions = List<Map<String, String>>.from(_allTypes);
+    }
+  }
+
+  // ==================== CHARGEMENT ====================
+
+  /// Détecte l'arrivée en bas de liste (marge de 200 px)
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final provider = context.read<TransactionHistoryProvider>();
+    final nearBottom = _scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200;
+    if (nearBottom && !provider.isLoading && provider.hasMore) {
+      _fetch(reset: false);
+    }
+  }
+
+  /// Point d'entrée unique de chargement, selon le rôle.
+  /// reset = true : première page (filtres appliqués, rafraîchissement)
+  /// reset = false : page suivante
+  Future<void> _fetch({required bool reset}) async {
+    final provider = context.read<TransactionHistoryProvider>();
+    final start = _getStartDate();
+    final end = _getEndDate();
+
+    switch (_userRole) {
+      case 'ETUDIANT':
+        await provider.loadTransactionsForUser(
+          transactionType: _selectedTransactionType,
+          startDate: start,
+          endDate: end,
+          userId: _currentUserId,
+          reset: reset,
+        );
+        break;
+      case 'PORTIER':
+        await provider.loadTransactionsForUser(
+          transactionType: 'DEBIT',
+          startDate: start,
+          endDate: end,
+          userId: _currentUserId,
+          reset: reset,
+        );
+        break;
+      case 'ADMIN':
+        await provider.loadTransactions(
+          transactionType: _selectedTransactionType,
+          startDate: start,
+          endDate: end,
+          reset: reset,
+        );
+        break;
+    }
+  }
+
+  Future<void> _applyFilters() => _fetch(reset: true);
+
+  // ==================== DATES ====================
+
+  DateTime? _getStartDate() => _parseDate(_startDateController.text);
+  DateTime? _getEndDate() => _parseDate(_endDateController.text);
+
+  /// Lecture tolérante : une saisie invalide donne null au lieu de planter
+  DateTime? _parseDate(String text) =>
+      text.isEmpty ? null : DateTime.tryParse(text);
+
+  Future<void> _selectDate(TextEditingController controller) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked == null || !mounted) return;
+
+    setState(() {
+      controller.text = DateFormat('yyyy-MM-dd').format(picked);
+    });
+    _applyFilters();
+  }
+
   // ==================== BUILD ====================
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<TransactionHistoryProvider>(context);
-    /* final userProvider = Provider.of<UserProvider>(context);
-    final userRole = userProvider.currentUser?.role.name.toUpperCase() ?? ''; */
+    final provider = context.watch<TransactionHistoryProvider>();
     final transactions = provider.transactions;
     final isLoading = provider.isLoading;
     final error = provider.error;
 
-    // ==================== CAS 1: UTILISATEUR NON AUTHENTIFIÉ ====================
+    // Non authentifié
     if (!_isAuthenticated) {
       return _buildEmptyHistory(
-        message: 'Veuillez vous connecter pour voir l\'historique',
+        message: "Veuillez vous connecter pour voir l'historique",
         icon: Icons.lock_outline,
         showLoginButton: true,
       );
     }
 
-    // ==================== CAS 2: UTILISATEUR AUTHENTIFIÉ MAIS AUCUNE TRANSACTION ====================
-    if (!isLoading && transactions.isEmpty && error.isEmpty) {
-      return _buildEmptyHistory(
-        message: 'Aucun historique trouvé',
-        icon: Icons.history,
-        subtitle: 'Les transactions que vous effectuerez apparaîtront ici',
-        showLoginButton: false,
-      );
-    }
-
-    // ==================== CAS 3: AFFICHAGE NORMAL DE L'HISTORIQUE ====================
     return Column(
       children: [
-        // ==================== FILTRE PAR TYPE DE TRANSACTION ====================
-        // Pour le portier, on désactive le dropdown car il n'a qu'une seule option
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 10.0),
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedTransactionType,
-            decoration: const InputDecoration(
-              labelText: 'Type de transaction',
-              // labelStyle: TextStyle(color: dateColor),
-              border: OutlineInputBorder(),
-            ),
-            items: _filterOptions.map((option) {
-              return DropdownMenuItem<String>(
-                value: option['value'],
-                child: Text(option['label']!),
-              );
-            }).toList(),
-            onChanged: _userRole == 'PORTIER'
-                ? null // Pour le portier, le dropdown est désactivé
-                : (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedTransactionType = newValue;
-                      });
-                      _applyFilters();
-                    }
-                  },
-            // Si c'est un portier, afficher que c'est désactivé
-            hint: _userRole == 'portier'
-                ? const Text('Débits de compte')
-                : null,
-          ),
-        ),
-
-        // ==================== FILTRES PAR DATES ====================
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 4.0, 20.0, 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Date de début
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _selectDate(_startDateController),
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: secondColor,
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: kPrimaryColor, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(
-                            Icons.calendar_month,
-                            color: dateColor,
-                            size: 18,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            _startDateController.text.isEmpty
-                                ? 'Date de début'
-                                : _startDateController.text,
-                            style: TextStyle(
-                              color: _startDateController.text.isEmpty
-                                  ? dateColor
-                                  : kThirdColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-
-              // Date de fin
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _selectDate(_endDateController),
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: secondColor,
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: kPrimaryColor, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(
-                            Icons.calendar_month,
-                            color: dateColor,
-                            size: 18,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            _endDateController.text.isEmpty
-                                ? 'Date de fin'
-                                : _endDateController.text,
-                            style: TextStyle(
-                              color: _endDateController.text.isEmpty
-                                  ? dateColor
-                                  : kThirdColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // ==================== LISTE DES TRANSACTIONS ====================
+        _buildTypeFilter(),
+        _buildDateFilters(),
         Expanded(
           child: RefreshIndicator(
             onRefresh: _applyFilters,
-            child: error.isNotEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          error,
-                          style: const TextStyle(color: redErrorColor),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: _applyFilters,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
-                          ),
-                          child: const Text(
-                            'Réessayer',
-                            style: TextStyle(color: kSecondColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                /*  : transactions.isEmpty && !isLoading
-                ? const Center(
-                    child: Text(
-                      'Aucune transaction trouvée',
-                      style: TextStyle(color: greyBorderColor),
-                    ),
-                  ) */
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    itemCount: transactions.length + (isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == transactions.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Center(
-                            child: CustomCircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                      return _buildTransactionCard(transactions[index]);
-                    },
-                  ),
+            child: _buildList(transactions, isLoading, error),
           ),
         ),
       ],
     );
   }
 
-  /// Construit un message d'historique vide avec icône et message personnalisé
+  /// Corps de liste : toujours scrollable pour que le "tirer pour rafraîchir"
+  /// fonctionne aussi en cas d'erreur ou de liste vide
+  Widget _buildList(
+      List<TransactionHistoryDTO> transactions,
+      bool isLoading,
+      String error,
+      ) {
+    // Erreur
+    if (error.isNotEmpty) {
+      return _scrollableCenter(
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              error,
+              style: const TextStyle(color: redErrorColor),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _applyFilters,
+              style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+              child: const Text(
+                'Réessayer',
+                style: TextStyle(color: kSecondColor),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Premier chargement
+    if (isLoading && transactions.isEmpty) {
+      return _scrollableCenter(const CustomCircularProgressIndicator());
+    }
+
+    // Aucune transaction
+    if (transactions.isEmpty) {
+      return _scrollableCenter(
+        _buildEmptyHistory(
+          message: 'Aucun historique trouvé',
+          icon: Icons.history,
+          subtitle: 'Les transactions que vous effectuerez apparaîtront ici',
+        ),
+      );
+    }
+
+    // Liste normale
+    return ListView.builder(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: transactions.length + (isLoading ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index == transactions.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CustomCircularProgressIndicator()),
+          );
+        }
+        return _buildTransactionCard(transactions[index]);
+      },
+    );
+  }
+
+  Widget _scrollableCenter(Widget child) {
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: constraints.maxHeight,
+          child: Center(child: child),
+        ),
+      ),
+    );
+  }
+
+  // ==================== FILTRES ====================
+
+  Widget _buildTypeFilter() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 10.0),
+      child: DropdownButtonFormField<String>(
+        initialValue: _selectedTransactionType,
+        decoration: const InputDecoration(
+          labelText: 'Type de transaction',
+          border: OutlineInputBorder(),
+        ),
+        items: _filterOptions
+            .map(
+              (o) => DropdownMenuItem<String>(
+            value: o['value'],
+            child: Text(o['label']!),
+          ),
+        )
+            .toList(),
+        // Le portier n'a qu'une option : dropdown désactivé
+        onChanged: _userRole == 'PORTIER'
+            ? null
+            : (String? value) {
+          if (value == null) return;
+          setState(() => _selectedTransactionType = value);
+          _applyFilters();
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateFilters() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 4.0, 20.0, 4.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: _dateField(_startDateController, 'Date de début'),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _dateField(_endDateController, 'Date de fin'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dateField(TextEditingController controller, String placeholder) {
+    final isEmpty = controller.text.isEmpty;
+    return GestureDetector(
+      onTap: () => _selectDate(controller),
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          color: secondColor,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: kPrimaryColor, width: 1),
+        ),
+        child: Row(
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Icon(Icons.calendar_month, color: dateColor, size: 18),
+            ),
+            Expanded(
+              child: Text(
+                isEmpty ? placeholder : controller.text,
+                style: TextStyle(
+                  color: isEmpty ? dateColor : kThirdColor,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==================== ÉCRAN VIDE ====================
+
   Widget _buildEmptyHistory({
     required String message,
     required IconData icon,
@@ -498,7 +360,7 @@ class _HistoricBodyState extends State<HistoricBody> {
   }) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 80, color: greyBorderColor),
           const SizedBox(height: 20),
@@ -519,50 +381,44 @@ class _HistoricBodyState extends State<HistoricBody> {
               textAlign: TextAlign.center,
             ),
           ],
-
-          // ✅ Bouton uniquement si non authentifié
           if (showLoginButton) ...[
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => LoginPage()),
-              );
-            },
-            icon: const Icon(Icons.login),
-            label: const Text('Se connecter'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
-              foregroundColor: kSecondColor,
+              ),
+              icon: const Icon(Icons.login),
+              label: const Text('Se connecter'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                foregroundColor: kSecondColor,
+              ),
             ),
-           ),
-          ]
+          ],
         ],
       ),
     );
   }
 
-  // ==================== MÉTHODES D'AFFICHAGE ====================
+  // ==================== CARTE D'UNE TRANSACTION ====================
 
-  /// Construit la carte d'affichage d'une transaction
-  /// Affiche le type, la date, les détails et les informations sur les tickets
   Widget _buildTransactionCard(TransactionHistoryDTO transaction) {
+    final summary = transaction.ticketSummary;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () {
-          _showTransactionDetails(transaction);
-        },
+        onTap: () => _showTransactionDetails(transaction),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // En-tête avec le type de transaction et la date
+              // Type et date
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -592,14 +448,14 @@ class _HistoricBodyState extends State<HistoricBody> {
               ),
               const SizedBox(height: 8),
 
-              // Détails de la transaction
+              // Acteurs de la transaction
               Text(
                 transaction.getTransactionDetails(),
                 style: const TextStyle(fontSize: 13, color: kThirdColor),
               ),
               const SizedBox(height: 4),
 
-              // Informations sur les tickets
+              // Nombre de tickets, résumé par type et montant
               Row(
                 children: [
                   const Icon(
@@ -616,27 +472,32 @@ class _HistoricBodyState extends State<HistoricBody> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  const Icon(Icons.label, size: 14, color: greyBorderColor),
-                  const SizedBox(width: 4),
-                  Text(
-                    transaction.ticketTypes.join(', '),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: greyBorderColor,
-                      fontWeight: FontWeight.w800,
+                  if (summary != null && summary.isNotEmpty) ...[
+                    const SizedBox(width: 12),
+                    const Icon(Icons.label, size: 14, color: greyBorderColor),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        summary,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: greyBorderColor,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
 
-              // Indicateur d'annulation pour les transferts
+              // Transfert annulé
               if (transaction.transactionType == TransactionType.transfer &&
                   transaction.transferCanceled == true)
                 const Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    ' Transfert annulé',
+                    'Transfert annulé',
                     style: TextStyle(
                       fontSize: 11,
                       color: dateColor,
@@ -651,8 +512,11 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
-  /// Affiche les détails d'une transaction dans une boîte de dialogue
+  // ==================== DÉTAILS (DIALOGUE) ====================
+
   void _showTransactionDetails(TransactionHistoryDTO transaction) {
+    final summary = transaction.ticketSummary;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -676,12 +540,16 @@ class _HistoricBodyState extends State<HistoricBody> {
                 transaction.ticketIds.join(', '),
               ),
               _buildDetailRow(
-                'Types des tickets',
-                transaction.ticketTypes.join(', '),
+                'Détail',
+                (summary == null || summary.isEmpty) ? '-' : summary,
               ),
+              if (transaction.amount != null)
+                _buildDetailRow(
+                  'Montant',
+                  '${transaction.amount!.toInt()} FCFA',
+                ),
               const Divider(),
               _buildDetailRow('Détails', transaction.getTransactionDetails()),
-
               if (transaction.transactionType == TransactionType.transfer)
                 _buildDetailRow(
                   'Statut',
@@ -706,7 +574,6 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
-  /// Construit une ligne de détail pour la boîte de dialogue
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -714,7 +581,7 @@ class _HistoricBodyState extends State<HistoricBody> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 110,
             child: Text(
               '$label:',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
@@ -726,7 +593,6 @@ class _HistoricBodyState extends State<HistoricBody> {
     );
   }
 
-  /// Retourne la couleur associée au type de transaction  pour l'affichage
   Color _getTransactionColor(TransactionType type) {
     switch (type) {
       case TransactionType.purchase:
@@ -738,190 +604,3 @@ class _HistoricBodyState extends State<HistoricBody> {
     }
   }
 }
-
-/* sans dynamisation
-class HistoricBody extends StatefulWidget {
-  const HistoricBody({super.key});
-
-  @override
-  State<HistoricBody> createState() => _HistoricBodyState();
-}
-
-class _HistoricBodyState extends State<HistoricBody> {
-  TextEditingController dateController1 = TextEditingController();
-  TextEditingController dateController2 = TextEditingController();
-  TextEditingController searchTransactionController = TextEditingController();
-  String _selectedItem = 'Toutes les transactions';
-  var items = [
-    'Toutes les transactions',
-    'Achat ticket',
-    'Transfert ticket',
-    'Débiter compte',
-  ];
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 10.0),
-          child: DropdownButtonFormField<String>(
-            value: _selectedItem,
-            onChanged: (String? value) {
-              setState(() {
-                _selectedItem = value!;
-                if (_selectedItem == true) {
-                  print(_selectedItem);
-                  String kw = _selectedItem;
-                  context.read<HistoricBloc>().add(
-                    SearchHistoricEvent(keyword: kw),
-                  );
-                }
-              });
-            },
-            decoration: const InputDecoration(
-              labelText: 'Selectionner une option',
-              border: OutlineInputBorder(),
-            ),
-            items: items.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Row(children: [Text(value)]),
-              );
-            }).toList(),
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 4.0, 20.0, 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 160,
-                height: 50,
-                alignment: Alignment.centerLeft,
-                decoration: BoxDecoration(
-                  color: kSecondColor,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: greyBorderColor, width: 1),
-                ),
-                child: TextField(
-                  keyboardType: TextInputType.datetime,
-                  controller: dateController1,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 8.0),
-                    prefixIcon: Icon(
-                      Icons.calendar_month,
-                      color: dateColor,
-                      size: 15,
-                    ),
-                    hintText: 'Choisir date de début',
-                    hintStyle: TextStyle(color: dateColor, fontSize: 10),
-                  ),
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1997),
-                      lastDate: DateTime(2050),
-                    );
-
-                    if (pickedDate != null) {
-                      String formattedDate = DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(pickedDate);
-                      setState(() {
-                        dateController1.text = formattedDate.toString();
-                      });
-                    } else {
-                      print("Date is not selected");
-                    }
-                  },
-                ),
-              ),
-              Container(
-                width: 160,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: kSecondColor,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: greyBorderColor, width: 1),
-                ),
-                child: TextField(
-                  keyboardType: TextInputType.datetime,
-                  controller: dateController2,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 8.0),
-                    prefixIcon: Icon(
-                      Icons.calendar_month,
-                      color: dateColor,
-                      size: 15,
-                    ),
-                    hintText: 'Choisir date de fin',
-                    hintStyle: TextStyle(color: dateColor, fontSize: 10),
-                  ),
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1997),
-                      lastDate: DateTime(2050),
-                    );
-
-                    if (pickedDate != null) {
-                      String formattedDate = DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(pickedDate);
-                      setState(() {
-                        dateController2.text = formattedDate.toString();
-                      });
-                    } else {
-                      print("Date is not selected");
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        //blocBuilder
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 4.0, 20.0, 4.0),
-          child: BlocBuilder<HistoricBloc, HistoricState>(
-            builder: (context, state) {
-              if (state is SearchHistoricLoadingState) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is SearchHistoricErrorState) {
-                return Column(
-                  children: [
-                    Text(
-                      state.errorMessage,
-                      style: const TextStyle(color: redErrorColor),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                );
-              } else if (state is SearchHistoricSucessState &&
-                  searchTransactionController.selection.isValid
-              //contains('services')
-              ) {
-                return const Expanded(child: ResearchListView());
-              } else {
-                return Container();
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
- */

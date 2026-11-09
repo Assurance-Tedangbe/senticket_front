@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -26,26 +26,28 @@ class LoginBtn extends StatelessWidget {
                 userProvider.isLoggingIn || !userProvider.isLoginFormValid
                 ? null // Désactivé si validation échoue
                 : () async {
-                    final success = await userProvider.submitLogin();
-                    if (success) {
-                      // Afficher un message de succès
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Connexion réussie !'),
-                          backgroundColor: validateBtnColor,
-                        ),
-                      );
+                  final messenger = ScaffoldMessenger.of(context);
+
+                  final success = await userProvider.submitLogin();
+
+                  if (success) {
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Connexion réussie !'),
+                        backgroundColor: validateBtnColor,
+                      ),
+                    );
 
                       // Navigation ou callback
                       onLoginSuccess();
                     } else {
                       // Afficher l'erreur
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(userProvider.error),
-                          backgroundColor: redErrorColor,
-                        ),
-                      );
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(userProvider.error),
+                        backgroundColor: redErrorColor,
+                      ),
+                    );
                     }
                   },
             style: ElevatedButton.styleFrom(

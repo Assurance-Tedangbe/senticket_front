@@ -47,7 +47,6 @@ class _ScanQRState extends State<ScanQR> {
     await _controller.stop();
 
     final qrString = barcode!.rawValue!;
-    print('[ScanQR] QR scanné: $qrString');
 
     // Parser les données du QR code
     final qrData = QrCodeData.fromQrString(qrString);
@@ -208,12 +207,7 @@ class _ScanQRState extends State<ScanQR> {
     );
   }
 
-  // Dans _buildInstructions() de ScanQR
-
   Widget _buildInstructions() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final role = userProvider.currentUser?.role.name.toUpperCase() ?? '';
-
     // Déterminer le message selon le contexte
     String instruction;
 

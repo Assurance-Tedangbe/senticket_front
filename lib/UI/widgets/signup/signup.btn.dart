@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/constants.dart';
@@ -28,9 +28,10 @@ class SignupBtn extends StatelessWidget {
             onPressed: userProvider.isCreatingUser || !userProvider.isFormValid
                 ? null
                 : () async {
+                    final messenger = ScaffoldMessenger.of(context);
                     final success = await userProvider.submitSignup();
                     if (success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         const SnackBar(
                           content: Text('Compte créé avec succès !'),
                           backgroundColor: validateBtnColor,
@@ -42,7 +43,7 @@ class SignupBtn extends StatelessWidget {
                       // Navigation ou callback
                       onSignupSuccess();
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         SnackBar(
                           content: Text(userProvider.error),
                           backgroundColor: redErrorColor,

@@ -8,8 +8,7 @@ import 'package:senticket_front/enums/transaction_type.dart';
 /// - Afficher les informations dans l'UI
 
 /// DTO représentant une transaction individuelle
-/// Contient toutes les informations nécessaires pour afficher une transaction
-/// dans la liste d'historique.
+/// Contient ttes ls infos nécessaires pr afficher une transaction dans la liste d'historique.
 class TransactionHistoryDTO {
   final int id;
 
@@ -25,8 +24,11 @@ class TransactionHistoryDTO {
   /// Liste des IDs des tickets impliqués dans la transaction
   final List<int> ticketIds;
 
-  /// Liste des types des tickets impliqués (A, B, etc.)
-  final List<String> ticketTypes;
+  /// "2×A, 1×B"
+  final String? ticketSummary;
+
+  /// FCFA (achats et débits)
+  final double? amount;
 
   // Champs spécifiques aux achats:  l'Utilisateur qui a effectué l'achat
   final UserDTO? purchaserDTO;
@@ -55,7 +57,8 @@ class TransactionHistoryDTO {
     required this.date,
     required this.ticketsCount,
     required this.ticketIds,
-    required this.ticketTypes,
+    this.ticketSummary,
+    this.amount,
     this.purchaserDTO,
     this.porterDTO,
     this.studentDTO,
@@ -63,6 +66,8 @@ class TransactionHistoryDTO {
     this.recipientDTO,
     this.transferCanceled,
   });
+
+  static UserDTO? _user(dynamic j) => j == null ? null : UserDTO.fromJson(j);
 
   /// Convertit un JSON (reçu du backend) en objet TransactionHistoryDTO
   /// Utilise la méthode fromApi() de TransactionType pour convertir la chaîne
@@ -74,11 +79,9 @@ class TransactionHistoryDTO {
       date: DateTime.parse(json['date']),
       ticketsCount: json['ticketsCount'],
       ticketIds: (json['ticketIds'] as List<dynamic>?)?.cast<int>() ?? [],
-      ticketTypes:
-          (json['ticketTypes'] as List<dynamic>?)?.cast<String>() ?? [],
-      purchaserDTO: json['purchaserDTO'] != null
-          ? UserDTO.fromJson(json['purchaserDTO'])
-          : null,
+      ticketSummary: json['ticketSummary'] as String?,
+      amount: (json['amount'] as num?)?.toDouble(),
+      purchaserDTO: _user(json['purchaserDTO']),
       porterDTO: json['porterDTO'] != null
           ? UserDTO.fromJson(json['porterDTO'])
           : null,
@@ -113,6 +116,22 @@ class TransactionHistoryDTO {
             '${transferCanceled == true ? ' (Annulé)' : ''}';
     }
   }
+
+  /* String getTransactionDetails() {
+    final summary = ticketSummary != null ? ' • $ticketSummary' : '';
+    final price = amount != null ? ' • ${amount!.toInt()} FCFA' : '';
+    switch (transactionType) {
+      case TransactionType.purchase:
+        return 'Par ${purchaserDTO?.username ?? 'Inconnu'}$summary$price';
+      case TransactionType.debit:
+        return 'Par ${porterDTO?.username ?? 'Inconnu'} sur '
+            '${studentDTO?.username ?? 'Inconnu'}$summary$price';
+      case TransactionType.transfer:
+        return 'De ${senderDTO?.username ?? 'Inconnu'} à '
+            '${recipientDTO?.username ?? 'Inconnu'}$summary'
+            '${transferCanceled == true ? ' (Annulé)' : ''}';
+    }
+  }*/
 }
 
 /// DTO de réponse paginée pour l'historique

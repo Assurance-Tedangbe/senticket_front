@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/pages/coverPage.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.template.dart';
-import 'package:senticket_front/UI/widgets/updateUser/pageIconTemplate.dart';
+import 'package:senticket_front/UI/widgets/updateUser/page_icon_template.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
+
+import '../pages/cover_page.dart';
 
 class LogOutBody extends StatefulWidget {
   const LogOutBody({super.key});
@@ -47,6 +48,8 @@ class _LogOutBodyState extends State<LogOutBody> {
 
   // ✅ De la version 1 : logique de logout séparée du dialog
   Future<void> _handleLogout() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final navigator = Navigator.of(context);
     final confirmed = await _showConfirmDialog();
     if (!confirmed) return;
 
@@ -54,21 +57,14 @@ class _LogOutBodyState extends State<LogOutBody> {
     setState(() => _isLoggingOut = true);
 
     try {
-      final userProvider = Provider.of<UserProvider>(
-        context,
-        listen: false,
-      );
       await userProvider.logout();
     } finally {
       if (mounted) {
         setState(() => _isLoggingOut = false);
       }
     }
-
-    if (!mounted) return;
-
-    // Supprime tout l'historique — impossible de revenir en arrière
-    Navigator.of(context).pushAndRemoveUntil(
+    // Supprime tout l'historique
+    navigator.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const CoverPage()),
           (_) => false,
     );

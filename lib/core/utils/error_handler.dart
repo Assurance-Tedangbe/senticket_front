@@ -89,6 +89,9 @@ class ErrorHandler {
         'Solde insuffisant': 'Vous n\'avez pas assez de tickets de ce type.',
         'Invalid password': 'Mot de passe incorrect.',
         'enough tickets': 'Vous n\'avez pas assez de tickets de ce type.',
+        'Cannot transfer tickets to yourself': 'Vous ne pouvez pas transférer des tickets à vous-même.',
+        'Not eligible for debit': 'Un des tickets a déjà été utilisé.',
+        'Does not belong to the specified student': "Un des tickets n'appartient pas à cet étudiant.",
       };
 
       for (final entry in translations.entries) {

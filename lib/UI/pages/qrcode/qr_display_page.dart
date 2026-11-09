@@ -54,9 +54,9 @@ class QrDisplayPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: kPrimaryColor.withOpacity(0.05),
+                    color: kPrimaryColor.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: kPrimaryColor.withOpacity(0.2)),
+                    border: Border.all(color: kPrimaryColor.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [

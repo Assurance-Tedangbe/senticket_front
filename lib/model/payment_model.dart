@@ -2,26 +2,22 @@
 import 'package:senticket_front/enums/payment_status.dart';
 
 // REQUÊTE D'INITIATION DE PAIEMENT
-//
 // Envoyée par Flutter → Backend : POST /api/payments/initiate
 // Correspond exactement à PaymentInitiationDTO.java
 //
 // Champs :
 //   userId           : ID de l'étudiant connecté
-//   selectedTicketIds: IDs des tickets sélectionnés dans l'UI
 //   totalAmount      : Montant à papyer calculé côté Flutter (countA×100 + countB×150)
-//   countA           : Nombre de tickets Type A à régénérer
-//   countB           : Nombre de tickets Type B à régénérer
+//   countA           : Nombre de tickets Type A
+//   countB           : Nombre de tickets Type B à payer
 class PaymentInitiationDTO {
   final int userId;
-  final List<int> selectedTicketIds;   // ✅ SUPPRIMÉ : selectedTicketIds
   final double totalAmount;
   final int countA;
   final int countB;
 
   PaymentInitiationDTO({
     required this.userId,
-    required this.selectedTicketIds,
     required this.totalAmount,
     required this.countA,
     required this.countB,
@@ -31,7 +27,6 @@ class PaymentInitiationDTO {
   // Les noms de clés correspondent exactement aux champs de PaymentInitiationDTO.java
   Map<String, dynamic> toJson() => {
     'userId': userId,
-    'selectedTicketIds': selectedTicketIds,
     'totalAmount': totalAmount,
     'countA': countA,
     'countB': countB,
@@ -41,7 +36,6 @@ class PaymentInitiationDTO {
   String toString() =>
       'PaymentInitiationRequest('
       'userId: $userId, '
-      'tickets: $selectedTicketIds, '
       'total: $totalAmount FCFA, '
       'countA: $countA, countB: $countB)';
 }

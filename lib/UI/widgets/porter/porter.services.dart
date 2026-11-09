@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/pages/debitAccount.dart';
+import 'package:senticket_front/UI/pages/debit_account.dart';
 import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';

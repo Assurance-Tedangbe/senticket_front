@@ -10,23 +10,12 @@ class RoleProvider with ChangeNotifier {
   bool _isLoading = false;
   String _error = '';
 
-  bool _isCreatingRole = false;
-  bool _isFetchingRole =
-      false;
-
-  String _createRoleError = '';
-
   RoleProvider(this._roleservice);
 
   List<Role> get roles => _roles;
   Role? get currentRole => _currentRole;
   bool get isLoading => _isLoading;
   String get error => _error;
-
-  bool get isCreatingRole => _isCreatingRole;
-  bool get isFetchingRole => _isFetchingRole;
-
-  String get createRoleError => _createRoleError;
 
   // ************************ READ ALL ROLES **************************
 
@@ -48,33 +37,5 @@ class RoleProvider with ChangeNotifier {
     }
   }
 }
-  /*
- // ************************** CREATE ROLE ***************************
-  Future<bool> createNewRole(Role role) async {
-    _isCreatingRole = true;
-    _createRoleError = '';
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final newRole = await _roleservice.createRole(role);
-      _roles.add(newRole);
-
-      _createRoleError = '';
-      _error = '';
-      print("✅ Rôle créé avec succès: ${newRole.name}");
-      return true;
-    } catch (e) {
-      _createRoleError = 'Erreur lors de la création: ${e.toString()}';
-      _error = 'Erreur lors de la création: ${e.toString()}';
-      print(" Erreur dans createNewRole: $e");
-      return false;
-    } finally {
-      _isCreatingRole = false;
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-  */
 
 

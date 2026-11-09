@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
 import 'package:senticket_front/UI/widgets/home/imageasset.template.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.session.dart';
 import 'package:senticket_front/UI/widgets/home/stat.label.dart';
 import 'package:senticket_front/constants.dart';
-
 import '../../../provider/ticket_provider.dart';
 import '../../../provider/user_provider.dart' show UserProvider;
 
@@ -86,13 +85,6 @@ class _StatisticsStudentState extends State<StatisticsStudent> {
         // Afficher un indicateur de chargement si les stats sont en cours de chargement
         if (isLoading)
           const Center(child: CustomCircularProgressIndicator())
-        /*else if (userStats == null)
-          const Center(
-            child: Text(
-              "Aucune statistique disponible",
-              style: TextStyle(color: greyBorderColor),
-            ),
-          )*/
         else
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

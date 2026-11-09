@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/widgets/qr/qr_ticket_widget.dart';
 import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/enums/ticket_status.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
 import 'package:senticket_front/provider/ticket_provider.dart';
@@ -128,7 +127,7 @@ class _MyTicketsPageState extends State<MyTicketsPage>
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: tickets.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final ticket = tickets[index];
         return _buildTicketCard(ticket, user);

@@ -3,36 +3,43 @@ import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/enums/transaction_type.dart';
 
 /* role(Conversion données), utilise forApi, fromApi, toBackend, fromBackend  */
+/// Ticket possédé par un étudiant. Créé directement BOOKED au paiement.
 class Ticket {
   final int? id;
   final TicketType type;
   final double price;
-  final bool booked;
   final TicketStatus status;
-  final DateTime creationDate;
+  final DateTime purchasedAt;
+  final DateTime? usedAt;    // null tant que le ticket n'est pas débité
   final PurchaseUserDTO purchaseUserDTO;
-  final bool isSelected;
+  final bool isSelected;   // état UI local (débit)
 
   Ticket({
     this.id,
     required this.type,
     required this.price,
-    required this.booked,
     required this.status,
-    required this.creationDate,
+    required this.purchasedAt,
+    this.usedAt,
     required this.purchaseUserDTO,
     this.isSelected = false,
   });
+
+  bool get isBooked => status == TicketStatus.booked;
+  bool get isUsed => status == TicketStatus.used;
+
+  static DateTime? _date(dynamic v) =>
+      v == null ? null : DateTime.tryParse(v.toString());
 
   /// Factory constructor pour créer un Ticket à partir d'un JSON
   factory Ticket.fromJson(Map<String, dynamic> json) {
     return Ticket(
       id: json['id'],
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      booked: json['booked'] ?? false,
       type: TicketTypeExtension.fromBackend(json['type']),
       status: TicketStatusExtension.fromApi(json['status']),
-      creationDate: DateTime.parse(json['creationDate']),
+      purchasedAt: DateTime.parse(json['purchasedAt']),
+      usedAt: _date(json['usedAt']),
       purchaseUserDTO: PurchaseUserDTO.fromJson(json['userDTO']),
       isSelected: false,
     );
@@ -44,9 +51,9 @@ class Ticket {
       'id': id,
       'type': type.toBackend, // "A", "B"
       'price': price,
-      'booked': booked,
-      'status': status.forApi, // "AVAILABLE", "BOOKED", "USED"
-      'creationDate': creationDate.toIso8601String().split('T')[0],
+      'status': status.forApi, // "BOOKED", "USED"
+      'purchaseAt': purchasedAt.toIso8601String(),
+      'useAt': usedAt?.toIso8601String(),
       'purchaseUserDTO': purchaseUserDTO.toJson(),
       'isSelected': isSelected,
     };
@@ -58,9 +65,9 @@ class Ticket {
     int? id,
     TicketType? type,
     double? price,
-    bool? booked,
     TicketStatus? status,
-    DateTime? creationDate,
+    DateTime? purchasedAt,
+    DateTime? usedAt,
     PurchaseUserDTO? purchaseUserDTO,
     bool? isSelected,
   }) {
@@ -68,9 +75,9 @@ class Ticket {
       id: id ?? this.id,
       type: type ?? this.type,
       price: price ?? this.price,
-      booked: booked ?? this.booked,
       status: status ?? this.status,
-      creationDate: creationDate ?? this.creationDate,
+      purchasedAt: purchasedAt ?? this.purchasedAt,
+      usedAt: usedAt ?? this.usedAt,
       purchaseUserDTO: purchaseUserDTO ?? this.purchaseUserDTO,
       isSelected: isSelected ?? this.isSelected,
     );
@@ -93,44 +100,6 @@ class PurchaseUserDTO {
 }
 
 // Modèles pour les requêtes complexes
-class CreationTicketsRequestDTO {
-  final List<Ticket> tickets;
-  //the total number of A tickets to create
-  final int countA;
-  final int countB;
-
-  CreationTicketsRequestDTO(
-    this.tickets, {
-    required this.countA,
-    required this.countB,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'tickets': tickets.map((ticket) => ticket.toJson()).toList(),
-      'countA': countA,
-      'countB': countB,
-    };
-  }
-}
-
-class PurchaseTicketsRequestDTO {
-  final PurchaseUserDTO purchaseUserDTO;
-  final List<int> selectedTicketIds;
-
-  PurchaseTicketsRequestDTO({
-    required this.purchaseUserDTO,
-    required this.selectedTicketIds,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'purchaseUserDTO': purchaseUserDTO.toJson(),
-      'selectedTicketIds': selectedTicketIds,
-    };
-  }
-}
-
 class DebitAccountRequestDTO {
   final DebitPorterDTO debitPorterDTO;
   final DebitStudentDTO debitStudentDTO;
@@ -310,46 +279,6 @@ class OriginalSenderDTO {
   }
 }
 
-class TransfertHistoryDTO {
-  final int id;
-  final String ticketIdsTransfered;
-  final UserDTO senderDTO;
-  final UserDTO recipientDTO;
-  final DateTime transferDate;
-  final bool canceled;
-
-  TransfertHistoryDTO({
-    required this.id,
-    required this.ticketIdsTransfered,
-    required this.senderDTO,
-    required this.recipientDTO,
-    required this.transferDate,
-    required this.canceled,
-  });
-
-  factory TransfertHistoryDTO.fromJson(Map<String, dynamic> json) {
-    return TransfertHistoryDTO(
-      id: json['id'],
-      ticketIdsTransfered: json['ticketIdsTransfered'],
-      senderDTO: UserDTO.fromJson(json['senderDTO']),
-      recipientDTO: UserDTO.fromJson(json['recipientDTO']),
-      transferDate: DateTime.parse(json['transferDate']),
-      canceled: json['canceled'] as bool,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'ticketIdsTransfered': ticketIdsTransfered,
-      'senderDTO': senderDTO.toJson(),
-      'recipientDTO': recipientDTO.toJson(),
-      'transferDate': transferDate.toIso8601String(),
-      'canceled': canceled,
-    };
-  }
-}
-
 class UserDTO {
   final int id;
   final String username;
@@ -453,23 +382,6 @@ class TransactionHistoryDTO {
     );
   }
 
-  /// Retourne le libellé de la transaction selon son type
-  String getTransactionLabel() {
-    return transactionType.getDisplayName();
-  }
-
-  /// Retourne les détails de la transaction selon son type
-  String getTransactionDetails() {
-    switch (transactionType) {
-      case TransactionType.purchase:
-        return 'Par ${purchaserDTO?.username ?? 'Inconnu'}';
-      case TransactionType.debit:
-        return 'Par ${porterDTO?.username ?? 'Inconnu'} sur ${studentDTO?.username ?? 'Inconnu'}';
-      case TransactionType.transfer:
-        return 'De ${senderDTO?.username ?? 'Inconnu'} à ${recipientDTO?.username ?? 'Inconnu'}'
-            '${transferCanceled == true ? ' (Annulé)' : ''}';
-    }
-  }
 }
 
 // ==================== STATISTICS DTO ====================
@@ -479,13 +391,10 @@ class TicketStatisticsDTO {
   final Map<String, UserTicketStats> userStats;
   // Statistiques globales (tous utilisateurs confondus)
   final GlobalTicketStats globalStats;
-  // Statistiques des tickets disponibles (status = AVAILABLE)
-  final AvailableTicketsStats availableStats;
 
   TicketStatisticsDTO({
     required this.userStats,
     required this.globalStats,
-    required this.availableStats,
   });
 
   /// Convertit un JSON en objet TicketStatisticsDTO
@@ -501,9 +410,6 @@ class TicketStatisticsDTO {
     return TicketStatisticsDTO(
       userStats: userStatsMap,
       globalStats: GlobalTicketStats.fromJson(json['globalStats'] ?? {}),
-      availableStats: AvailableTicketsStats.fromJson(
-        json['availableStats'] ?? {},
-      ),
     );
   }
 
@@ -517,7 +423,6 @@ class TicketStatisticsDTO {
     return {
       'userStats': userStatsMap,
       'globalStats': globalStats.toJson(),
-      'availableStats': availableStats.toJson(),
     };
   }
 }
@@ -600,35 +505,3 @@ class GlobalTicketStats {
   }
 }
 
-/// Statistiques des tickets disponibles (status = AVAILABLE)
-class AvailableTicketsStats {
-  final int
-  typeATicketsAvailable; // Tickets Type A disponibles (non achetés, non débités)
-  final int
-  typeBTicketsAvailable; // Tickets Type B disponibles (non achetés, non débités)
-  final int totalTicketsAvailable; // Total tickets disponibles (A + B)
-
-  AvailableTicketsStats({
-    required this.typeATicketsAvailable,
-    required this.typeBTicketsAvailable,
-    required this.totalTicketsAvailable,
-  });
-
-  /// Convertit un JSON en objet AvailableTicketsStats
-  factory AvailableTicketsStats.fromJson(Map<String, dynamic> json) {
-    return AvailableTicketsStats(
-      typeATicketsAvailable: json['typeATicketsAvailable'] ?? 0,
-      typeBTicketsAvailable: json['typeBTicketsAvailable'] ?? 0,
-      totalTicketsAvailable: json['totalTicketsAvailable'] ?? 0,
-    );
-  }
-
-  /// Convertit l'objet en JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'typeATicketsAvailable': typeATicketsAvailable,
-      'typeBTicketsAvailable': typeBTicketsAvailable,
-      'totalTicketsAvailable': totalTicketsAvailable,
-    };
-  }
-}

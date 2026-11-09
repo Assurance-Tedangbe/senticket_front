@@ -4,7 +4,7 @@ import 'package:senticket_front/UI/widgets/home/services.dart';
 import 'package:senticket_front/UI/widgets/home/statistics.dart';
 
 import '../../../provider/user_provider.dart';
-import '../customWidgets/sizeboxHeightSession.dart';
+import '../customWidgets/sizebox.height.session.dart';
 
 /// Widget principal de la page d'accueil
 /// Affiche les services et les statistiques globales selon le rôle de l'utilisateur

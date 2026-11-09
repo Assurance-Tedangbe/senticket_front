@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/listStudents.dart';
+import 'package:senticket_front/UI/widgets/admin/student.mgmt.dart/list.students.dart';
 
 class ManageStudentsBody extends StatelessWidget {
   const ManageStudentsBody({super.key});

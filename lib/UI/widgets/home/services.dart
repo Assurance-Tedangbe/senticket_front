@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/pages/buyTicket.dart';
-import 'package:senticket_front/UI/pages/consultAccount.dart';
-import 'package:senticket_front/UI/pages/debitAccount.dart';
+import 'package:senticket_front/UI/pages/buy_ticket.dart';
+import 'package:senticket_front/UI/pages/consult_account.dart';
+import 'package:senticket_front/UI/pages/debit_account.dart';
 import 'package:senticket_front/UI/pages/historic.dart';
 import 'package:senticket_front/UI/pages/qrcode/scanqr.dart';
 import 'package:senticket_front/UI/pages/transfert.ticket.dart';
-import 'package:senticket_front/UI/widgets/cancelTrsf/PopupCancelTransferById.dart';
+import 'package:senticket_front/UI/widgets/cancelTrsf/popup_cancel_transfer_by_id.dart';
 import 'package:senticket_front/UI/widgets/home/container.template.dart';
 import 'package:senticket_front/UI/widgets/home/homebloctitle.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.session.dart';
 import 'package:senticket_front/UI/widgets/home/statistics.dart';
 
 class Services extends StatelessWidget {
