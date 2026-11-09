@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:senticket_front/main.dart';
-import 'package:senticket_front/UI/pages/coverPage.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/pages/signup.dart';
 import 'package:senticket_front/bloc/services.bloc.dart';

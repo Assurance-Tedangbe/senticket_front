@@ -75,8 +75,6 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
       final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
       final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-      // Recharger les tickets disponibles (pour BuyTicket)
-      await ticketProvider.loadAllTickets(forceRefresh: true);
       // Recharger les statistiques (pour StudentInterface)
       final userId = userProvider.currentUser?.userId;
       if (userId != null) {

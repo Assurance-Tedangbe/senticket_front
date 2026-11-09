@@ -14,14 +14,12 @@ import 'package:senticket_front/enums/payment_status.dart';
 //   countB           : Nombre de tickets Type B à régénérer
 class PaymentInitiationDTO {
   final int userId;
-  final List<int> selectedTicketIds;   // ✅ SUPPRIMÉ : selectedTicketIds
   final double totalAmount;
   final int countA;
   final int countB;
 
   PaymentInitiationDTO({
     required this.userId,
-    required this.selectedTicketIds,
     required this.totalAmount,
     required this.countA,
     required this.countB,
@@ -31,7 +29,6 @@ class PaymentInitiationDTO {
   // Les noms de clés correspondent exactement aux champs de PaymentInitiationDTO.java
   Map<String, dynamic> toJson() => {
     'userId': userId,
-    'selectedTicketIds': selectedTicketIds,
     'totalAmount': totalAmount,
     'countA': countA,
     'countB': countB,
@@ -41,7 +38,6 @@ class PaymentInitiationDTO {
   String toString() =>
       'PaymentInitiationRequest('
       'userId: $userId, '
-      'tickets: $selectedTicketIds, '
       'total: $totalAmount FCFA, '
       'countA: $countA, countB: $countB)';
 }

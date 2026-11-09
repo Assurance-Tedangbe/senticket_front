@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/enums/ticket_status.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
-import 'package:senticket_front/provider/user_provider.dart';
 import 'package:senticket_front/services/ticket_service.dart';
-import 'package:provider/provider.dart';
 
 /*
   Rôle Principal: Gestionnaire d'état centralisé pour les tickets
@@ -27,9 +24,6 @@ class TicketProvider with ChangeNotifier {
   // Instance du service qui gère les appels API - injectée via le constructeur
   // Pas besoin de stocker UserProvider ici, on le récupère via Provider.of dans les méthodes
 
-  List<Ticket> _tickets =
-      []; // "Liste vide pour stocker tous les tickets chargés depuis l'API"
-
   // Remplacer la liste unique par deux listes séparées
   List<Ticket> _ticketsTypeA = [];
   List<Ticket> _ticketsTypeB = [];
@@ -45,19 +39,9 @@ class TicketProvider with ChangeNotifier {
   // Stocke le dernier message d'erreur rencontré, vide string signifie aucune erreur
 
   // Ces booléens permettent de savoir quelle opération est en cours
-  bool _isPurchasingTickets =
-      false; // Achat en cours. True only during purchase operation
   bool _isDebitingAccount = false;
   bool _isTransferringTickets = false;
   bool _isCancelingTransfer = false;
-  /*    
-  bool _isCreatingTickets = false;
-  bool _isUpdatingTicket = false;
-  bool _isDeletingTicket = false;
-  bool _isUpdatingTicketStatus = false;
-  bool _isBookingTicket = false;
-  bool _isUnbookingTicket = false;
- ; */
 
   // Le constructeur reçoit une instance de TicketApiService en paramètre (dependency injection)
   TicketProvider(this._service);
@@ -81,12 +65,6 @@ class TicketProvider with ChangeNotifier {
   bool _isLoadingStatistics = false;
 
   // ******************** GETTERS *********************
-
-  // Getters principaux
-  List<Ticket> get tickets =>
-      _tickets; // Retourne la liste complète des tickets
-
-  // Getters
   List<Ticket> get ticketsTypeA => _ticketsTypeA;
   List<Ticket> get ticketsTypeB => _ticketsTypeB;
 
@@ -98,30 +76,9 @@ class TicketProvider with ChangeNotifier {
   String get error => _error; // Retourne le dernier message d'erreur rencontré
 
   // Getters pour les booléens
-  bool get isPurchasingTickets =>
-      _isPurchasingTickets; // Indique si un achat est en cours
   bool get isTransferringTickets => _isTransferringTickets;
   bool get isDebitingAccount => _isDebitingAccount;
   bool get isCancelingTransfer => _isCancelingTransfer;
-  /* bool get isCreatingTickets => _isCreatingTickets;
-  bool get isUpdatingTicket => _isUpdatingTicket;
-  bool get isDeletingTicket => _isDeletingTicket;
-  bool get isUpdatingTicketStatus => _isUpdatingTicketStatus;
-  bool get isBookingTicket => _isBookingTicket; */
-
-  // Getters pour les tickets filtrés - buyTicket
-  List<Ticket> get availableTickets => _tickets
-      .where((ticket) => ticket.status == TicketStatus.available)
-      .toList();
-
-  List<Ticket> get ticketsA =>
-      availableTickets.where((ticket) => ticket.type == TicketType.a).toList();
-
-  List<Ticket> get ticketsB =>
-      availableTickets.where((ticket) => ticket.type == TicketType.b).toList();
-
-  List<Ticket> get selectedTickets =>
-      _tickets.where((ticket) => ticket.isSelected).toList();
 
   // Getters for debit operation
   List<Ticket> get studentTicketsForDebit => _studentTicketsForDebit;
@@ -155,10 +112,6 @@ class TicketProvider with ChangeNotifier {
   // Getter pour les statistiques globales
   GlobalTicketStats? get globalStats => _ticketStatistics?.globalStats;
 
-  // Getter pour les statistiques des tickets disponibles
-  AvailableTicketsStats? get availableStats =>
-      _ticketStatistics?.availableStats;
-
   // ******************** SETTERS ********************
 
   // Setters for transfer operation
@@ -182,153 +135,7 @@ class TicketProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ******************** FOR LOADING ALL TICKETS OPERATION *************************
-
-  /* @param forceRefresh : si true, ignore le cache et force le rechargement */
-  Future<void> loadAllTickets({bool forceRefresh = false}) async {
-    _isLoading = true; // active le chargement
-    _error = ''; // efface les erreurs précédentes
-    notifyListeners(); // notifie tous les écouteurs (UI) que l'état a changé/du début du chargement
-    // Notifie tous les widgets écoutant ce provider
-
-    try {
-      _tickets = await _service.getAllTickets(
-        forceRefresh: forceRefresh,
-      ); // "récupère tous les tickets depuis l'API via le service"
-
-      // Si succès : mise à jour de la liste et effacement des erreurs
-      _error = ''; // "Confirme qu'il n'y a pas d'erreurs"
-      print("Chargement réussi : ${_tickets.length} tickets");
-    } catch (e) {
-      _error = e.toString(); // "Stocke l'erreur"
-      print("Erreur loadAllTickets: $e");
-    } finally {
-      _isLoading = false; // "arrête le chargement"
-      notifyListeners(); // "notifie l'UI de la fin du chargement"
-    }
-  }
-
-  // ********************* FOR PURCHASING TICKETS OPERATION ***********************
-
-  Future<bool> purchaseTicketsWithContext(BuildContext context) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // Vérifier si l'utilisateur est connecté
-    if (userProvider.currentUser == null) {
-      _error = 'Vous devez être connecté pour acheter des tickets';
-      notifyListeners();
-      return false;
-    }
-    // Vérifier si l'utilisateur a le rôle ETUDIANT
-    final user = userProvider.currentUser!;
-    final isStudent = user.role.name.toUpperCase() == 'ETUDIANT';
-    if (!isStudent) {
-      _error = 'Seuls les étudiants peuvent acheter des tickets';
-      notifyListeners();
-      return false;
-    }
-    final selected = selectedTickets;
-    if (selected.isEmpty) {
-      _error = 'Veuillez sélectionner des tickets';
-      notifyListeners();
-      return false;
-    }
-    _isPurchasingTickets = true;
-    _error = '';
-    notifyListeners();
-    try {
-      final ticketIds = selected.map((t) => t.id!).toList();
-
-      // Créer le PurchaseUserDTO avec l'utilisateur connecté
-      final purchaseUserDTO = PurchaseUserDTO(
-        userId: user.userId!, // userId ne doit pas être null
-        username: user.username,
-      );
-
-      final purchaseRequest = PurchaseTicketsRequestDTO(
-        purchaseUserDTO: purchaseUserDTO,
-        selectedTicketIds: ticketIds,
-      );
-      print("Envoi de la requête d'achat...");
-      print("PurchaseUserDTO: ${purchaseUserDTO.toJson()}");
-      print("Ticket IDs: $ticketIds");
-      // print("Request JSON: ${purchaseRequest.toJsonString()}");
-
-      final purchasedTickets = await _service.purchaseTickets(purchaseRequest);
-
-      if (purchasedTickets.isNotEmpty) {
-        // Recharger les tickets après achat réussi
-        await loadAllTickets(forceRefresh: true);
-        _error = '';
-        return true;
-      } else {
-        _error = 'Aucun ticket n\'a été acheté';
-        return false;
-      }
-    } catch (e) {
-      _error = 'Erreur lors de l\'achat: $e';
-      print("Erreur détaillée: $e");
-      return false;
-    } finally {
-      _isPurchasingTickets = false;
-      notifyListeners();
-    }
-  }
-
-  // Pour gérer la sélection/désélection
-  void toggleTicketSelection(int ticketId) {
-    final index = _tickets.indexWhere((t) => t.id == ticketId);
-    if (index != -1) {
-      _tickets[index] = _tickets[index].copyWith(
-        isSelected: !(_tickets[index].isSelected),
-      );
-      notifyListeners();
-    }
-  }
-
-  void selectAllTicketsA() {
-    for (var ticket in _tickets) {
-      if (ticket.type == TicketType.a &&
-          ticket.status == TicketStatus.available) {
-        final index = _tickets.indexWhere((t) => t.id == ticket.id);
-        if (index != -1) {
-          _tickets[index] = _tickets[index].copyWith(isSelected: true);
-        }
-      }
-    }
-    notifyListeners();
-  }
-
-  void selectAllTicketsB() {
-    for (var ticket in _tickets) {
-      if (ticket.type == TicketType.b &&
-          ticket.status == TicketStatus.available) {
-        final index = _tickets.indexWhere((t) => t.id == ticket.id);
-        if (index != -1) {
-          _tickets[index] = _tickets[index].copyWith(isSelected: true);
-        }
-      }
-    }
-    notifyListeners();
-  }
-
-  void clearAllSelections() {
-    for (var i = 0; i < _tickets.length; i++) {
-      if (_tickets[i].isSelected == true) {
-        _tickets[i] = _tickets[i].copyWith(isSelected: false);
-      }
-    }
-    notifyListeners();
-  }
-
-  //🧹 Nettoie l'erreur courante et notifie l'UI
-  void clearError() {
-    _error = '';
-    notifyListeners();
-  }
-
   // ******************** FOR DEBIT ACCOUNT OPERATION *******************
-
   // Fetch student's purchased tickets by user
   Future<void> getPurchasedTicketsByUser({
     required int studentId,
@@ -342,7 +149,7 @@ class TicketProvider with ChangeNotifier {
     try {
       final tickets = await _service.getPurchasedTicketsByUser(
         userId: studentId,
-        ticketType: type?.toBackend,
+        ticketType: type!.toBackend,
       );
 
       // ✅ Stocker dans la bonne liste selon le type (pour MyTicketsPage)
@@ -572,19 +379,6 @@ class TicketProvider with ChangeNotifier {
       print(
         "TT traités (achetés + débités): ${_ticketStatistics!.globalStats.totalTicketsProcessed}",
       );
-
-      /// Statistiques des tickets disponibles
-      print("--- STATISTIQUES TICKETS DISPONIBLES ---");
-      print(
-        "T. Type A disponibles: ${_ticketStatistics!.availableStats.typeATicketsAvailable}",
-      );
-      print(
-        "T. Type B disponibles: ${_ticketStatistics!.availableStats.typeBTicketsAvailable}",
-      );
-      print(
-        "TT disponibles: ${_ticketStatistics!.availableStats.totalTicketsAvailable}",
-      );
-
       _error = '';
       return true;
     } catch (e) {

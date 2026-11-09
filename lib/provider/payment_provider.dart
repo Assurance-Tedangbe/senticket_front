@@ -59,16 +59,8 @@ class PaymentProvider with ChangeNotifier {
 
   // INITIER UN PAIEMENT AVEC PAYDUNYA
   // Appelée par RequestSection quand l'étudiant clique "Payer".
-  // Prend les tickets sélectionnés du TicketProvider et initie le paiement.
-  //
-  // @param userId            ID de l'étudiant connecté (depuis UserProvider)
-  // @param selectedTicketIds IDs des tickets sélectionnés (depuis TicketProvider)
-  // @param totalAmount       Montant calculé par RequestSection
-  // @param countA            Nombre de tickets Type A à regenérer (pour le backend)
-  // @param countB            Nombre de tickets Type B à regenérer (pour le backend)
   Future<void> initiatePayment({
     required int userId,
-    required List<int> selectedTicketIds,     // ✅ Plus de selectedTicketIds
     required double totalAmount,
     required int countA,
     required int countB,
@@ -82,7 +74,6 @@ class PaymentProvider with ChangeNotifier {
       // Construction de la requête d'initiation
       final request = PaymentInitiationDTO(
         userId: userId,
-        selectedTicketIds: selectedTicketIds,      // ✅ Plus de selectedTicketIds
         totalAmount: totalAmount,
         countA: countA,
         countB: countB,
@@ -154,11 +145,7 @@ class PaymentProvider with ChangeNotifier {
       _cancelPolling();
       return;
     }
-
     _pollingAttempts++;
-    print(
-      '[PaymentProvider] Polling #$_pollingAttempts/${_maxPollingAttempts}',
-    );
 
     // Timeout : limite de tentatives atteinte
     if (_pollingAttempts > _maxPollingAttempts) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/model/user_model.dart';
 import 'package:senticket_front/provider/user_provider.dart';

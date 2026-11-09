@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.btn.label.field.dart';
 import 'package:senticket_front/constants.dart';
 
 /*

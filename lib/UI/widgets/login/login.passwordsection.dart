@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/login/loginLabel.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/SizeboxBtwLabelField.dart';
+import 'package:senticket_front/UI/widgets/login/login.label.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.btn.label.field.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 import 'package:provider/provider.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:senticket_front/UI/widgets/forgot.pwd/forgot.pwd.body.dart';
+import 'package:senticket_front/UI/widgets/forgot.pwd/forgot_pwd_body.dart';
 
 class ForgotPwd extends StatelessWidget {
   static const String _title = 'Mot de passe oublié';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/login.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/transaction_type.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';

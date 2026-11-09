@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class ServicesEvent {}
 
@@ -35,11 +35,6 @@ class ServicesBloc extends Bloc<ServicesEvent, ServicesState> {
       } catch (e) {
         emit(SearchServicesErrorState(errorMessage: e.toString()));
       }
-      /* just for testing bloc
-       print("*****Bloc event processing");
-      print(event);
-      print(event.keyword);
-      print("xxxxxxxxxxxxxxxxxxxxx");*/
     });
   }
 }

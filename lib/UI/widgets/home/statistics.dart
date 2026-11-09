@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/customCircularProgressIndicator.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/custom.circular.progress.indicator.dart';
 import 'package:senticket_front/UI/widgets/home/bloctitle.dart';
 import 'package:senticket_front/UI/widgets/home/imageasset.template.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.session.dart';
 import 'package:senticket_front/UI/widgets/home/stat.label.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/provider/user_provider.dart';
@@ -35,7 +35,6 @@ class _StatisticsState extends State<Statistics> {
     final userProvider = Provider.of<UserProvider>(context);
     final currentUser = userProvider.currentUser;
     final globalStats = ticketProvider.globalStats;
-    final availableStats = ticketProvider.availableStats;
     final isLoading = ticketProvider.isLoadingStatistics;
     Size size = MediaQuery.of(context).size;
 
@@ -51,12 +50,6 @@ class _StatisticsState extends State<Statistics> {
         : 0;
     final totalDebited = (isAuthenticatedAdmin && globalStats != null)
         ? globalStats.totalDebitedTickets
-        : 0;
-    final typeAAvailable = (isAuthenticatedAdmin && availableStats != null)
-        ? availableStats.typeATicketsAvailable
-        : 0;
-    final typeBAvailable = (isAuthenticatedAdmin && availableStats != null)
-        ? availableStats.typeBTicketsAvailable
         : 0;
 
     return Column(
@@ -194,110 +187,6 @@ class _StatisticsState extends State<Statistics> {
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            //const SizeboxHeightSession(),
-            Stack(
-              children: [
-                /// Tickets disponibles (Type A et Type B)
-                if (availableStats != null)
-                Container(
-                  width: size.width / 1.5,
-                  height: size.height / 12.0,
-                  decoration: BoxDecoration(
-                    color: ticketSectionColor,
-                    borderRadius: const BorderRadius.all(Radius.circular(17.0)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: boxshadowColor,
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                    border: Border.all(color: kPrimaryColor, width: 0.5),
-                  ),
-                child:
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      /// Type A disponibles
-                      Column(
-                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: size.width / 25.0,
-                                height: size.height / 30.0,
-                                child: const ImageAsset(
-                                  iconpath: "images/breakfast.JPG",
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                  6.0,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                ),
-                                child: StatisticsLabel(label: "A dispo."),
-                              ),
-                            ],
-                          ),
-                           Padding(
-                            padding: EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                            child: Text(
-                              typeAAvailable.toString(),
-                              style: TextStyle(
-                                color: kThirdColor,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Séparateur vertical
-                      Container(
-                        width: 1,
-                        height: 50,
-                        color: kPrimaryColor,
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                      ),
-
-                      /// Type B disponibles
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(3.0, 0.0, 0.0, 0.0),
-                        child: Column(
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(Icons.food_bank),
-                                StatisticsLabel(label: "B dispo."),
-                              ],
-                            ),
-                            //const SizedBox(height: 4),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(15.0, 0.0, 0.0, 0.0),
-                              child: Text(
-                                typeBAvailable.toString(),
-                                style: const TextStyle(
-                                  color: kThirdColor,
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 ),
               ],
             ),

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senticket_front/UI/pages/login.dart';
 import 'package:senticket_front/UI/widgets/background.dart';
-import 'package:senticket_front/UI/widgets/cancelTrsf/cancelButtonWithBadge.dart';
-import 'package:senticket_front/UI/widgets/cancelTrsf/popupCancelTransfer.dart';
+import 'package:senticket_front/UI/widgets/cancelTrsf/cancel_button_with_badge.dart';
+import 'package:senticket_front/UI/widgets/cancelTrsf/popup_cancel_transfer.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.dart';
-import 'package:senticket_front/UI/widgets/customWidgets/sizeboxHeightSession.dart';
+import 'package:senticket_front/UI/widgets/customWidgets/sizebox.height.session.dart';
 import 'package:senticket_front/UI/widgets/customWidgets/label.dart';
-import 'package:senticket_front/UI/widgets/transfert/ticket/recipientUsernameTrsfTicket.dart';
-import 'package:senticket_front/UI/widgets/transfert/ticket/trsfTicketBtn.dart';
+import 'package:senticket_front/UI/widgets/transfert/ticket/recipient.username.trsf.ticket.dart';
+import 'package:senticket_front/UI/widgets/transfert/ticket/trsf.ticket.btn.dart';
 import 'package:senticket_front/constants.dart';
 import 'package:senticket_front/enums/ticket_type.dart';
 import 'package:senticket_front/model/ticket_model.dart';
@@ -16,8 +16,8 @@ import 'package:senticket_front/provider/ticket_provider.dart';
 import 'package:senticket_front/provider/user_provider.dart';
 
 import '../../../pages/qrcode/scanqr.dart';
-import 'numberTicketsSection.dart';
-import 'senderPasswordTrsfTicket.dart';
+import 'number.tickets.section.dart';
+import 'sender.password.trsf.ticket.dart';
 
 class TrsfTicketBody extends StatefulWidget {
   const TrsfTicketBody({super.key});
@@ -116,14 +116,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
   }
 
   bool _isFormValid() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
     final recipientNotEmpty = _recipientController.text.isNotEmpty;
-    // ✅ On vérifie searchedUser uniquement si le champ est rempli
-    // Pour ne pas bloquer si l'utilisateur saisit manuellement
-    final recipientValid = recipientNotEmpty &&
-        (userProvider.searchedUser != null ||
-            userProvider.searchedUser?.username == _recipientController.text);
     final typeSelected = _selectedTicketType != null;
     final numberNotEmpty = _numberController.text.isNotEmpty;
     final passwordNotEmpty = _passwordController.text.isNotEmpty;
@@ -140,30 +133,6 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         isNumberValid &&
         passwordNotEmpty;
   }
-  /*bool _isFormValid() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // Vérifier que tous les champs sont remplis
-    final recipientNotEmpty = _recipientController.text.isNotEmpty;
-    final typeSelected = _selectedTicketType != null;
-    final numberNotEmpty = _numberController.text.isNotEmpty;
-    final passwordNotEmpty = _passwordController.text.isNotEmpty;
-    final recipientFound = userProvider.searchedUser != null;
-
-    // Vérifier que le nombre est valide (si présent)
-    bool isNumberValid = true;
-    if (numberNotEmpty) {
-      final number = int.tryParse(_numberController.text.trim());
-      isNumberValid = number != null && number > 0;
-    }
-
-    return recipientNotEmpty &&
-        recipientFound &&
-        typeSelected &&
-        numberNotEmpty &&
-        isNumberValid &&
-        passwordNotEmpty;
-  }*/
 
   Future<void> _validateRecipientUsername(UserProvider userProvider) async {
     if (_recipientController.text.isEmpty) {
@@ -277,10 +246,12 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
     }
 
     // Valider le destinataire (et le chercher si pas encore fait)
+    final messenger = ScaffoldMessenger.of(context);
     if (userProvider.searchedUser == null) {
       await _validateRecipientUsername(userProvider);
+
       if (userProvider.debitUsernameError != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Text(userProvider.debitUsernameError!),
             backgroundColor: redErrorColor,
@@ -290,9 +261,8 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
         return;
       }
     }
-    final recipient = userProvider.searchedUser!;
-    // final number = int.parse(_numberController.text.trim());
 
+    final recipient = userProvider.searchedUser!;
     // Construire la requête
     final request = TransfertTicketRequestDTO(
       senderDTO: SenderDTO(

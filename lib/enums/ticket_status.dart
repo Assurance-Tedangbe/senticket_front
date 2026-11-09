@@ -1,12 +1,13 @@
 // 🎫 ENUMERATION DES STATUTS DE TICKETS
 // Définit tous les statuts possibles qu'un ticket peut avoir dans l'application
 enum TicketStatus {
-  // TICKET DISPONIBLE : Peut être acheté ou réservé
-  available,
-  // TICKET RÉSERVÉ : A été réservé mais pas encore payé/utilisé
-  booked,
-  // TICKET UTILISÉ : A été utilisé (débité) par un portier
-  used,
+  booked,  // TICKET ACHETÉ : a été acheté
+  used;    // TICKET UTILISÉ : a été utilisé (débité) par un portier
+
+  static TicketStatus fromBackend(String? v) =>
+      v?.toUpperCase() == 'USED' ? TicketStatus.used : TicketStatus.booked;
+
+  String get toBackend => name.toUpperCase();
 }
 
 /*
@@ -23,8 +24,6 @@ extension TicketStatusExtension on TicketStatus {
    */
   String get forApi {
     switch (this) {
-      case TicketStatus.available:
-        return 'AVAILABLE';
       case TicketStatus.booked:
         return 'BOOKED';
       case TicketStatus.used:
@@ -43,8 +42,6 @@ extension TicketStatusExtension on TicketStatus {
    */
   static TicketStatus fromApi(String backendStatus) {
     switch (backendStatus.toUpperCase()) {
-      case 'AVAILABLE':
-        return TicketStatus.available;
       case 'BOOKED':
         return TicketStatus.booked;
       case 'USED':

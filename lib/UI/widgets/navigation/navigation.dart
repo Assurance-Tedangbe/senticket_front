@@ -1,14 +1,13 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:senticket_front/UI/pages/adminInterface.dart';
+import 'package:senticket_front/UI/pages/admin_interface.dart';
 import 'package:senticket_front/UI/pages/home.dart';
-import 'package:senticket_front/UI/pages/porterInterface.dart';
-import 'package:senticket_front/UI/pages/studentInterface.dart';
-import 'package:senticket_front/UI/widgets/navigation/bottomIcon.dart';
-import 'package:senticket_front/UI/widgets/navigation/bottomText.dart';
+import 'package:senticket_front/UI/pages/porter_interface.dart';
+import 'package:senticket_front/UI/pages/student.interface.dart';
+import 'package:senticket_front/UI/widgets/navigation/bottom_icon.dart';
+import 'package:senticket_front/UI/widgets/navigation/bottom_text.dart';
 import 'package:senticket_front/constants.dart';
-//import 'package:senticket_front/UI/pages/agentInterface.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});

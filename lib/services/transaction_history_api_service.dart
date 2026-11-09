@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/model/transaction_history_model.dart';
 import 'package:senticket_front/http/auth_http_client.dart';

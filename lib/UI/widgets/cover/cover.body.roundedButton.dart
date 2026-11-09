@@ -8,12 +8,12 @@ class RoundedButton extends StatefulWidget {
   final Function() press;
   final Color color, textColor;
   const RoundedButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.press,
     this.color = kPrimaryColor,
     this.textColor = kSecondColor,
-  }) : super(key: key);
+  });
 
   @override
   State<RoundedButton> createState() => _RoundedButtonState();

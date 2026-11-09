@@ -349,16 +349,15 @@ class UserProvider with ChangeNotifier {
     return null;
   }
 
-  String? get usernameError{
-    if(_username.isNotEmpty && _username.length < 3) {
-      return 'Il doit contenir au moins 3 caractères';
-    }
-  }
+  String? get usernameError =>
+      (_username.isNotEmpty && _username.length < 3)
+          ? 'Il doit contenir au moins 3 caractères'
+          : null;
 
   Future<bool> submitSignup() async {
-    print('1. _firstName: $_firstName');
-    print('2. _role: $_role');
-    print('3. _role?.name: ${_role?.name}');
+    print(' 1. _username: $_username'
+          ' 2. _role: ${_role?.name}'
+          ' 3. _role?.name: ${_role?.name}');
 
     if (!isFormValid) {
       _error = 'Veuillez remplir tous les champs correctement';

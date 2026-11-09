@@ -13,7 +13,7 @@ class TransactionHistoryProvider extends ChangeNotifier {
   // ==================== ÉTATS INTERNES ====================
 
   /// Liste des transactions chargées
-  List<TransactionHistoryDTO> _transactions = [];
+  final List<TransactionHistoryDTO> _transactions = [];
 
   /// Indique si le chargement est en cours
   bool _isLoading = false;

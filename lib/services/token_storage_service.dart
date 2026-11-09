@@ -36,16 +36,7 @@ class TokenStorageService {
   Future<String?> getToken() async {
     return await _storage.read(key: 'jwt_token');
   }
-  // ✅ Version 2 : try/catch évite les crashes sur certains appareils Android
-  /*Future<String?> getToken() async {
-    try {
-      return await _storage.read(key: _tokenKey);
-    } catch (_) {
-      return null;
-    }
-  }*/
 
- // Future<String?> getUserId() async => _storage.read(key: _userIdKey);
   Future<String?> getUserId() async {
     final id = await _storage.read(key: _userIdKey);  // ← même clé
     print('[TokenStorage] getUserId: $id');

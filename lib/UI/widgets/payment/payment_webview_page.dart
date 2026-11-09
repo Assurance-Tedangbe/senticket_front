@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:senticket_front/constants.dart';
-import 'package:senticket_front/config/network_config.dart';
 import 'package:senticket_front/provider/payment_provider.dart';
 
 //**************** PAGE WEBVIEW PAYDUNYA *****************
@@ -95,8 +94,6 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
     if (_hasNavigated) return;
 
     // Construire les patterns à détecter
-    // Utilise NetworkConfig.baseUrl pour être cohérent avec payment_service.dart
-    final baseUrl = NetworkConfig.baseUrl;
 
     // URL de retour après paiement réussi ou terminé
     // Pattern : http://{IP}:8080/api/payments/return?token=xxx

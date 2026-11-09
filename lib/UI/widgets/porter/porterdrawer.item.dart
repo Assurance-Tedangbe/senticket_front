@@ -7,12 +7,11 @@ class PortierDrawerItem extends StatelessWidget {
   final Function onAction;
 
   const PortierDrawerItem(
-      {Key? key,
+      {super.key,
       required this.title,
       required this.leadingIcon,
       required this.trailingIcon,
-      required this.onAction})
-      : super(key: key);
+      required this.onAction});
 
   @override
   Widget build(BuildContext context) {

@@ -7,9 +7,9 @@ class Ticket {
   final int? id;
   final TicketType type;
   final double price;
-  final bool booked;
   final TicketStatus status;
-  final DateTime creationDate;
+  final DateTime purchaseAt;
+  final DateTime useAt;
   final PurchaseUserDTO purchaseUserDTO;
   final bool isSelected;
 
@@ -17,9 +17,9 @@ class Ticket {
     this.id,
     required this.type,
     required this.price,
-    required this.booked,
     required this.status,
-    required this.creationDate,
+    required this.purchaseAt,
+    required this.useAt,
     required this.purchaseUserDTO,
     this.isSelected = false,
   });
@@ -29,10 +29,10 @@ class Ticket {
     return Ticket(
       id: json['id'],
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      booked: json['booked'] ?? false,
       type: TicketTypeExtension.fromBackend(json['type']),
       status: TicketStatusExtension.fromApi(json['status']),
-      creationDate: DateTime.parse(json['creationDate']),
+      purchaseAt: DateTime.parse(json['purchaseAt']),
+      useAt: DateTime.parse(json['useAt']),
       purchaseUserDTO: PurchaseUserDTO.fromJson(json['userDTO']),
       isSelected: false,
     );
@@ -44,9 +44,9 @@ class Ticket {
       'id': id,
       'type': type.toBackend, // "A", "B"
       'price': price,
-      'booked': booked,
-      'status': status.forApi, // "AVAILABLE", "BOOKED", "USED"
-      'creationDate': creationDate.toIso8601String().split('T')[0],
+      'status': status.forApi, // "BOOKED", "USED"
+      'purchaseAt': purchaseAt.toIso8601String().split('T')[0],
+      'useAt': useAt.toIso8601String().split('T')[0],
       'purchaseUserDTO': purchaseUserDTO.toJson(),
       'isSelected': isSelected,
     };
@@ -60,7 +60,8 @@ class Ticket {
     double? price,
     bool? booked,
     TicketStatus? status,
-    DateTime? creationDate,
+    DateTime? purchaseAt,
+    DateTime? useAt,
     PurchaseUserDTO? purchaseUserDTO,
     bool? isSelected,
   }) {
@@ -68,9 +69,9 @@ class Ticket {
       id: id ?? this.id,
       type: type ?? this.type,
       price: price ?? this.price,
-      booked: booked ?? this.booked,
       status: status ?? this.status,
-      creationDate: creationDate ?? this.creationDate,
+      purchaseAt: purchaseAt ?? this.purchaseAt,
+      useAt: useAt ?? this.useAt,
       purchaseUserDTO: purchaseUserDTO ?? this.purchaseUserDTO,
       isSelected: isSelected ?? this.isSelected,
     );
@@ -114,22 +115,6 @@ class CreationTicketsRequestDTO {
   }
 }
 
-class PurchaseTicketsRequestDTO {
-  final PurchaseUserDTO purchaseUserDTO;
-  final List<int> selectedTicketIds;
-
-  PurchaseTicketsRequestDTO({
-    required this.purchaseUserDTO,
-    required this.selectedTicketIds,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'purchaseUserDTO': purchaseUserDTO.toJson(),
-      'selectedTicketIds': selectedTicketIds,
-    };
-  }
-}
 
 class DebitAccountRequestDTO {
   final DebitPorterDTO debitPorterDTO;
@@ -479,13 +464,10 @@ class TicketStatisticsDTO {
   final Map<String, UserTicketStats> userStats;
   // Statistiques globales (tous utilisateurs confondus)
   final GlobalTicketStats globalStats;
-  // Statistiques des tickets disponibles (status = AVAILABLE)
-  final AvailableTicketsStats availableStats;
 
   TicketStatisticsDTO({
     required this.userStats,
     required this.globalStats,
-    required this.availableStats,
   });
 
   /// Convertit un JSON en objet TicketStatisticsDTO
@@ -501,9 +483,6 @@ class TicketStatisticsDTO {
     return TicketStatisticsDTO(
       userStats: userStatsMap,
       globalStats: GlobalTicketStats.fromJson(json['globalStats'] ?? {}),
-      availableStats: AvailableTicketsStats.fromJson(
-        json['availableStats'] ?? {},
-      ),
     );
   }
 
@@ -517,7 +496,6 @@ class TicketStatisticsDTO {
     return {
       'userStats': userStatsMap,
       'globalStats': globalStats.toJson(),
-      'availableStats': availableStats.toJson(),
     };
   }
 }
@@ -600,35 +578,3 @@ class GlobalTicketStats {
   }
 }
 
-/// Statistiques des tickets disponibles (status = AVAILABLE)
-class AvailableTicketsStats {
-  final int
-  typeATicketsAvailable; // Tickets Type A disponibles (non achetés, non débités)
-  final int
-  typeBTicketsAvailable; // Tickets Type B disponibles (non achetés, non débités)
-  final int totalTicketsAvailable; // Total tickets disponibles (A + B)
-
-  AvailableTicketsStats({
-    required this.typeATicketsAvailable,
-    required this.typeBTicketsAvailable,
-    required this.totalTicketsAvailable,
-  });
-
-  /// Convertit un JSON en objet AvailableTicketsStats
-  factory AvailableTicketsStats.fromJson(Map<String, dynamic> json) {
-    return AvailableTicketsStats(
-      typeATicketsAvailable: json['typeATicketsAvailable'] ?? 0,
-      typeBTicketsAvailable: json['typeBTicketsAvailable'] ?? 0,
-      totalTicketsAvailable: json['totalTicketsAvailable'] ?? 0,
-    );
-  }
-
-  /// Convertit l'objet en JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'typeATicketsAvailable': typeATicketsAvailable,
-      'typeBTicketsAvailable': typeBTicketsAvailable,
-      'totalTicketsAvailable': totalTicketsAvailable,
-    };
-  }
-}
