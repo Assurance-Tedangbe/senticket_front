@@ -34,7 +34,7 @@ class LoginBtn extends StatelessWidget {
                     messenger.showSnackBar(
                       const SnackBar(
                         content: Text('Connexion réussie !'),
-                        backgroundColor: validateBtnColor,
+                        backgroundColor: kPrimaryColor,
                       ),
                     );
 

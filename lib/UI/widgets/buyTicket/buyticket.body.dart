@@ -70,7 +70,7 @@ class BuyTicketBody extends StatelessWidget {
               label: 'Ticket Type B',
               subtitle: 'Déjeuner / Dîner',
               unitPrice: TicketPricing.priceB,
-              color: cyanColor,
+              color: kPrimaryColor,
               count: cart.countB,
               canIncrement: cart.canIncrementB,
               onIncrement: cart.incrementB,

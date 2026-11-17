@@ -82,7 +82,7 @@ class _ListStudentsPageState extends State<ListStudentsPage> {
                       content: Text(
                         'Compte ${user.username} supprimé avec succès',
                       ),
-                      backgroundColor: validateBtnColor,
+                      backgroundColor: kPrimaryColor,
                       duration: const Duration(seconds: 5),
                     ),
                   );

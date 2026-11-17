@@ -99,7 +99,7 @@ class _ListPortiersPageState extends State<ListPortiersPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text('Compte ${portier.username} supprimé avec succès'),
-          backgroundColor: Colors.green,
+          backgroundColor: kPrimaryColor,
           duration: const Duration(seconds: 5),
         ),
       );

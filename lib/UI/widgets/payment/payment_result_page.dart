@@ -280,10 +280,10 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: cyanColor.withValues(alpha: 0.1),
+              color: kPrimaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.cancel, color: cyanColor, size: 80),
+            child: const Icon(Icons.cancel, color: kPrimaryColor, size: 80),
           ),
           const SizedBox(height: 28),
           const Text(
@@ -291,7 +291,7 @@ class _PaymentResultPageState extends State<PaymentResultPage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: cyanColor,
+              color: kPrimaryColor,
             ),
           ),
           const SizedBox(height: 16),

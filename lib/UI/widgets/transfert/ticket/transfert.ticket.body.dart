@@ -101,7 +101,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Destinataire trouvé : ${qrData.username}'),
-          backgroundColor: validateBtnColor,
+          backgroundColor: kPrimaryColor,
         ),
       );
       setState(() {}); // Rebuild pour mettre à jour l'état du bouton
@@ -294,7 +294,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
             /* '$number ticket(s) de type ${_selectedTicketType == TicketType.a ? 'A' : 'B'} '
             'transféré(s) à ${recipient.username}',*/
           ),
-          backgroundColor: validateBtnColor,
+          backgroundColor: kPrimaryColor,
           duration: const Duration(seconds: 5),
         ),
       );
@@ -512,13 +512,7 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
             ),
           ],
         ),
-        /*RecipientUsernameTrsfTicket(
-          controller: _recipientController,
-          onChanged: (value) {
-            userProvider.setDebitUsername(value);
-            setState(() {}); // Rebuild pour mettre à jour l'état du bouton
-          },
-        ),*/
+
         const SizeboxHeightSession(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -597,31 +591,6 @@ class _TrsfTicketBodyState extends State<TrsfTicketBody> {
               onPressed: _onCancelTransferPressed,
               hasTransferToCancel: _lastTransferHistory != null,
             ),
-
-            /*  // Afficher le badge du nombre de transferts à annuler si disponible
-            if (_lastTransferHistory != null)
-              Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: kPrimaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  '1',
-                  style: const TextStyle(
-                    color: kSecondColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            IconButton(
-              iconSize: 60,
-              icon: const Icon(Icons.cancel, color: kPrimaryColor),
-              tooltip: 'Annuler le dernier transfert',
-              onPressed: _onCancelTransferPressed,
-            ),*/
           ],
         ),
       ],

@@ -1,14 +1,12 @@
-// Définit ts ls statuts possibles qu'1 ticket peut avoir ds l'appli
+// 🎫 ENUMERATION DES STATUTS DE TICKETS
+// Définit tous les statuts possibles qu'un ticket peut avoir dans l'application
 enum TicketStatus {
-  booked,  // TICKET ACHETÉ : a été acheté
-  used;    // TICKET UTILISÉ : a été utilisé (débité) par un portier
+  booked,  // TICKET ACHETÉ
+  used;    // TICKET UTILISÉ
 }
 
-/*
-🎯 EXTENSION POUR L'ENUM TICKETSTATUS
-Cette extension ajoute des fonctionnalités supplémentaires à l'enum TicketStatus
-pour faciliter la conversion entre les conventions Flutter et Spring Boot
-*/
+/* ajoute des fonctionnalités supplémentaires à TicketStatus
+   pr faciliter la conversion entre les conventions Flutter et Spring Boot */
 extension TicketStatusExtension on TicketStatus {
   /* FORMAT POUR L'API SPRING BOOT : toBackend
    * Convertit l'enum au format attendu par l'API backend

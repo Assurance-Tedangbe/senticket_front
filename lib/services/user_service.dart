@@ -136,9 +136,6 @@ class UserApiService {
           // _saveToken(token);
 
           //  // ✅ SAUVEGARDER LE TOKEN — c'est le cœur du système JWT
-          // Toutes les requêtes suivantes l'auront automatiquement
-          /*await TokenStorageService.instance.saveToken(token);
-          await TokenStorageService.instance.saveUserInfo*/
           await _tokenStorage.saveToken(token);
           await _tokenStorage.saveUserSession(
             userId: user.userId?.toString() ?? '',  // ← ne doit pas être vide
@@ -240,10 +237,6 @@ class UserApiService {
     catch (e) {
       throw Exception(ErrorHandler.fromException(e));
     }
-    /* catch (e) {
-      print('Erreur lors de la connexion: $e');
-      rethrow;
-    }*/
   }
 
   // ************ LOGOUT — protégé + nettoyage local **************
@@ -310,9 +303,6 @@ class UserApiService {
       } else {
         final errorMsg = ErrorHandler.fromResponse(response);
         throw Exception(errorMsg);
-        /*throw Exception(
-          'Erreur récupération utilisateurs: ${response.statusCode}',
-        );*/
       }
     } catch (e) {
       print("Erreur récupération: $e");
@@ -325,7 +315,6 @@ class UserApiService {
 
       // ← AJOUTER ICI — remplace 'Erreur réseau: $e'
       throw Exception(ErrorHandler.fromException(e));
-    //  throw Exception('Erreur réseau: $e');
     }
   }
 
@@ -523,15 +512,6 @@ class UserApiService {
       if (e.toString().startsWith('Exception: ')) rethrow;
       throw Exception(ErrorHandler.fromException(e));
     }
-     /* if (response.statusCode != 200) {
-        throw Exception(
-          'Erreur mise à jour mot de passe: ${response.statusCode}',
-        );
-      }
-      print("Password updated for user with ID: $userId");
-    } catch (e) {
-      throw Exception('Erreur réseau: $e');
-    }*/
   }
 
   /// Envoie le token FCM au backend pour activer les notifications push

@@ -61,7 +61,7 @@ class RequestSection extends StatelessWidget {
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isDisabled ? greyBorderColor : validateBtnColor,
+                  backgroundColor: isDisabled ? greyBorderColor : blueOfImages,
                   foregroundColor: kSecondColor,
                   disabledBackgroundColor: greyBorderColor,
                   shape: RoundedRectangleBorder(

@@ -51,7 +51,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                   '(${_isPasswordChanged ? 'modifié' : 'actuel: ********'})',
                   style: TextStyle(
                     fontSize: 12,
-                    color: _isPasswordChanged ? Colors.green : Colors.grey[600],
+                    color: _isPasswordChanged ? kPrimaryColor : Colors.grey[600],
                     fontStyle: FontStyle.italic,
                   ),
                 ),

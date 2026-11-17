@@ -34,7 +34,7 @@ class SignupBtn extends StatelessWidget {
                       messenger.showSnackBar(
                         const SnackBar(
                           content: Text('Compte créé avec succès !'),
-                          backgroundColor: validateBtnColor,
+                          backgroundColor: kPrimaryColor,
                         ),
                       );
 

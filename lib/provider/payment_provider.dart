@@ -114,7 +114,6 @@ class PaymentProvider with ChangeNotifier {
       _setState(PaymentState.cancelled);
       return;
     }
-
     // L'utilisateur a potentiellement payé → démarrer la vérification
     print('[PaymentProvider] WebView fermé → démarrage polling...');
     _startPolling();

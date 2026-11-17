@@ -56,10 +56,6 @@ class TicketApiService {
         return;
       } else {
         _fail(response, 'Le débit a échoué');
-        /*final errorBody = json.decode(response.body);
-        final errorMessage =
-            errorBody['message'] ?? 'Erreur de débit: ${response.statusCode}';
-        throw Exception(errorMessage);*/
       }
     } catch (e) {
       print("Erreur debitAccount: $e");
@@ -83,14 +79,10 @@ class TicketApiService {
       }
       else {
         _fail(response, 'Impossible de charger les tickets');
-        /*throw Exception(
-          'Erreur récupération tickets utilisateur: ${response.statusCode}',
-        );*/
       }
     } catch (e) {
       print('Erreur getPurchasedTicketsByUser: $e');
       throw ApiException.from(e);
-      //rethrow;
     }
   }
 
@@ -129,12 +121,10 @@ class TicketApiService {
       } else {
         // tout autre code HTTP (500, 403, etc.)
         _fail(response, 'Le transfert a échoué');
-        //throw Exception('Erreur serveur: ${response.statusCode}');
       }
     } catch (e) {
       print("Erreur transferTickets: $e");
       throw ApiException.from(e);
-      //rethrow;
     }
   }
 
@@ -152,14 +142,10 @@ class TicketApiService {
         return TransactionHistoryDTO.fromJson(json.decode(response.body));
       } else {
         _fail(response, 'Transaction introuvable');
-        /*throw Exception(
-          'Erreur récupération historique transaction: ${response.statusCode}',
-        );*/
       }
     } catch (e) {
       print("Erreur getTransactionHistoryById: $e");
       throw ApiException.from(e);
-      //rethrow;
     }
   }
 
@@ -180,10 +166,6 @@ class TicketApiService {
         return;
       } else {
         _fail(response, "L'annulation a échoué");
-        /*final errorBody = json.decode(response.body);
-        final errorMessage =
-            errorBody['message'] ?? 'Erreur annulation: ${response.statusCode}';
-        throw Exception(errorMessage);*/
       }
     } catch (e) {
       print("Erreur cancelTransfer: $e");
@@ -213,16 +195,10 @@ class TicketApiService {
         return TicketStatisticsDTO.fromJson(jsonData);
       } else {
         _fail(response, 'Impossible de charger les statistiques');
-        /*final errorBody = json.decode(response.body);
-        final errorMessage =
-            errorBody['message'] ??
-            'Erreur récupération statistiques: ${response.statusCode}';
-        throw Exception(errorMessage);*/
       }
     } catch (e) {
       print("Erreur getTicketStatistics: $e");
       throw ApiException.from(e);
-      //rethrow;
     }
   }
 }

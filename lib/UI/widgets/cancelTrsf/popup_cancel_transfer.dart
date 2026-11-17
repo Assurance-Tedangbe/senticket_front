@@ -43,7 +43,7 @@ class PopupCancelTransfer extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(backgroundColor: cyanColor),
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           child: const Text('Quitter', style: TextStyle(color: kThirdColor)),
         ),
         ElevatedButton(
@@ -87,7 +87,7 @@ class PopupCancelTransfer extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Transfert annulé'),
-                  backgroundColor: validateBtnColor,
+                  backgroundColor: blueOfImages,
                   duration: Duration(seconds: 5),
                 ),
               );

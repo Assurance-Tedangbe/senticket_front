@@ -43,8 +43,7 @@ class _DebitPageState extends State<DebitPage> {
       _selectedTicketType = value;
     });
 
-    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    await ticketProvider.getPurchasedTicketsByUser(
+    await context.read<TicketProvider>().getTicketsForDebit(
       studentId: widget.studentId,
       type: value,
     );
@@ -102,16 +101,16 @@ class _DebitPageState extends State<DebitPage> {
           content: Text(
             'Ticket(s) débité(s) avec succès pour ${widget.studentUsername}',
           ),
-          backgroundColor: validateBtnColor,
+          backgroundColor: kPrimaryColor,
           duration: const Duration(seconds: 5),
         ),
       );
 
       // Rafraîchir les tickets après un débit réussi
       if (_selectedTicketType != null) {
-        await ticketProvider.getPurchasedTicketsByUser(
+        await ticketProvider.getTicketsForDebit(
           studentId: widget.studentId,
-          type: _selectedTicketType,
+          type: _selectedTicketType!,
         );
       }
     } else {
@@ -436,22 +435,6 @@ class _DebitPageState extends State<DebitPage> {
                 activeColor: kPrimaryColor,
               ),
               title: Text('Ticket ${ticket.id}'),
-              /*  subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  Text('Type: ${ticket.ticketType.toString().split('.').last}'),
-                  Text('Prix: ${ticket.ticketPrice} FCFA'),
-                  Text('Statut: ${ticket.ticketStatus.toString().split('.').last}'),
-                  if (ticket.ticketCreationDate != null)
-                     Text('Créé: ${_formatDate(ticket.ticketCreationDate!)}'),
-                  ],
-                 ), */
-              /*  trailing: Icon(
-                  ticket.isSelected
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                        color: ticket.isSelected ? kPrimaryColor : Colors.grey,
-              ), */
               onTap: () {
                 provider.toggleTicketSelectionForDebit(ticket.id!);
               },

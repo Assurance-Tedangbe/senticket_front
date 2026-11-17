@@ -596,9 +596,9 @@ class _HistoricBodyState extends State<HistoricBody> {
   Color _getTransactionColor(TransactionType type) {
     switch (type) {
       case TransactionType.purchase:
-        return blueOfImages;
+        return kPrimaryColor;
       case TransactionType.debit:
-        return cyanColor;
+        return blueOfImages;
       case TransactionType.transfer:
         return kPrimaryColor;
     }

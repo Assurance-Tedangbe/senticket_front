@@ -116,22 +116,6 @@ class TransactionHistoryDTO {
             '${transferCanceled == true ? ' (Annulé)' : ''}';
     }
   }
-
-  /* String getTransactionDetails() {
-    final summary = ticketSummary != null ? ' • $ticketSummary' : '';
-    final price = amount != null ? ' • ${amount!.toInt()} FCFA' : '';
-    switch (transactionType) {
-      case TransactionType.purchase:
-        return 'Par ${purchaserDTO?.username ?? 'Inconnu'}$summary$price';
-      case TransactionType.debit:
-        return 'Par ${porterDTO?.username ?? 'Inconnu'} sur '
-            '${studentDTO?.username ?? 'Inconnu'}$summary$price';
-      case TransactionType.transfer:
-        return 'De ${senderDTO?.username ?? 'Inconnu'} à '
-            '${recipientDTO?.username ?? 'Inconnu'}$summary'
-            '${transferCanceled == true ? ' (Annulé)' : ''}';
-    }
-  }*/
 }
 
 /// DTO de réponse paginée pour l'historique

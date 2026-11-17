@@ -197,7 +197,6 @@ class _DebitBodyState extends State<DebitBody> {
       children: [
 
         // ── Section 1 : Scan QR ──────────────────────────────────────
-        // Titre de section discret — remplace le paragraphe explicatif
         const Padding(
           padding: EdgeInsets.only(bottom: 12),
           child: Text(

@@ -42,8 +42,6 @@ class TicketProvider with ChangeNotifier {
   // State for Débit ──────────────────────────────────────────────────────
   List<Ticket> _studentTicketsForDebit = [];
   bool _isLoadingStudentTickets = false;
-  // TicketType? _selectedTicketTypeForDebit;
-  //List<int> _selectedTicketIdsForDebit = [];
 
   // State for Transfert ─────────────────────────────────────
   String? _numberOfTicketsError; // Stocke les erreurs liées au nombre de tickets à transférer
@@ -68,9 +66,7 @@ class TicketProvider with ChangeNotifier {
   // Getters for debit operation
   List<Ticket> get studentTicketsForDebit => _studentTicketsForDebit;
   bool get isLoadingStudentTickets => _isLoadingStudentTickets;
-  //TicketType? get selectedTicketTypeForDebit => _selectedTicketTypeForDebit;
-  //List<int> get selectedTicketIdsForDebit => _selectedTicketIdsForDebit;
-  /// Calculé depuis la liste : plus de second état à synchroniser
+  /// Calculé depuis la liste
   List<int> get selectedTicketIdsForDebit => _studentTicketsForDebit
       .where((t) => t.isSelected && t.id != null)
       .map((t) => t.id!)
@@ -171,16 +167,10 @@ class TicketProvider with ChangeNotifier {
         _ticketsTypeB = tickets;
       }
 
-      // ✅ Mettre aussi à jour studentTicketsForDebit (pour DebitPage)
-     // _studentTicketsForDebit = tickets;
-      // Réinitialiser les sélections quand on change de type
-     // _selectedTicketIdsForDebit = [];
       _error = '';
      // return true;
     } catch (e) {
       _error = e.toString();
-      /*_error = e.toString().replaceFirst('Exception: ', '');
-      print('[TicketProvider] getPurchasedTicketsByUser error: $e');*/
       //return false;
     } finally {
       _isLoading = false;
@@ -252,15 +242,11 @@ class TicketProvider with ChangeNotifier {
       final debited = request.ticketIds.toSet();
       _studentTicketsForDebit =
           _studentTicketsForDebit.where((t) => !debited.contains(t.id)).toList();
-      // Clear selection after successful debit
-      // _selectedTicketIdsForDebit.clear();
       _error = '';
       print("Compte de ${request.debitStudentDTO.username} débité avec succès");
       return true;
     } catch (e) {
       _error = e.toString();
-     /* _error = 'Erreur débit compte: ${e.toString()}';
-      print("Erreur debitAccount: $e");*/
       return false;
     } finally {
       _isDebitingAccount = false;
@@ -272,8 +258,6 @@ class TicketProvider with ChangeNotifier {
   // Reset debit state
   void resetDebitState() {
     _studentTicketsForDebit = [];
-    //_selectedTicketTypeForDebit = null;
-   // _selectedTicketIdsForDebit.clear();
     _error = '';
     notifyListeners();
   }
@@ -294,9 +278,7 @@ class TicketProvider with ChangeNotifier {
       print("Transfert réussi, transaction ID: ${history.id}");
       return history;
     } catch (e) {
-      _error = e.toString(); // message déjà lisible
-      /*_error = 'Erreur lors du transfert des tickets: ${e.toString()}';
-      print("Erreur transferTickets: $e");*/
+      _error = e.toString();
       return null;
     } finally {
       _isTransferringTickets = false;
@@ -316,8 +298,6 @@ class TicketProvider with ChangeNotifier {
       return await _service.getTransactionHistoryById(transactionId);
     } catch (e) {
       _error = e.toString();
-      /*_error = 'Erreur lors de la récupération: ${e.toString()}';
-      print("Erreur getTransactionHistoryById: $e");*/
       return null;
     } finally {
       _isLoading = false;
@@ -341,8 +321,6 @@ class TicketProvider with ChangeNotifier {
       return true;
     } catch (e) {
       _error = e.toString();
-      /*_error = 'Erreur lors de l\'annulation: ${e.toString()}';
-      print("Erreur cancelTransfer: $e");*/
       return false;
     } finally {
       _isCancelingTransfer = false;
@@ -380,8 +358,6 @@ class TicketProvider with ChangeNotifier {
       return true;
     } catch (e) {
       _error = e.toString();
-      /*_error = 'Erreur lors du chargement des statistiques: ${e.toString()}';
-      print("Erreur loadTicketStatistics: $e");*/
       return false;
     } finally {
       _isLoadingStatistics = false;

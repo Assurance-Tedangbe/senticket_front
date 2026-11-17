@@ -91,15 +91,7 @@ class _MyTicketsPageState extends State<MyTicketsPage>
                 _buildTicketList(ticketProvider.ticketsTypeA, user, TicketType.a),
                 _buildTicketList(ticketProvider.ticketsTypeB, user, TicketType.b),
               ],
-            ); /*TabBarView(
-            controller: _tabController,
-            children: [
-              _buildTicketList(ticketProvider.studentTicketsForDebit
-                  .where((t) => t.type == TicketType.a).toList(), user, TicketType.a),
-              _buildTicketList(ticketProvider.studentTicketsForDebit
-                  .where((t) => t.type == TicketType.b).toList(), user, TicketType.b),
-            ],
-          );*/
+            );
         },
       ),
     );

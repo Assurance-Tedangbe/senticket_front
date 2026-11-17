@@ -135,7 +135,7 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(backgroundColor: cyanColor),
+              style: TextButton.styleFrom(backgroundColor: kPrimaryColor),
               child: const Text(
                 'Quitter',
                 style: TextStyle(color: kThirdColor),
@@ -168,7 +168,7 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
                   messenger.showSnackBar(
                     const SnackBar(
                       content: Text('Transfert annulé avec succès'),
-                      backgroundColor: validateBtnColor,
+                      backgroundColor: blueOfImages,
                       duration: Duration(seconds: 5),
                     ),
                   );
@@ -241,7 +241,7 @@ class _PopupCancelTransferByIdState extends State<PopupCancelTransferById> {
           children: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(backgroundColor: cyanColor),
+              style: TextButton.styleFrom(backgroundColor: kPrimaryColor),
               child: const Text(
                 'Quitter',
                 style: TextStyle(color: kThirdColor),

@@ -130,7 +130,7 @@ class _UpdateUserBodyState extends State<UpdateUserBody> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Compte modifié avec succès !'),
-                            backgroundColor: validateBtnColor,
+                            backgroundColor: kPrimaryColor,
                           ),
                         );
                       },
